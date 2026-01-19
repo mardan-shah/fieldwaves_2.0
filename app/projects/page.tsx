@@ -44,29 +44,29 @@ export default function ProjectsPage() {
           }}
         />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-14 md:px-6 w-full">
           <SectionHeading label="Recent Work" title="DEPLOYMENTS" subtitle="Enterprise solutions in production" />
         </div>
       </section>
 
       {/* Projects Grid */}
       <section className="py-24 bg-[#141414]">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-14 md:px-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {loading ? (
               <p className="font-mono text-[#FF5F1F] animate-pulse">LOADING_DATA_STREAM...</p>
             ) : (
               projects.map((project) => (
                 <SkewContainer key={project._id} variant="ghost" className="h-full group" hoverEffect>
-                  <div className="flex flex-col h-full">
+                  <div className="flex flex-col h-full -skew-x-12">
                     {/* Image Area */}
-                    <div className="h-48 w-full bg-[#000] relative overflow-hidden border-b-2 border-[#333] group-hover:border-[#FF5F1F] transition-colors">
+                    <div className="h-48 w-full bg-black relative overflow-hidden border-b-2 border-[#333] group-hover:border-[#FF5F1F] transition-colors">
                       <img
                         src={project.screenshotUrl || "/placeholder.svg"}
                         alt={project.title}
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-110 group-hover:scale-100"
+                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-125 group-hover:scale-110 skew-x-12"
                       />
-                      <div className="absolute top-2 right-2">
+                      <div className="absolute top-2 right-2 skew-x-12">
                         <SkewContainer variant="primary" className="p-1 px-2">
                           <ArrowUpRight size={16} />
                         </SkewContainer>
@@ -74,15 +74,17 @@ export default function ProjectsPage() {
                     </div>
 
                     {/* Content */}
-                    <div className="p-6 flex flex-col flex-grow bg-[#1a1a1a]">
-                      <h3 className="font-display text-xl font-bold mb-2">{project.title}</h3>
-                      <p className="text-sm text-[#B0B0B0] mb-4 flex-grow">{project.description}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {project.techStack.map((tech) => (
-                          <span key={tech} className="text-xs font-mono text-[#B0B0B0] border border-[#333] px-2 py-1">
-                            {tech}
-                          </span>
-                        ))}
+                    <div className="p-6 flex flex-col grow bg-[#1a1a1a]">
+                      <div className="skew-x-12 h-full flex flex-col">
+                        <h3 className="font-display text-xl font-bold mb-2">{project.title}</h3>
+                        <p className="text-sm text-[#B0B0B0] mb-4 grow">{project.description}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {project.techStack.map((tech) => (
+                            <span key={tech} className="text-xs font-mono text-[#B0B0B0] border border-[#333] px-2 py-1">
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -95,7 +97,7 @@ export default function ProjectsPage() {
 
       {/* CTA */}
       <section className="py-24">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+        <div className="max-w-4xl mx-auto px-14 md:px-6 text-center">
           <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 uppercase">Impressed?</h2>
           <p className="text-lg text-[#B0B0B0] mb-8 max-w-2xl mx-auto">
             Let's talk about bringing your next vision to life.

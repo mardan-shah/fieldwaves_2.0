@@ -18,6 +18,7 @@ export interface ITeamMember extends Document {
   bio: string;
   socialLinks: Map<string, string>;
   avatarUrl: string;
+  backgroundColor: string;
   order: number;
   isOwner: boolean;
 }
@@ -28,6 +29,7 @@ const TeamMemberSchema = new Schema<ITeamMember>({
   bio: { type: String },
   socialLinks: { type: Map, of: String },
   avatarUrl: { type: String },
+  backgroundColor: { type: String, default: 'transparent' },
   order: { type: Number, default: 0 },
   isOwner: { type: Boolean, default: false },
 });

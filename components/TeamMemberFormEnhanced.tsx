@@ -6,10 +6,10 @@ import SkewContainer from "./ui/SkewContainer"
 import SocialIconPicker, { SOCIAL_PLATFORMS } from "./ui/SocialIconPicker"
 import FormInput from "./ui/FormInput"
 import FormTextarea from "./ui/FormTextarea"
-import { Plus, Loader2, Check, X } from "lucide-react"
+import { Plus, Loader2, Check, X, Upload } from "lucide-react"
 
 interface TeamMemberFormEnhancedProps {
-  onSubmit?: (data: any) => Promise<void>
+  onSubmit?: (data: FormData) => Promise<void>
   loading?: boolean
 }
 
@@ -31,8 +31,10 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
     name: "",
     role: "",
     bio: "",
-    avatarUrl: "",
+    backgroundColor: "#000000", // Default to black
   })
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   const [socials, setSocials] = useState<SocialLink[]>([])
   const [projects, setProjects] = useState<Project[]>([])
@@ -62,18 +64,40 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
     setProjects(projects.filter((p) => p.id !== id))
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setAvatarFile(file)
+      // Create preview URL
+      const url = URL.createObjectURL(file)
+      setPreviewUrl(url)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (onSubmit) {
-      const payload = {
-        ...formData,
-        socialLinks: socials,
-        projects,
+      const payload = new FormData()
+      payload.append("name", formData.name)
+      payload.append("role", formData.role)
+      payload.append("bio", formData.bio)
+      payload.append("backgroundColor", formData.backgroundColor)
+      if (avatarFile) {
+        payload.append("avatar", avatarFile)
       }
+      payload.append("socialLinks", JSON.stringify(socials))
+      // projects are currently not supported by backend schema for team members
+
       await onSubmit(payload)
       setSubmitted(true)
+      
+      // Cleanup preview URL
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+        
       // Reset form
-      setFormData({ name: "", role: "", bio: "", avatarUrl: "" })
+      setFormData({ name: "", role: "", bio: "", backgroundColor: "#000000" })
+      setAvatarFile(null)
+      setPreviewUrl(null)
       setSocials([])
       setProjects([])
       setActiveTab("basics")
@@ -82,7 +106,7 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 -skew-x-12">
       {/* Tabs */}
       <div className="flex gap-2 border-b border-[#333]">
         <button
@@ -144,20 +168,74 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
             rows={3}
           />
 
-          <FormInput
-            type="url"
-            value={formData.avatarUrl}
-            onChange={(e) => setFormData((prev) => ({ ...prev, avatarUrl: e.target.value }))}
-            label="AVATAR_URL"
-            placeholder="https://..."
-          />
+          <div className="grid md:grid-cols-2 gap-4">
+             {/* File Upload */}
+            <div className="group">
+              <label className="block font-mono text-xs text-[#B0B0B0] mb-2 tracking-widest">AVATAR_IMAGE</label>
+              <div className="relative transform border border-[#333] bg-[#0a0a0a] transition-colors group-hover:border-[#FF5F1F] p-1">
+                <div className="transform flex items-center gap-3 p-2">
+                    <label className="cursor-pointer bg-[#333] hover:bg-[#FF5F1F] text-white px-4 py-2 text-xs font-bold font-mono transition-colors flex items-center gap-2">
+                      <Upload size={14} />
+                      CHOOSE_FILE
+                      <input type="file" onChange={handleFileChange} className="hidden" accept="image/*" />
+                    </label>
+                    <span className="text-xs text-[#666] font-mono truncate max-w-[200px]">
+                      {avatarFile ? avatarFile.name : "NO_FILE_CHOSEN"}
+                    </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Background Color Control */}
+            <div className="group">
+              <label className="block font-mono text-xs text-[#B0B0B0] mb-2 tracking-widest">BG_COLOR (HEX)</label>
+              <div className="flex gap-2">
+                 <div className="flex-1 relative transform -skew-x-12 border border-[#333] bg-[#0a0a0a] transition-colors focus-within:border-[#FF5F1F]">
+                    <input 
+                      type="text"
+                      value={formData.backgroundColor}
+                      onChange={(e) => setFormData(prev => ({ ...prev, backgroundColor: e.target.value }))}
+                      className="w-full h-full bg-transparent text-white p-3 outline-none transform skew-x-12 placeholder:text-[#666] font-mono"
+                      placeholder="#000000"
+                    />
+                 </div>
+                 <input 
+                    type="color"
+                    value={formData.backgroundColor}
+                    onChange={(e) => setFormData(prev => ({ ...prev, backgroundColor: e.target.value }))}
+                    className="h-full w-12 bg-transparent cursor-pointer"
+                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Preview Area */}
+          {previewUrl && (
+             <div className="mt-4">
+                <p className="font-mono text-xs text-[#B0B0B0] mb-2 tracking-widest">PREVIEW</p>
+                <div className="flex gap-4">
+                  <div 
+                    className="w-24 h-24 border border-[#333] overflow-hidden"
+                    style={{ backgroundColor: formData.backgroundColor }}
+                  >
+                     <img src={previewUrl} className="w-full h-full object-cover" alt="Preview" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-[#666] font-mono">
+                      Check if the background color matches the image transparency properly.
+                    </p>
+                  </div>
+                </div>
+             </div>
+          )}
+
         </div>
       )}
 
       {/* Socials Tab */}
       {activeTab === "socials" && (
         <div className="space-y-4">
-          <div>
+          <div className="flex items-center justify-between">
             <label className="block font-mono text-xs text-[#B0B0B0] mb-4 tracking-widest">SELECT PLATFORM</label>
             <SocialIconPicker
               selected={newSocial.platform}
@@ -176,11 +254,13 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
           <button type="button" onClick={handleAddSocial} className="w-full group">
             <SkewContainer
               variant="secondary"
-              className="py-2 text-center flex items-center justify-center gap-2"
+              className="py-2 text-center flex items-center justify-center gap-2 skew-x-0"
               hoverEffect
             >
-              <Plus size={16} />
-              <span className="font-bold text-sm">ADD SOCIAL</span>
+              <div className="flex items-center justify-center gap-2">
+                <Plus size={16} />
+                <span className="font-bold text-sm">ADD SOCIAL</span>
+              </div>
             </SkewContainer>
           </button>
 
@@ -240,11 +320,13 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
           <button type="button" onClick={handleAddProject} className="w-full group">
             <SkewContainer
               variant="secondary"
-              className="py-2 text-center flex items-center justify-center gap-2"
+              className="py-2 text-center flex items-center justify-center skew-x-0 gap-2"
               hoverEffect
             >
-              <Plus size={16} />
-              <span className="font-bold text-sm">ADD PROJECT</span>
+              <div className="flex justify-center items-center gap-2">
+                <Plus size={16} />
+                <span className="font-bold text-sm">ADD PROJECT</span>
+              </div>
             </SkewContainer>
           </button>
 
@@ -274,10 +356,11 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
       <button type="submit" disabled={loading || submitted} className="w-full group">
         <SkewContainer
           variant="primary"
-          className="py-3 text-center flex items-center justify-center gap-2"
+          className="py-3 text-center flex items-center justify-center gap-2 skew-x-0"
           hoverEffect
         >
-          {submitted ? (
+          <div className="flex items-center justify-center gap-2">
+            {submitted ? (
             <>
               <Check size={18} />
               <span className="font-bold tracking-widest">MEMBER_ADDED</span>
@@ -293,6 +376,7 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
               <span className="font-bold tracking-widest">ADD_MEMBER</span>
             </>
           )}
+          </div>
         </SkewContainer>
       </button>
     </form>

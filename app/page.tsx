@@ -58,7 +58,7 @@ export default function Home() {
           }}
         />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-14 md:px-6 w-full">
           <div className="flex flex-col items-start gap-4">
             <SkewContainer variant="secondary" className="px-3 py-1 mb-4">
               <span className="font-mono text-xs font-bold tracking-widest">SYS_ONLINE // V.2.5.0</span>
@@ -73,12 +73,14 @@ export default function Home() {
               Coding
             </h1>
 
-            <div className="max-w-2xl bg-[#1a1a1a]/80 backdrop-blur-sm border-l-4 border-[#FF5F1F] pl-6 py-2">
-              <p className="text-xl md:text-2xl text-[#B0B0B0] font-light">
-                We use AI not to copy-paste, but to accelerate{" "}
-                <span className="text-white font-bold">senior-level security</span> and{" "}
-                <span className="text-white font-bold">O(n) performance</span>.
-              </p>
+            <div className="max-w-2xl bg-[#1a1a1a]/80 backdrop-blur-sm border-l-4 border-[#FF5F1F] pl-6 py-2 -skew-x-12">
+              <div className="skew-x-12">
+                <p className="text-xl md:text-2xl text-[#B0B0B0] font-light">
+                  We use AI not to copy-paste, but to accelerate{" "}
+                  <span className="text-white font-bold">senior-level security</span> and{" "}
+                  <span className="text-white font-bold">architectural rigor</span>.
+                </p>
+              </div>
             </div>
 
             <div className="mt-12 flex gap-6 flex-wrap">
@@ -93,7 +95,7 @@ export default function Home() {
 
       {/* --- STATS SECTION --- */}
       <section className="py-24 bg-[#141414]">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-14 md:px-6">
           <div className="grid md:grid-cols-4 gap-6">
             <StatCard label="Projects Delivered" value="150+" description="Enterprise-scale solutions" />
             <StatCard label="Uptime" value="99.99%" description="Average reliability" />
@@ -104,18 +106,18 @@ export default function Home() {
       </section>
 
       {/* --- CLIENT LOGOS --- */}
-      <section className="py-24">
+      {/* <section className="py-24">
         <div className="max-w-7xl mx-auto px-6">
           <p className="text-center font-mono text-xs text-[#B0B0B0] uppercase tracking-widest mb-12">
             Trusted by industry leaders
           </p>
           <ClientLogoGrid clients={clients} />
         </div>
-      </section>
+      </section> */}
 
       {/* --- FEATURED PROJECTS PREVIEW --- */}
       <section className="py-24 bg-[#141414]">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-14 md:px-6">
           <SectionHeading
             label="Recent Work"
             title="Featured Deployments"
@@ -129,16 +131,16 @@ export default function Home() {
               <p className="font-mono text-[#FF5F1F] animate-pulse">LOADING_DATA_STREAM...</p>
             ) : (
               projects.slice(0, 3).map((project) => (
-                <SkewContainer key={project._id} variant="ghost" className="h-full group" hoverEffect>
-                  <div className="flex flex-col h-full">
+                <SkewContainer key={project._id} variant="ghost" className="h-full group p-1" hoverEffect>
+                  <div className="flex flex-col h-full -skew-x-12">
                     {/* Image Area */}
                     <div className="h-48 w-full bg-[#000] relative overflow-hidden border-b-2 border-[#333] group-hover:border-[#FF5F1F] transition-colors">
                       <img
                         src={project.screenshotUrl || "/placeholder.svg"}
                         alt={project.title}
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-110 group-hover:scale-100"
+                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-125 group-hover:scale-110 skew-x-12"
                       />
-                      <div className="absolute top-2 right-2">
+                      <div className="absolute top-2 right-2 skew-x-12">
                         <SkewContainer variant="primary" className="p-1 px-2">
                           <ArrowUpRight size={16} />
                         </SkewContainer>
@@ -146,14 +148,16 @@ export default function Home() {
                     </div>
 
                     {/* Content */}
-                    <div className="p-6 flex flex-col flex-grow bg-[#1a1a1a]">
-                      <h3 className="font-display text-xl font-bold mb-2">{project.title}</h3>
-                      <div className="mt-auto flex flex-wrap gap-2">
-                        {project.techStack.map((tech) => (
-                          <span key={tech} className="text-xs font-mono text-[#B0B0B0] border border-[#333] px-1">
-                            {tech}
-                          </span>
-                        ))}
+                    <div className="p-6 flex flex-col grow bg-[#1a1a1a]">
+                      <div className="skew-x-12 h-full flex flex-col">
+                        <h3 className="font-display text-xl font-bold mb-2">{project.title}</h3>
+                        <div className="mt-auto flex flex-wrap gap-2">
+                          {project.techStack.map((tech) => (
+                            <span key={tech} className="text-xs font-mono text-[#B0B0B0] border border-[#333] px-1">
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -170,7 +174,7 @@ export default function Home() {
 
       {/* --- FEATURED TEAM MEMBERS PREVIEW --- */}
       <section className="py-24 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="max-w-7xl mx-auto px-14 md:px-6 relative z-10">
           <SectionHeading
             label="Our Team"
             title="Key Operatives"
@@ -186,54 +190,57 @@ export default function Home() {
               team.slice(0, 3).map((member) => (
                 <div key={member._id} className="relative group">
                   <SkewContainer variant="glass" className="h-full p-0">
-                    <div className="relative">
-                      <div className="aspect-[4/5] w-full bg-gray-800 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-500">
+                    <div className="relative h-full flex flex-col -skew-x-12">
+                      <div className="aspect-square md:aspect-4/5 w-full bg-gray-800 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-500 relative">
                         <img
                           src={member.avatarUrl || "/placeholder.svg"}
                           alt={member.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover skew-x-12 scale-125"
                         />
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-[#FF5F1F]/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                          <div className="flex gap-4 skew-x-12">
+                            {member.socialLinks.github && (
+                              <a
+                                href={member.socialLinks.github}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-white hover:scale-125 transition-transform"
+                              >
+                                <Github size={32} />
+                              </a>
+                            )}
+                            {member.socialLinks.linkedin && (
+                              <a
+                                href={member.socialLinks.linkedin}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-white hover:scale-125 transition-transform"
+                              >
+                                <Linkedin size={32} />
+                              </a>
+                            )}
+                            {member.socialLinks.twitter && (
+                              <a
+                                href={member.socialLinks.twitter}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-white hover:scale-125 transition-transform"
+                              >
+                                <Twitter size={32} />
+                              </a>
+                            )}
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-[#FF5F1F]/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                        {member.socialLinks.github && (
-                          <a
-                            href={member.socialLinks.github}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-white hover:scale-125 transition-transform"
-                          >
-                            <Github size={32} />
-                          </a>
-                        )}
-                        {member.socialLinks.linkedin && (
-                          <a
-                            href={member.socialLinks.linkedin}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-white hover:scale-125 transition-transform"
-                          >
-                            <Linkedin size={32} />
-                          </a>
-                        )}
-                        {member.socialLinks.twitter && (
-                          <a
-                            href={member.socialLinks.twitter}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-white hover:scale-125 transition-transform"
-                          >
-                            <Twitter size={32} />
-                          </a>
-                        )}
+                      <div className="p-6 border-t-2 border-[#333] group-hover:border-[#FF5F1F] bg-[#1a1a1a] grow">
+                        <div className="skew-x-12">
+                          <h3 className="font-display text-2xl font-bold uppercase">{member.name}</h3>
+                          <p className="font-mono text-[#FF5F1F] text-xs mb-4 tracking-widest">{member.role}</p>
+                          <p className="text-sm text-[#B0B0B0] line-clamp-2">{member.bio}</p>
+                        </div>
                       </div>
-                    </div>
-
-                    <div className="p-6 border-t-2 border-[#333] group-hover:border-[#FF5F1F] bg-[#1a1a1a]">
-                      <h3 className="font-display text-2xl font-bold uppercase">{member.name}</h3>
-                      <p className="font-mono text-[#FF5F1F] text-xs mb-4 tracking-widest">{member.role}</p>
-                      <p className="text-sm text-[#B0B0B0] line-clamp-2">{member.bio}</p>
                     </div>
                   </SkewContainer>
                 </div>
@@ -249,7 +256,7 @@ export default function Home() {
 
       {/* --- CTA SECTION --- */}
       <section className="py-24 bg-[#141414]">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+        <div className="max-w-4xl mx-auto px-14 md:px-6 text-center">
           <Lightbulb className="mx-auto text-[#FF5F1F] mb-8" size={48} />
           <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 uppercase">Ready to Transform?</h2>
           <p className="text-lg text-[#B0B0B0] mb-8 max-w-2xl mx-auto">

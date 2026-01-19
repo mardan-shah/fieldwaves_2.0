@@ -96,11 +96,11 @@ export default function CaseStudiesPage() {
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4 mb-8">
                   {caseStudy.results.map((result, idx) => (
-                    <div key={idx} className="bg-[#141414] border border-[#333] p-4">
+                    <SkewContainer key={idx} variant="glass" className="p-4">
                       <p className="font-mono text-xs text-[#FF5F1F] mb-2">{result.label}</p>
                       <p className="font-display text-2xl font-bold">{result.value}</p>
                       <p className="text-xs text-[#B0B0B0]">{result.unit}</p>
-                    </div>
+                    </SkewContainer>
                   ))}
                 </div>
 

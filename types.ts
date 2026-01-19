@@ -1,7 +1,9 @@
-export interface SocialLink {
-  platform: "twitter" | "github" | "linkedin" | "website" | "email"
-  url: string
-  icon?: string
+export interface SocialLinks {
+  twitter?: string
+  github?: string
+  linkedin?: string
+  website?: string
+  email?: string
 }
 
 export interface TeamProject {
@@ -17,7 +19,7 @@ export interface TeamMember {
   name: string
   role: string
   bio: string
-  socialLinks: SocialLink[]
+  socialLinks: SocialLinks
   projects?: TeamProject[]
   avatarUrl: string
   isOwner: boolean
@@ -27,7 +29,9 @@ export interface TeamMember {
 export interface Project {
   _id: string
   title: string
+  description?: string
   liveUrl: string
+
   screenshotUrl: string
   techStack: string[]
 }

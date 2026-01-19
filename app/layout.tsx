@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import ErrorBoundary from "../components/ErrorBoundary"
 import ScrollToTop from "../components/ScrollToTop"
+import { Toaster } from "sonner"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
@@ -35,6 +36,7 @@ export default function RootLayout({
           {children}
           <ScrollToTop />
           <Analytics />
+          <Toaster position="top-right" theme="dark" richColors />
         </ErrorBoundary>
       </body>
     </html>

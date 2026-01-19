@@ -71,7 +71,7 @@ export default function AboutPage() {
       <section className="py-24 bg-[#141414]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div>
+            <div className="-skew-x-12">
               <h2 className="font-display text-4xl font-bold mb-6">Our Story</h2>
               <p className="text-[#B0B0B0] mb-4 leading-relaxed">
                 Founded by engineers who were tired of compromising on quality, FieldWaves started with a simple
@@ -88,7 +88,7 @@ export default function AboutPage() {
             </div>
 
             <SkewContainer variant="glass" className="p-8">
-              <div className="space-y-6">
+              <div className="space-y-6 -skew-x-12">
                 <div className="border-l-4 border-[#FF5F1F] pl-6">
                   <h3 className="font-bold text-lg mb-2">Founded</h3>
                   <p className="text-[#B0B0B0]">2020 with a vision to revolutionize enterprise development</p>
@@ -126,13 +126,15 @@ export default function AboutPage() {
             {values.map((value, i) => {
               const Icon = value.icon
               return (
-                <SkewContainer key={i} variant="ghost" className="p-8 group" hoverEffect>
-                  <Icon className="text-[#FF5F1F] mb-6 group-hover:scale-110 transition-transform" size={40} />
+                <SkewContainer key={i} variant="ghost" className="p-8 group " hoverEffect>
+                  <div className="-skew-x-12">
+                    <Icon className="text-[#FF5F1F] mb-6 group-hover:scale-110 group-hover:text-white transition-transform" size={40} />
                   <h3 className="font-display text-xl font-bold mb-3">{value.title}</h3>
                   <p className="text-[#B0B0B0]">{value.description}</p>
+                  </div>
                 </SkewContainer>
               )
-            })}
+            })} 
           </div>
         </div>
       </section>

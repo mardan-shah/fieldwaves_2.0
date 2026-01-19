@@ -7,52 +7,105 @@ import SkewContainer from "../../components/ui/SkewContainer"
 import AdminHeader from "../../components/AdminHeader"
 import ProjectList from "../../components/ProjectList"
 import TeamMemberFormEnhanced from "../../components/TeamMemberFormEnhanced"
-import { toggleSoloMode, addProject, deleteProject } from "../actions/admin"
+import TeamList from "../../components/TeamList"
+import FormInput from "../../components/ui/FormInput"
+import { toggleSoloMode, addProject, deleteProject, addTeamMember, getAllTeamMembers, deleteTeamMember, checkAdminExists, createAdmin, verifyAdmin } from "../actions/admin"
 import { getSettings, getProjects } from "../actions/public"
 import type { GlobalSettings, Project } from "../../../types"
-import { Terminal, Save, Power, Eye, Loader2, ArrowLeft, Users, Boxes } from "lucide-react"
+import { Terminal, Save, Power, Eye, Loader2, ArrowLeft, Users, Boxes, Lock } from "lucide-react"
 
 export default function AdminPage() {
   const [authorized, setAuthorized] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [needsSetup, setNeedsSetup] = useState(false)
+  
+  // Auth State
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [authError, setAuthError] = useState("")
+  const [isAuthSubmitting, setIsAuthSubmitting] = useState(false)
 
+  // Dashboard State
   const [settings, setSettings] = useState<GlobalSettings | null>(null)
   const [projects, setProjects] = useState<Project[]>([])
+  const [team, setTeam] = useState<any[]>([])
   const [newProjectTitle, setNewProjectTitle] = useState("")
   const [newProjectUrl, setNewProjectUrl] = useState("")
+  const [newProjectTechStack, setNewProjectTechStack] = useState("")
+  
+  const [activeView, setActiveView] = useState<"PROJECTS" | "TEAM">("PROJECTS")
   const [submitting, setSubmitting] = useState(false)
   const [successMsg, setSuccessMsg] = useState("")
 
   // Initial Load
   useEffect(() => {
-    if (sessionStorage.getItem("fw_admin_auth") === "true") {
-      setAuthorized(true)
-      loadData()
+    const init = async () => {
+      // Check session
+      if (sessionStorage.getItem("fw_admin_auth") === "true") {
+        setAuthorized(true)
+        loadData()
+      } else {
+        // Check if setup is needed
+        const status = await checkAdminExists()
+        setNeedsSetup(!status.exists)
+      }
+      setLoading(false)
     }
+    init()
   }, [])
 
   const loadData = async () => {
-    const [s, p] = await Promise.all([getSettings(), getProjects()])
+    const [s, p, t] = await Promise.all([
+      getSettings(), 
+      getProjects(),
+      getAllTeamMembers()
+    ])
     // @ts-ignore
     setSettings(s)
     // @ts-ignore
     setProjects(p)
+    setTeam(t)
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password === "admin") {
-      setAuthorized(true)
-      sessionStorage.setItem("fw_admin_auth", "true")
-      loadData()
-    } else {
-      alert("ACCESS_DENIED")
+    setAuthError("")
+    setIsAuthSubmitting(true)
+
+    const formData = new FormData()
+    formData.append("email", email)
+    formData.append("password", password)
+
+    try {
+      if (needsSetup) {
+        // Create Admin
+        const result = await createAdmin(formData)
+        if (result.error) throw new Error(result.error)
+        
+        // Auto login
+        setAuthorized(true)
+        sessionStorage.setItem("fw_admin_auth", "true")
+        loadData()
+      } else {
+        // Login
+        const result = await verifyAdmin(formData)
+        if (result.error) throw new Error(result.error)
+
+        setAuthorized(true)
+        sessionStorage.setItem("fw_admin_auth", "true")
+        loadData()
+      }
+    } catch (err: any) {
+      setAuthError(err.message || "Authentication failed")
+    } finally {
+      setIsAuthSubmitting(false)
     }
   }
 
   const handleLogout = () => {
     setAuthorized(false)
     sessionStorage.removeItem("fw_admin_auth")
+    setEmail("")
     setPassword("")
   }
 
@@ -78,6 +131,7 @@ export default function AdminPage() {
       const formData = new FormData()
       formData.append("title", newProjectTitle)
       formData.append("url", newProjectUrl)
+      formData.append("techStack", newProjectTechStack)
 
       const result = await addProject(formData)
       if (result.error) {
@@ -90,6 +144,7 @@ export default function AdminPage() {
       setSuccessMsg(`PROJECT "${newProjectTitle}" DEPLOYED SUCCESSFULLY`)
       setNewProjectTitle("")
       setNewProjectUrl("")
+      setNewProjectTechStack("")
       setTimeout(() => setSuccessMsg(""), 3000)
     } catch (err) {
       console.error(err)
@@ -120,29 +175,94 @@ export default function AdminPage() {
     }
   }
 
+  const handleAddTeamMember = async (formData: FormData) => {
+    setSubmitting(true)
+    try {
+      const result = await addTeamMember(formData)
+      if (result.error) throw new Error(result.error)
+      
+      const updated = await getAllTeamMembers()
+      setTeam(updated)
+      setSuccessMsg("TEAM_MEMBER_ADDED")
+      setTimeout(() => setSuccessMsg(""), 3000)
+    } catch (err) {
+      console.error(err)
+      alert("Failed to add team member")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleDeleteTeamMember = async (id: string) => {
+    if (confirm("DELETE_MEMBER?")) {
+      const oldTeam = team
+      setTeam(team.filter(m => m._id !== id))
+
+      try {
+        await deleteTeamMember(id)
+        setSuccessMsg("MEMBER_DELETED")
+        const updated = await getAllTeamMembers()
+        setTeam(updated)
+        setTimeout(() => setSuccessMsg(""), 2000)
+      } catch (err) {
+        console.error(err)
+        setTeam(oldTeam)
+        alert("Failed to delete member")
+      }
+    }
+  }
+
+  if (loading) {
+    return <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center p-4 text-[#B0B0B0] font-mono">INITIALIZING...</div>
+  }
+
   if (!authorized) {
     return (
       <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center p-4">
         <SkewContainer variant="outline" className="w-full max-w-md p-10 bg-[#141414]">
-          <div className="mb-8 text-center">
+          <div className="mb-8 text-center ">
             <Terminal size={48} className="mx-auto text-[#FF5F1F] mb-4" />
-            <h1 className="font-display text-3xl font-bold">SECURE_GATE</h1>
-            <p className="font-mono text-xs text-[#B0B0B0]">RESTRICTED ACCESS ONLY</p>
+            <h1 className="font-display text-3xl font-bold">
+              {needsSetup ? "SYSTEM_INIT" : "SECURE_GATE"}
+            </h1>
+            <p className="font-mono text-xs text-[#B0B0B0]">
+              {needsSetup ? "CREATE ROOT CREDENTIALS" : "RESTRICTED ACCESS ONLY"}
+            </p>
           </div>
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block font-mono text-xs text-[#FF5F1F] mb-2">ACCESS_KEY</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#0a0a0a] border-2 border-[#333] text-white p-3 focus:border-[#FF5F1F] outline-none font-mono"
-                placeholder="Hint: admin"
-              />
-            </div>
-            <button type="submit" className="w-full group">
-              <SkewContainer variant="primary" className="py-3 text-center" hoverEffect>
-                <span className="font-bold tracking-widest">AUTHENTICATE</span>
+          
+          <form onSubmit={handleAuth} className="space-y-6 -skew-x-12">
+            <FormInput
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              label="ADMIN_EMAIL"
+              placeholder="admin@fieldwaves.io"
+              required
+            />
+            
+            <FormInput
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              label={needsSetup ? "SET_PASSWORD" : "PASSWORD"}
+              placeholder="••••••••"
+              required
+            />
+
+            {authError && (
+              <div className="p-3 bg-red-900/20 border border-red-500 text-red-500 text-xs font-mono">
+                ERROR: {authError}
+              </div>
+            )}
+
+            <button type="submit" disabled={isAuthSubmitting} className="w-full group">
+              <SkewContainer variant="primary" className="py-3 text-center flex items-center justify-center gap-2 skew-x-0" hoverEffect>
+                <div className="flex items-center justify-center gap-2">
+                  {isAuthSubmitting ? <Loader2 className="animate-spin" size={16} /> : <Lock size={16} />}
+                  <span className="font-bold tracking-widest">
+                    {needsSetup ? "INITIALIZE_SYSTEM" : "AUTHENTICATE"}
+                  </span>
+                </div>
               </SkewContainer>
             </button>
           </form>
@@ -171,6 +291,30 @@ export default function AdminPage() {
             {successMsg}
           </div>
         )}
+
+        {/* View Tabs */}
+        <div className="flex gap-4 mb-8 border-b border-[#333]">
+          <button
+            onClick={() => setActiveView("PROJECTS")}
+            className={`px-6 py-3 font-mono font-bold tracking-wider transition-all border-b-2 ${
+              activeView === "PROJECTS"
+                ? "border-[#FF5F1F] text-[#FF5F1F]"
+                : "border-transparent text-[#666] hover:text-white"
+            }`}
+          >
+            PROJECTS
+          </button>
+          <button
+            onClick={() => setActiveView("TEAM")}
+            className={`px-6 py-3 font-mono font-bold tracking-wider transition-all border-b-2 ${
+              activeView === "TEAM"
+                ? "border-[#FF5F1F] text-[#FF5F1F]"
+                : "border-transparent text-[#666] hover:text-white"
+            }`}
+          >
+            TEAM
+          </button>
+        </div>
 
         {/* Main Grid */}
         <div className="grid lg:grid-cols-3 gap-8">
@@ -228,77 +372,98 @@ export default function AdminPage() {
             </section>
           </div>
 
-          {/* Main Content - Projects */}
+          {/* Main Content Area */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Deploy Project Section */}
-            <section>
-              <div className="flex items-center gap-3 mb-6">
-                <Boxes className="text-[#FF5F1F]" />
-                <h2 className="font-mono font-bold text-lg tracking-wider">DEPLOY_PROJECT</h2>
-              </div>
-
-              <SkewContainer variant="outline" className="p-8 bg-[#141414]">
-                <form onSubmit={handleAddProject} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block font-mono text-xs text-[#B0B0B0] mb-2">PROJECT_TITLE</label>
-                      <input
-                        type="text"
-                        value={newProjectTitle}
-                        onChange={(e) => setNewProjectTitle(e.target.value)}
-                        className="w-full bg-[#0a0a0a] border border-[#333] text-white p-3 focus:border-[#FF5F1F] outline-none"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-mono text-xs text-[#B0B0B0] mb-2">LIVE_URL</label>
-                      <input
-                        type="url"
-                        value={newProjectUrl}
-                        onChange={(e) => setNewProjectUrl(e.target.value)}
-                        className="w-full bg-[#0a0a0a] border border-[#333] text-white p-3 focus:border-[#FF5F1F] outline-none"
-                        placeholder="https://..."
-                        required
-                      />
-                    </div>
+            
+            {/* PROJECTS VIEW */}
+            {activeView === "PROJECTS" && (
+              <>
+                <section>
+                  <div className="flex items-center gap-3 mb-6">
+                    <Boxes className="text-[#FF5F1F]" />
+                    <h2 className="font-mono font-bold text-lg tracking-wider">DEPLOY_PROJECT</h2>
                   </div>
 
-                  <button type="submit" disabled={submitting} className="w-full group">
-                    <SkewContainer
-                      variant="primary"
-                      className="py-3 text-center flex items-center justify-center gap-2"
-                      hoverEffect
-                    >
-                      {submitting ? <Loader2 className="animate-spin" /> : <Save size={18} />}
-                      <span className="font-bold tracking-widest">COMMIT_TO_DB</span>
-                    </SkewContainer>
-                  </button>
-                </form>
-              </SkewContainer>
-            </section>
+                  <SkewContainer variant="outline" className="p-8 bg-[#141414]">
+                    <form onSubmit={handleAddProject} className="space-y-6 -skew-x-12">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <FormInput
+                          type="text"
+                          value={newProjectTitle}
+                          onChange={(e) => setNewProjectTitle(e.target.value)}
+                          label="PROJECT_TITLE"
+                          required
+                        />
+                        <FormInput
+                          type="url"
+                          value={newProjectUrl}
+                          onChange={(e) => setNewProjectUrl(e.target.value)}
+                          label="LIVE_URL"
+                          placeholder="https://..."
+                          required
+                        />
+                      </div>
+                      
+                      <FormInput
+                        type="text"
+                        value={newProjectTechStack}
+                        onChange={(e) => setNewProjectTechStack(e.target.value)}
+                        label="TECH_STACK"
+                        placeholder="Next.js, React, Tailwind (comma separated)"
+                      />
 
-            {/* Projects List */}
-            <section>
-              <div className="flex items-center gap-3 mb-6">
-                <Eye className="text-[#FF5F1F]" />
-                <h2 className="font-mono font-bold text-lg tracking-wider">ACTIVE_DEPLOYMENTS</h2>
-              </div>
+                      <button type="submit" disabled={submitting} className="w-full group">
+                        <SkewContainer
+                          variant="primary"
+                          className="py-3 text-center flex items-center skew-x-0 justify-center gap-2"
+                          hoverEffect
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            {submitting ? <Loader2 className="animate-spin" /> : <Save size={18} />}
+                            <span className="font-bold tracking-widest">COMMIT_TO_DB</span>
+                          </div>
+                        </SkewContainer>
+                      </button>
+                    </form>
+                  </SkewContainer>
+                </section>
 
-              <ProjectList projects={projects} onDelete={handleDeleteProject} />
-            </section>
+                <section>
+                  <div className="flex items-center gap-3 mb-6">
+                    <Eye className="text-[#FF5F1F]" />
+                    <h2 className="font-mono font-bold text-lg tracking-wider">ACTIVE_DEPLOYMENTS</h2>
+                  </div>
 
-            {/* Team Management */}
-            <section>
-              <div className="flex items-center gap-3 mb-6">
-                <Users className="text-[#FF5F1F]" />
-                <h2 className="font-mono font-bold text-lg tracking-wider">ADD_TEAM_MEMBER</h2>
-              </div>
+                  <ProjectList projects={projects} onDelete={handleDeleteProject} />
+                </section>
+              </>
+            )}
 
-              <SkewContainer variant="outline" className="p-8 bg-[#141414]">
-                <TeamMemberFormEnhanced loading={submitting} />
-              </SkewContainer>
-            </section>
+            {/* TEAM VIEW */}
+            {activeView === "TEAM" && (
+              <>
+                <section>
+                  <div className="flex items-center gap-3 mb-6">
+                    <Eye className="text-[#FF5F1F]" />
+                    <h2 className="font-mono font-bold text-lg tracking-wider">ACTIVE_PERSONNEL</h2>
+                  </div>
+
+                  <TeamList team={team} onDelete={handleDeleteTeamMember} />
+                </section>
+
+                <section>
+                  <div className="flex items-center gap-3 mb-6">
+                    <Users className="text-[#FF5F1F]" />
+                    <h2 className="font-mono font-bold text-lg tracking-wider">ADD_TEAM_MEMBER</h2>
+                  </div>
+
+                  <SkewContainer variant="outline" className="p-8 bg-[#141414]">
+                    <TeamMemberFormEnhanced onSubmit={handleAddTeamMember} loading={submitting} />
+                  </SkewContainer>
+                </section>
+              </>
+            )}
+
           </div>
         </div>
       </div>

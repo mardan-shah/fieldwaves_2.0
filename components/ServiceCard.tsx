@@ -12,7 +12,7 @@ interface ServiceCardProps {
 const ServiceCard: React.FC<ServiceCardProps> = ({ icon: Icon, title, description, features }) => {
   return (
     <SkewContainer variant="glass" className="p-8 h-full group hover:bg-[#1a1a1a]/60 transition-all">
-      <div className="space-y-6">
+      <div className="space-y-6 -skew-x-12">
         <Icon className="text-[#FF5F1F] group-hover:scale-110 transition-transform" size={32} strokeWidth={2} />
         <div>
           <h3 className="font-display text-2xl font-bold mb-3 uppercase">{title}</h3>

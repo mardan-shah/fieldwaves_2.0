@@ -9,6 +9,8 @@ import SkewContainer from "../../components/ui/SkewContainer"
 import FormInput from "../../components/ui/FormInput"
 import FormTextarea from "../../components/ui/FormTextarea"
 import { Mail, Phone, MapPin, Loader2, Check } from "lucide-react"
+import { submitContactForm } from "../actions/public"
+import { toast } from "sonner"
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false)
@@ -20,20 +22,30 @@ export default function ContactPage() {
     message: "",
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const data = new FormData(e.currentTarget)
+      const result = await submitContactForm(data)
 
-    setSubmitted(true)
-    setLoading(false)
-
-    setTimeout(() => {
-      setSubmitted(false)
-      setFormData({ name: "", email: "", company: "", message: "" })
-    }, 3000)
+      if (result.error) {
+        toast.error(result.error)
+      } else {
+        setSubmitted(true)
+        setFormData({ name: "", email: "", company: "", message: "" })
+        toast.success("Message sent successfully!")
+        
+        setTimeout(() => {
+          setSubmitted(false)
+        }, 3000)
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -93,7 +105,7 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div className="grid md:grid-cols-2 gap-16">
-            <div>
+            <div className="-skew-x-12">
               <h2 className="font-display text-3xl font-bold mb-6">Get In Touch</h2>
               <p className="text-[#B0B0B0] mb-8 leading-relaxed">
                 Whether you're looking to scale your infrastructure, improve security, or launch a new project, our team
@@ -102,7 +114,7 @@ export default function ContactPage() {
             </div>
 
             <SkewContainer variant="outline" className="p-8 bg-[#141414]">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6 -skew-x-12">
                 <FormInput
                   type="text"
                   name="name"
@@ -145,10 +157,11 @@ export default function ContactPage() {
                 <button type="submit" disabled={loading || submitted} className="w-full group">
                   <SkewContainer
                     variant="primary"
-                    className="py-3 text-center flex items-center justify-center gap-2"
+                    className="py-3 text-center flex items-center justify-center gap-2 skew-x-0"
                     hoverEffect
                   >
-                    {submitted ? (
+                    <div className="flex items-center justify-center gap-2">
+                      {submitted ? (
                       <>
                         <Check size={18} />
                         <span className="font-bold tracking-widest">MESSAGE SENT</span>
@@ -161,6 +174,7 @@ export default function ContactPage() {
                     ) : (
                       <span className="font-bold tracking-widest">SEND MESSAGE</span>
                     )}
+                    </div>
                   </SkewContainer>
                 </button>
               </form>

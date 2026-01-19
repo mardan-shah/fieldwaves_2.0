@@ -34,22 +34,22 @@ export default function PhilosophyPage() {
             <div className="opacity-60 hover:opacity-100 transition-opacity">
               <h3 className="font-mono text-[#B0B0B0] mb-6 text-xl">// OTHERS.EXE</h3>
               <div className="space-y-4">
-                <div className="border border-red-900/50 bg-red-900/10 p-6">
+                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6">
                   <h4 className="font-bold text-red-500 mb-2">SPAGHETTI CODE</h4>
                   <p className="text-sm text-gray-500">Unmaintainable AI-generated slop that breaks in production.</p>
-                </div>
-                <div className="border border-red-900/50 bg-red-900/10 p-6">
+                </SkewContainer>
+                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6">
                   <h4 className="font-bold text-red-500 mb-2">SECURITY HOLES</h4>
                   <p className="text-sm text-gray-500">Exposed ENV variables and weak auth patterns.</p>
-                </div>
-                <div className="border border-red-900/50 bg-red-900/10 p-6">
+                </SkewContainer>
+                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6">
                   <h4 className="font-bold text-red-500 mb-2">UNSCALABLE DESIGN</h4>
                   <p className="text-sm text-gray-500">Monoliths that crumble under real-world load.</p>
-                </div>
-                <div className="border border-red-900/50 bg-red-900/10 p-6">
+                </SkewContainer>
+                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6">
                   <h4 className="font-bold text-red-500 mb-2">TECHNICAL DEBT</h4>
                   <p className="text-sm text-gray-500">Shortcuts that compound costs over time.</p>
-                </div>
+                </SkewContainer>
               </div>
             </div>
 
