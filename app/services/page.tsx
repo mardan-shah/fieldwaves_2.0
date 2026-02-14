@@ -2,7 +2,7 @@ import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import SectionHeading from "../../components/ui/SectionHeading"
 import ServiceCard from "../../components/ServiceCard"
-import Button from "../../components/ui/Button"
+import Button from "../../components/ui/SkewButton"
 import SkewContainer from "../../components/ui/SkewContainer"
 import { Cpu, Lock, Zap, Code, BarChart3, Wrench } from "lucide-react"
 

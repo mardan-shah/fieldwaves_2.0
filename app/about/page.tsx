@@ -4,7 +4,7 @@ import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import SectionHeading from "../../components/ui/SectionHeading"
 import SkewContainer from "../../components/ui/SkewContainer"
-import Button from "../../components/ui/Button"
+import Button from "../../components/ui/SkewButton"
 import { Code2, Users, Zap, Shield, TrendingUp, Award } from "lucide-react"
 
 export default function AboutPage() {

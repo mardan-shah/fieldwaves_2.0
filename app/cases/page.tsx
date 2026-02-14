@@ -1,7 +1,7 @@
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import SectionHeading from "../../components/ui/SectionHeading"
-import Button from "../../components/ui/Button"
+import Button from "../../components/ui/SkewButton"
 import SkewContainer from "../../components/ui/SkewContainer"
 
 export default function CaseStudiesPage() {

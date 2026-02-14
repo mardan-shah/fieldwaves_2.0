@@ -1,7 +1,7 @@
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import SectionHeading from "../../components/ui/SectionHeading"
-import Button from "../../components/ui/Button"
+import Button from "../../components/ui/SkewButton"
 import SkewContainer from "../../components/ui/SkewContainer"
 import { GitBranch, Lock, Zap, Lightbulb, Code2, Award } from "lucide-react"
 
@@ -116,7 +116,7 @@ export default function PhilosophyPage() {
           />
 
           <div className="grid md:grid-cols-3 gap-8">
-            <SkewContainer variant="ghost" className="p-8 group" hoverEffect>
+            <SkewContainer noUnskew variant="ghost" className="p-8 group sj" hoverEffect>
               <Code2 className="text-[#FF5F1F] mb-6 group-hover:scale-110 transition-transform" size={40} />
               <h3 className="font-display text-xl font-bold mb-3">Clean Architecture</h3>
               <p className="text-[#B0B0B0]">
@@ -124,7 +124,7 @@ export default function PhilosophyPage() {
               </p>
             </SkewContainer>
 
-            <SkewContainer variant="ghost" className="p-8 group" hoverEffect>
+            <SkewContainer noUnskew variant="ghost" className="p-8 group" hoverEffect>
               <Lock className="text-[#FF5F1F] mb-6 group-hover:scale-110 transition-transform" size={40} />
               <h3 className="font-display text-xl font-bold mb-3">Security First</h3>
               <p className="text-[#B0B0B0]">
@@ -132,7 +132,7 @@ export default function PhilosophyPage() {
               </p>
             </SkewContainer>
 
-            <SkewContainer variant="ghost" className="p-8 group" hoverEffect>
+            <SkewContainer noUnskew variant="ghost" className="p-8 group" hoverEffect>
               <Award className="text-[#FF5F1F] mb-6 group-hover:scale-110 transition-transform" size={40} />
               <h3 className="font-display text-xl font-bold mb-3">Long-term Support</h3>
               <p className="text-[#B0B0B0]">We're invested in your success. Our team stands behind every deployment.</p>

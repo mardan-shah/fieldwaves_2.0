@@ -6,22 +6,14 @@ export interface SocialLinks {
   email?: string
 }
 
-export interface TeamProject {
-  id: string
-  title: string
-  description: string
-  url?: string
-  techStack?: string[]
-}
-
 export interface TeamMember {
   _id: string
   name: string
   role: string
   bio: string
   socialLinks: SocialLinks
-  projects?: TeamProject[]
   avatarUrl: string
+  backgroundColor: string
   isOwner: boolean
   order: number
 }
@@ -29,11 +21,11 @@ export interface TeamMember {
 export interface Project {
   _id: string
   title: string
-  description?: string
+  description: string
   liveUrl: string
-
   screenshotUrl: string
   techStack: string[]
+  order: number
 }
 
 export interface GlobalSettings {

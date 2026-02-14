@@ -1,46 +1,16 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import SkewContainer from "../components/ui/SkewContainer"
 import Navbar from "../components/Navbar"
 import Footer from "../components/Footer"
-import Button from "../components/ui/Button"
+import Button from "../components/ui/SkewButton"
 import StatCard from "../components/ui/StatCard"
 import SectionHeading from "../components/ui/SectionHeading"
-import ClientLogoGrid from "../components/ClientLogoGrid"
+import ProjectGrid from "../components/ProjectGrid"
+import TeamGrid from "../components/TeamGrid"
 import { getProjects, getTeam } from "./actions/public"
-import type { Project, TeamMember } from "../../types"
-import { Github, Linkedin, Twitter, ArrowUpRight, Lightbulb } from "lucide-react"
+import { Lightbulb } from "lucide-react"
 
-export default function Home() {
-  const [projects, setProjects] = useState<Project[]>([])
-  const [team, setTeam] = useState<TeamMember[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [projData, teamData] = await Promise.all([getProjects(), getTeam()])
-        // @ts-ignore
-        setProjects(projData)
-        // @ts-ignore
-        setTeam(teamData)
-      } catch (error) {
-        console.error("Failed to fetch data", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
-
-  const clients = [
-    { name: "Netflix", logo: "https://picsum.photos/seed/logo1/100/100" },
-    { name: "Stripe", logo: "https://picsum.photos/seed/logo2/100/100" },
-    { name: "Figma", logo: "https://picsum.photos/seed/logo3/100/100" },
-    { name: "Notion", logo: "https://picsum.photos/seed/logo4/100/100" },
-    { name: "Vercel", logo: "https://picsum.photos/seed/logo5/100/100" },
-  ]
+export default async function Home() {
+  const [projects, team] = await Promise.all([getProjects(), getTeam()])
 
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white overflow-x-hidden selection:bg-[#FF5F1F] selection:text-white pb-20">
@@ -48,7 +18,6 @@ export default function Home() {
 
       {/* --- HERO SECTION --- */}
       <section className="relative min-h-screen flex items-center justify-center pt-20">
-        {/* Background Grid Lines */}
         <div
           className="absolute inset-0 z-0 opacity-10 pointer-events-none"
           style={{
@@ -97,23 +66,21 @@ export default function Home() {
       <section className="py-24 bg-[#141414]">
         <div className="max-w-7xl mx-auto px-14 md:px-6">
           <div className="grid md:grid-cols-4 gap-6">
-            <StatCard label="Projects Delivered" value="150+" description="Enterprise-scale solutions" />
+            <StatCard
+              label="Projects Delivered"
+              value={`${projects.length}+`}
+              description="Enterprise-scale solutions"
+            />
             <StatCard label="Uptime" value="99.99%" description="Average reliability" />
             <StatCard label="Performance" value="89%" description="Average improvement" />
-            <StatCard label="Team Members" value="25+" description="Senior engineers" />
+            <StatCard
+              label="Team Members"
+              value={`${team.length}+`}
+              description="Senior engineers"
+            />
           </div>
         </div>
       </section>
-
-      {/* --- CLIENT LOGOS --- */}
-      {/* <section className="py-24">
-        <div className="max-w-7xl mx-auto px-6">
-          <p className="text-center font-mono text-xs text-[#B0B0B0] uppercase tracking-widest mb-12">
-            Trusted by industry leaders
-          </p>
-          <ClientLogoGrid clients={clients} />
-        </div>
-      </section> */}
 
       {/* --- FEATURED PROJECTS PREVIEW --- */}
       <section className="py-24 bg-[#141414]">
@@ -126,44 +93,8 @@ export default function Home() {
             className="mb-16"
           />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {loading ? (
-              <p className="font-mono text-[#FF5F1F] animate-pulse">LOADING_DATA_STREAM...</p>
-            ) : (
-              projects.slice(0, 3).map((project) => (
-                <SkewContainer key={project._id} variant="ghost" className="h-full group p-1" hoverEffect>
-                  <div className="flex flex-col h-full -skew-x-12">
-                    {/* Image Area */}
-                    <div className="h-48 w-full bg-[#000] relative overflow-hidden border-b-2 border-[#333] group-hover:border-[#FF5F1F] transition-colors">
-                      <img
-                        src={project.screenshotUrl || "/placeholder.svg"}
-                        alt={project.title}
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-125 group-hover:scale-110 skew-x-12"
-                      />
-                      <div className="absolute top-2 right-2 skew-x-12">
-                        <SkewContainer variant="primary" className="p-1 px-2">
-                          <ArrowUpRight size={16} />
-                        </SkewContainer>
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6 flex flex-col grow bg-[#1a1a1a]">
-                      <div className="skew-x-12 h-full flex flex-col">
-                        <h3 className="font-display text-xl font-bold mb-2">{project.title}</h3>
-                        <div className="mt-auto flex flex-wrap gap-2">
-                          {project.techStack.map((tech) => (
-                            <span key={tech} className="text-xs font-mono text-[#B0B0B0] border border-[#333] px-1">
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </SkewContainer>
-              ))
-            )}
+          <div className="mb-12">
+            <ProjectGrid projects={projects.slice(0, 3)} />
           </div>
 
           <div className="text-center">
@@ -183,69 +114,8 @@ export default function Home() {
             className="mb-16"
           />
 
-          <div className="grid md:grid-cols-3 gap-12 mb-12">
-            {loading ? (
-              <p>Loading...</p>
-            ) : (
-              team.slice(0, 3).map((member) => (
-                <div key={member._id} className="relative group">
-                  <SkewContainer variant="glass" className="h-full p-0">
-                    <div className="relative h-full flex flex-col -skew-x-12">
-                      <div className="aspect-square md:aspect-4/5 w-full bg-gray-800 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-500 relative">
-                        <img
-                          src={member.avatarUrl || "/placeholder.svg"}
-                          alt={member.name}
-                          className="w-full h-full object-cover skew-x-12 scale-125"
-                        />
-                        {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-[#FF5F1F]/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <div className="flex gap-4 skew-x-12">
-                            {member.socialLinks.github && (
-                              <a
-                                href={member.socialLinks.github}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-white hover:scale-125 transition-transform"
-                              >
-                                <Github size={32} />
-                              </a>
-                            )}
-                            {member.socialLinks.linkedin && (
-                              <a
-                                href={member.socialLinks.linkedin}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-white hover:scale-125 transition-transform"
-                              >
-                                <Linkedin size={32} />
-                              </a>
-                            )}
-                            {member.socialLinks.twitter && (
-                              <a
-                                href={member.socialLinks.twitter}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-white hover:scale-125 transition-transform"
-                              >
-                                <Twitter size={32} />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-6 border-t-2 border-[#333] group-hover:border-[#FF5F1F] bg-[#1a1a1a] grow">
-                        <div className="skew-x-12">
-                          <h3 className="font-display text-2xl font-bold uppercase">{member.name}</h3>
-                          <p className="font-mono text-[#FF5F1F] text-xs mb-4 tracking-widest">{member.role}</p>
-                          <p className="text-sm text-[#B0B0B0] line-clamp-2">{member.bio}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </SkewContainer>
-                </div>
-              ))
-            )}
+          <div className="mb-12">
+            <TeamGrid team={team.slice(0, 3)} />
           </div>
 
           <div className="text-center">

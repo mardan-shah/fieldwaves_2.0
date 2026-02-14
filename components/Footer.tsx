@@ -61,7 +61,7 @@ const Footer = () => {
           {/* Social */}
           <div>
             <h3 className="font-mono text-xs text-[#FF5F1F] tracking-widest font-bold mb-4">CONNECT</h3>
-            <div className="flex gap-3">
+            <div className="flex gap-3 -skew-x-12">
               <a
                 href="#"
                 className="p-2 border border-[#333] hover:border-[#FF5F1F] hover:text-[#FF5F1F] transition-colors"

@@ -6,6 +6,7 @@ import { Resend } from 'resend';
 import { z } from 'zod';
 
 import nodemailer from 'nodemailer';
+import { buildClientConfirmationEmail, buildAdminNotificationEmail } from '@/lib/email-templates';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -70,13 +71,43 @@ const INITIAL_PROJECTS = [
 ];
 
 const ContactSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  company: z.string().optional(),
-  message: z.string().min(10),
+  name: z.string().min(2).max(100, 'Name too long').regex(/^[^\r\n]+$/, 'Name contains invalid characters'),
+  email: z.string().email().max(254, 'Email too long'),
+  company: z.string().max(200, 'Company name too long').optional(),
+  message: z.string().min(10).max(5000, 'Message too long'),
 });
 
+// --- Contact Form Rate Limiting ---
+const CONTACT_ATTEMPTS = new Map<string, { count: number; resetAt: number }>();
+const CONTACT_MAX = 5;
+const CONTACT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+function checkContactRateLimit(key: string): { allowed: boolean; retryAfterMs?: number } {
+  const now = Date.now();
+  const record = CONTACT_ATTEMPTS.get(key);
+
+  if (!record || now > record.resetAt) {
+    CONTACT_ATTEMPTS.set(key, { count: 1, resetAt: now + CONTACT_WINDOW_MS });
+    return { allowed: true };
+  }
+
+  if (record.count >= CONTACT_MAX) {
+    return { allowed: false, retryAfterMs: record.resetAt - now };
+  }
+
+  record.count++;
+  return { allowed: true };
+}
+
 export async function submitContactForm(formData: FormData) {
+  // Rate limit by submitted email
+  const submittedEmail = (formData.get('email') as string) || '';
+  const rateCheck = checkContactRateLimit(`contact_${submittedEmail.toLowerCase()}`);
+  if (!rateCheck.allowed) {
+    const minutes = Math.ceil((rateCheck.retryAfterMs || 0) / 60000);
+    return { error: `Too many submissions. Try again in ${minutes} minutes.` };
+  }
+
   const validatedFields = ContactSchema.safeParse({
     name: formData.get('name'),
     email: formData.get('email'),
@@ -85,10 +116,25 @@ export async function submitContactForm(formData: FormData) {
   });
 
   if (!validatedFields.success) {
-    return { error: 'Invalid fields' };
+    const errors = validatedFields.error.flatten().fieldErrors;
+    const firstError = Object.entries(errors).find(([, msgs]) => msgs && msgs.length > 0);
+    const message = firstError
+      ? `${firstError[0]}: ${firstError[1]?.[0]}`
+      : 'Invalid fields';
+    return { error: message };
   }
 
   const { name, email, company, message } = validatedFields.data;
+
+  const adminEmail = buildAdminNotificationEmail({
+    name,
+    email,
+    company: company || undefined,
+    message,
+    date: new Date().toLocaleString(),
+  });
+
+  const clientEmail = buildClientConfirmationEmail(name, message);
 
   try {
     // 1. Send Lead Notification via Gmail (Guaranteed Delivery)
@@ -96,31 +142,22 @@ export async function submitContactForm(formData: FormData) {
       from: `"FieldWaves System" <${process.env.GMAIL_USER}>`,
       to: process.env.CONTACT_EMAIL,
       subject: `[NEW_LEAD] Inquiry from ${name}`,
-      text: `
-SYSTEM_NOTIFICATION: NEW_CLIENT_INQUIRY
-----------------------------------------
-NAME:    ${name}
-EMAIL:   ${email}
-COMPANY: ${company || 'N/A'}
-DATE:    ${new Date().toLocaleString()}
-
-MESSAGE_BODY:
-${message}
-----------------------------------------
-      `,
+      html: adminEmail.html,
+      text: adminEmail.text,
     });
 
     // 2. Client Confirmation Workflow
     let confirmationSent = false;
 
     // Try Resend first (Branded)
-    if (process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 'ssss') {
+    if (process.env.RESEND_API_KEY) {
       try {
         const res = await resend.emails.send({
           from: 'FieldWaves <contact@fieldwaves.com>',
           to: email,
           subject: 'We have received your request - FieldWaves',
-          text: `Hello ${name},\n\nThank you for reaching out to FieldWaves. We have received your inquiry and our team is currently reviewing your project details. You can expect a response within 24 hours.`,
+          html: clientEmail.html,
+          text: clientEmail.text,
         });
         if (!res.error) confirmationSent = true;
       } catch (e) {
@@ -134,32 +171,40 @@ ${message}
         from: `"FieldWaves" <${process.env.GMAIL_USER}>`,
         to: email,
         subject: 'Inquiry Received - FieldWaves',
-        text: `Hello ${name},\n\nThis is an automated confirmation that we have received your inquiry. Our team will contact you within 24 hours.\n\nBest regards,\nFieldWaves Team`,
+        html: clientEmail.html,
+        text: clientEmail.text,
       });
     }
 
     return { success: true };
   } catch (err: any) {
     console.error('Lead Notification Failed:', err);
-    return { error: `NOTIFICATION_FAILURE: ${err.message || 'Check Gmail credentials'}` };
+    return { error: 'Failed to send message. Please try again later.' };
   }
 }
 
-export async function getProjects() {
+export async function getProjects(): Promise<{ _id: string; title: string; description: string; liveUrl: string; screenshotUrl: string; techStack: string[]; order: number }[]> {
   await connectToDatabase();
-  let projects = await Project.find().sort({ _id: -1 }).lean();
-  
+  let projects = await Project.find().sort({ order: 1, _id: -1 }).lean();
+
   if (projects.length === 0) {
     console.log('Seeding Projects...');
     await Project.insertMany(INITIAL_PROJECTS);
-    projects = await Project.find().sort({ _id: -1 }).lean();
+    projects = await Project.find().sort({ order: 1, _id: -1 }).lean();
   }
-  
-  // Convert _id to string for serialization
-  return projects.map(p => ({ ...p, _id: p._id.toString() }));
+
+  return projects.map(p => ({
+    _id: p._id.toString(),
+    title: p.title,
+    description: (p as any).description || '',
+    liveUrl: p.liveUrl,
+    screenshotUrl: p.screenshotUrl,
+    techStack: p.techStack,
+    order: (p as any).order || 0,
+  }));
 }
 
-export async function getTeam() {
+export async function getTeam(): Promise<{ _id: string; name: string; role: string; bio: string; socialLinks: Record<string, string>; avatarUrl: string; backgroundColor: string; isOwner: boolean; order: number }[]> {
   await connectToDatabase();
   
   // Check settings first
@@ -177,21 +222,33 @@ export async function getTeam() {
     team = await TeamMember.find().sort({ order: 1 }).lean();
   }
 
-  const result = team.map(t => ({ ...t, _id: t._id.toString() }));
+  const result = team.map(t => ({
+    _id: t._id.toString(),
+    name: t.name,
+    role: t.role,
+    bio: t.bio || '',
+    socialLinks: t.socialLinks instanceof Map
+      ? Object.fromEntries(t.socialLinks)
+      : (t.socialLinks || {}),
+    avatarUrl: t.avatarUrl || '/placeholder-user.jpg',
+    backgroundColor: t.backgroundColor || 'transparent',
+    isOwner: t.isOwner || false,
+    order: t.order || 0,
+  }));
 
   if (settings?.soloMode) {
     return result.filter(m => m.isOwner);
   }
-  
+
   return result;
 }
 
-export async function getSettings() {
+export async function getSettings(): Promise<{ soloMode: boolean; maintenanceMode: boolean } | null> {
   await connectToDatabase();
   let settings = await GlobalSettings.findOne().lean();
   if (!settings) {
      await GlobalSettings.create(INITIAL_SETTINGS);
      settings = await GlobalSettings.findOne().lean();
   }
-  return settings ? { ...settings, _id: settings._id.toString() } : null;
+  return settings ? { soloMode: settings.soloMode, maintenanceMode: settings.maintenanceMode } : null;
 }

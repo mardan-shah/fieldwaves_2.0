@@ -37,16 +37,20 @@ const TeamMemberSchema = new Schema<ITeamMember>({
 // --- Project Schema ---
 export interface IProject extends Document {
   title: string;
+  description: string;
   liveUrl: string;
   screenshotUrl: string;
   techStack: string[];
+  order: number;
 }
 
 const ProjectSchema = new Schema<IProject>({
   title: { type: String, required: true },
+  description: { type: String, default: '' },
   liveUrl: { type: String, required: true },
   screenshotUrl: { type: String },
   techStack: [{ type: String }],
+  order: { type: Number, default: 0 },
 });
 
 // --- Admin Schema ---

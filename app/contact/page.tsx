@@ -8,7 +8,7 @@ import SectionHeading from "../../components/ui/SectionHeading"
 import SkewContainer from "../../components/ui/SkewContainer"
 import FormInput from "../../components/ui/FormInput"
 import FormTextarea from "../../components/ui/FormTextarea"
-import { Mail, Phone, MapPin, Loader2, Check } from "lucide-react"
+import { Mail, MapPin, Loader2, Check } from "lucide-react"
 import { submitContactForm } from "../actions/public"
 import { toast } from "sonner"
 
@@ -82,18 +82,12 @@ export default function ContactPage() {
       {/* Contact Section */}
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-8 mb-24">
+          <div className="grid md:grid-cols-2 gap-8 mb-24">
             {/* Contact Methods */}
             <SkewContainer variant="glass" className="p-8">
               <Mail className="text-[#FF5F1F] mb-4" size={32} />
               <h3 className="font-display text-xl font-bold mb-2">Email</h3>
               <p className="text-[#B0B0B0] font-mono text-sm">contact@fieldwaves.io</p>
-            </SkewContainer>
-
-            <SkewContainer variant="glass" className="p-8">
-              <Phone className="text-[#FF5F1F] mb-4" size={32} />
-              <h3 className="font-display text-xl font-bold mb-2">Phone</h3>
-              <p className="text-[#B0B0B0] font-mono text-sm">+1 (555) 123-4567</p>
             </SkewContainer>
 
             <SkewContainer variant="glass" className="p-8">
