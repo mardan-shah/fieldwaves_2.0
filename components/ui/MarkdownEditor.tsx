@@ -26,15 +26,15 @@ export default function MarkdownEditor({
   return (
     <div className="group">
       <div className="flex items-center justify-between mb-2">
-        <label className="font-mono text-xs text-[#B0B0B0] tracking-widest">{label}</label>
+        <label className="font-mono text-xs text-secondary tracking-widest">{label}</label>
         <div className="flex gap-1">
           <button
             type="button"
             onClick={() => setActiveTab("write")}
             className={`px-3 py-1 font-mono text-[10px] tracking-wider transition-colors ${
               activeTab === "write"
-                ? "bg-[#FF5F1F] text-white"
-                : "bg-[#0a0a0a] text-[#666] hover:text-[#B0B0B0] border border-[#333]"
+                ? "bg-primary text-white"
+                : "bg-input text-muted hover:text-secondary border border-border"
             }`}
           >
             WRITE
@@ -44,8 +44,8 @@ export default function MarkdownEditor({
             onClick={() => setActiveTab("preview")}
             className={`px-3 py-1 font-mono text-[10px] tracking-wider transition-colors ${
               activeTab === "preview"
-                ? "bg-[#FF5F1F] text-white"
-                : "bg-[#0a0a0a] text-[#666] hover:text-[#B0B0B0] border border-[#333]"
+                ? "bg-primary text-white"
+                : "bg-input text-muted hover:text-secondary border border-border"
             }`}
           >
             PREVIEW
@@ -63,12 +63,12 @@ export default function MarkdownEditor({
             placeholder={placeholder}
             error={error}
           />
-          <p className="text-[10px] font-mono text-[#666] mt-1">
+          <p className="text-[10px] font-mono text-muted mt-1">
             SUPPORTS MARKDOWN: **bold**, *italic*, ## headings, - lists, [links](url), `code`, &gt; quotes
           </p>
         </div>
       ) : (
-        <div className="border border-[#333] bg-[#0a0a0a] p-4 min-h-[100px] max-h-[300px] overflow-y-auto">
+        <div className="border border-border bg-input p-4 min-h-[100px] max-h-[300px] overflow-y-auto">
           <MarkdownRenderer content={value} />
         </div>
       )}

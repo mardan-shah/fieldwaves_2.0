@@ -25,6 +25,7 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
     role: "",
     bio: "",
     backgroundColor: "#000000",
+    order: "0",
   })
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -74,13 +75,14 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
         payload.append("avatar", avatarFile)
       }
       payload.append("socialLinks", JSON.stringify(socials))
+      payload.append("order", formData.order)
 
       await onSubmit(payload)
       setSubmitted(true)
 
       if (previewUrl) URL.revokeObjectURL(previewUrl)
 
-      setFormData({ name: "", role: "", bio: "", backgroundColor: "#000000" })
+      setFormData({ name: "", role: "", bio: "", backgroundColor: "#000000", order: "0" })
       setAvatarFile(null)
       setPreviewUrl(null)
       setSocials([])
@@ -91,14 +93,14 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 -skew-x-12">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-[#333]">
+      <div className="flex gap-2 border-b border-border">
         <button
           type="button"
           onClick={() => setActiveTab("basics")}
           className={`px-4 py-2 font-mono text-sm transition-colors ${
-            activeTab === "basics" ? "border-b-2 border-[#FF5F1F] text-[#FF5F1F]" : "text-[#B0B0B0] hover:text-white"
+            activeTab === "basics" ? "border-b-2 border-primary text-primary" : "text-secondary hover:text-white"
           }`}
         >
           BASICS
@@ -107,7 +109,7 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
           type="button"
           onClick={() => setActiveTab("socials")}
           className={`px-4 py-2 font-mono text-sm transition-colors ${
-            activeTab === "socials" ? "border-b-2 border-[#FF5F1F] text-[#FF5F1F]" : "text-[#B0B0B0] hover:text-white"
+            activeTab === "socials" ? "border-b-2 border-primary text-primary" : "text-secondary hover:text-white"
           }`}
         >
           SOCIALS ({socials.length})
@@ -146,18 +148,18 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
             rows={4}
           />
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-3 gap-4">
             {/* File Upload */}
             <div className="group">
-              <label className="block font-mono text-xs text-[#B0B0B0] mb-2 tracking-widest">AVATAR_IMAGE</label>
-              <div className="relative transform border border-[#333] bg-[#0a0a0a] transition-colors group-hover:border-[#FF5F1F] p-1">
+              <label className="block font-mono text-xs text-secondary mb-2 tracking-widest">AVATAR_IMAGE</label>
+              <div className="relative transform border border-border bg-input transition-colors group-hover:border-primary p-1">
                 <div className="transform flex items-center gap-3 p-2">
-                  <label className="cursor-pointer bg-[#333] hover:bg-[#FF5F1F] text-white px-4 py-2 text-xs font-bold font-mono transition-colors flex items-center gap-2">
+                  <label className="cursor-pointer bg-border hover:bg-primary text-white px-4 py-2 text-xs font-bold font-mono transition-colors flex items-center gap-2">
                     <Upload size={14} />
                     CHOOSE_FILE
                     <input type="file" onChange={handleFileChange} className="hidden" accept="image/*" />
                   </label>
-                  <span className="text-xs text-[#666] font-mono truncate max-w-[200px]">
+                  <span className="text-xs text-muted font-mono truncate max-w-[200px]">
                     {avatarFile ? avatarFile.name : "NO_FILE_CHOSEN"}
                   </span>
                 </div>
@@ -166,14 +168,14 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
 
             {/* Background Color Control */}
             <div className="group">
-              <label className="block font-mono text-xs text-[#B0B0B0] mb-2 tracking-widest">BG_COLOR (HEX)</label>
+              <label className="block font-mono text-xs text-secondary mb-2 tracking-widest">BG_COLOR (HEX)</label>
               <div className="flex gap-2">
-                <div className="flex-1 relative transform -skew-x-12 border border-[#333] bg-[#0a0a0a] transition-colors focus-within:border-[#FF5F1F]">
+                <div className="flex-1 relative border border-border bg-input transition-colors focus-within:border-primary">
                   <input
                     type="text"
                     value={formData.backgroundColor}
                     onChange={(e) => setFormData(prev => ({ ...prev, backgroundColor: e.target.value }))}
-                    className="w-full h-full bg-transparent text-white p-3 outline-none transform skew-x-12 placeholder:text-[#666] font-mono"
+                    className="w-full h-full bg-transparent text-white p-3 outline-none placeholder:text-muted font-mono"
                     placeholder="#000000"
                   />
                 </div>
@@ -185,21 +187,30 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
                 />
               </div>
             </div>
+
+            {/* Order */}
+            <FormInput
+              type="number"
+              value={formData.order}
+              onChange={(e) => setFormData(prev => ({ ...prev, order: e.target.value }))}
+              label="ORDER"
+              placeholder="0"
+            />
           </div>
 
           {/* Preview Area */}
           {previewUrl && (
             <div className="mt-4">
-              <p className="font-mono text-xs text-[#B0B0B0] mb-2 tracking-widest">PREVIEW</p>
+              <p className="font-mono text-xs text-secondary mb-2 tracking-widest">PREVIEW</p>
               <div className="flex gap-4">
                 <div
-                  className="w-24 h-24 border border-[#333] overflow-hidden"
+                  className="w-24 h-24 border border-border overflow-hidden"
                   style={{ backgroundColor: formData.backgroundColor }}
                 >
                   <img src={previewUrl} className="w-full h-full object-cover" alt="Preview" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs text-[#666] font-mono">
+                  <p className="text-xs text-muted font-mono">
                     Check if the background color matches the image transparency properly.
                   </p>
                 </div>
@@ -213,7 +224,7 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
       {activeTab === "socials" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label className="block font-mono text-xs text-[#B0B0B0] mb-4 tracking-widest">SELECT PLATFORM</label>
+            <label className="block font-mono text-xs text-secondary mb-4 tracking-widest">SELECT PLATFORM</label>
             <SocialIconPicker
               selected={newSocial.platform}
               onChange={(p) => setNewSocial({ ...newSocial, platform: p })}
@@ -231,7 +242,7 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
           <button type="button" onClick={handleAddSocial} className="w-full group">
             <SkewContainer
               variant="secondary"
-              className="py-2 text-center flex items-center justify-center gap-2 skew-x-0"
+              className="py-2 text-center flex items-center justify-center gap-2"
               hoverEffect
             >
               <div className="flex items-center justify-center gap-2">
@@ -243,20 +254,20 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
 
           {/* Social Links List */}
           <div className="space-y-2 mt-6">
-            <p className="font-mono text-xs text-[#B0B0B0] tracking-widest">ADDED ({socials.length})</p>
+            <p className="font-mono text-xs text-secondary tracking-widest">ADDED ({socials.length})</p>
             {socials.map((social, i) => {
               const platform = SOCIAL_PLATFORMS.find((s) => s.name === social.platform)
               const Icon = platform?.icon
               return (
-                <div key={i} className="flex items-center justify-between bg-[#0a0a0a] border border-[#333] p-3">
+                <div key={i} className="flex items-center justify-between bg-input border border-border p-3">
                   <div className="flex items-center gap-3">
-                    {Icon && <Icon size={16} className="text-[#FF5F1F]" />}
-                    <span className="text-sm text-[#B0B0B0] truncate">{social.url}</span>
+                    {Icon && <Icon size={16} className="text-primary" />}
+                    <span className="text-sm text-secondary truncate">{social.url}</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleRemoveSocial(i)}
-                    className="text-[#FF5F1F] hover:text-red-500"
+                    className="text-primary hover:text-red-500"
                   >
                     <X size={16} />
                   </button>
@@ -271,7 +282,7 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
       <button type="submit" disabled={loading || submitted} className="w-full group">
         <SkewContainer
           variant="primary"
-          className="py-3 text-center flex items-center justify-center gap-2 skew-x-0"
+          className="py-3 text-center flex items-center justify-center gap-2"
           hoverEffect
         >
           <div className="flex items-center justify-center gap-2">

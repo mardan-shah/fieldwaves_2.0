@@ -3,7 +3,9 @@
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog"
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden"
 import MarkdownRenderer from "@/components/ui/MarkdownRenderer"
 import SkewContainer from "@/components/ui/SkewContainer"
 import type { TeamMember } from "@/types"
@@ -21,9 +23,13 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="bg-[#141414] border border-[#333] rounded-none max-w-2xl max-h-[90vh] overflow-y-auto p-0 -skew-x-12"
+        className="bg-transparent border-none shadow-none max-w-2xl p-0 overflow-visible"
         showCloseButton={false}
       >
+        <VisuallyHidden.Root>
+          <DialogTitle>{member.name}</DialogTitle>
+        </VisuallyHidden.Root>
+        <div className="bg-card border border-border -skew-x-12 max-h-[90vh] overflow-y-auto p-8">
         {/* Avatar */}
         {member.avatarUrl && (
           <div
@@ -35,7 +41,7 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
               alt={member.name}
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent " />
           </div>
         )}
 
@@ -53,18 +59,18 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
                   </SkewContainer>
                 )}
               </div>
-              <p className="font-mono text-[#FF5F1F] text-sm tracking-widest mt-1">{member.role}</p>
+              <p className="font-mono text-primary text-sm tracking-widest mt-1">{member.role}</p>
             </div>
             <button
               onClick={() => onOpenChange(false)}
-              className="text-[#666] hover:text-white transition-colors p-1"
+              className="text-muted hover:text-white transition-colors p-1"
             >
               <X size={20} />
             </button>
           </div>
 
           {/* Divider */}
-          <div className="border-t border-[#333]" />
+          <div className="border-t border-border" />
 
           {/* Bio */}
           <MarkdownRenderer content={member.bio} />
@@ -72,7 +78,7 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
           {/* Social links */}
           {member.socialLinks && Object.values(member.socialLinks).some(Boolean) && (
             <>
-              <div className="border-t border-[#333]" />
+              <div className="border-t border-border" />
               <div className="flex gap-3">
                 {member.socialLinks.github && (
                   <a
@@ -81,8 +87,8 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
                     rel="noopener noreferrer"
                     className="group"
                   >
-                    <SkewContainer variant="ghost" className="p-2.5 group-hover:border-[#FF5F1F]">
-                      <Github size={18} className="text-[#B0B0B0] group-hover:text-[#FF5F1F] transition-colors" />
+                    <SkewContainer variant="ghost" className="p-2.5 group-hover:border-primary">
+                      <Github size={18} className="text-secondary group-hover:text-primary transition-colors" />
                     </SkewContainer>
                   </a>
                 )}
@@ -93,8 +99,8 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
                     rel="noopener noreferrer"
                     className="group"
                   >
-                    <SkewContainer variant="ghost" className="p-2.5 group-hover:border-[#FF5F1F]">
-                      <Linkedin size={18} className="text-[#B0B0B0] group-hover:text-[#FF5F1F] transition-colors" />
+                    <SkewContainer variant="ghost" className="p-2.5 group-hover:border-primary">
+                      <Linkedin size={18} className="text-secondary group-hover:text-primary transition-colors" />
                     </SkewContainer>
                   </a>
                 )}
@@ -105,8 +111,8 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
                     rel="noopener noreferrer"
                     className="group"
                   >
-                    <SkewContainer variant="ghost" className="p-2.5 group-hover:border-[#FF5F1F]">
-                      <Twitter size={18} className="text-[#B0B0B0] group-hover:text-[#FF5F1F] transition-colors" />
+                    <SkewContainer variant="ghost" className="p-2.5 group-hover:border-primary">
+                      <Twitter size={18} className="text-secondary group-hover:text-primary transition-colors" />
                     </SkewContainer>
                   </a>
                 )}
@@ -117,8 +123,8 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
                     rel="noopener noreferrer"
                     className="group"
                   >
-                    <SkewContainer variant="ghost" className="p-2.5 group-hover:border-[#FF5F1F]">
-                      <Globe size={18} className="text-[#B0B0B0] group-hover:text-[#FF5F1F] transition-colors" />
+                    <SkewContainer variant="ghost" className="p-2.5 group-hover:border-primary">
+                      <Globe size={18} className="text-secondary group-hover:text-primary transition-colors" />
                     </SkewContainer>
                   </a>
                 )}
@@ -127,14 +133,15 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
                     href={`mailto:${member.socialLinks.email}`}
                     className="group"
                   >
-                    <SkewContainer variant="ghost" className="p-2.5 group-hover:border-[#FF5F1F] skew-x-0">
-                      <Mail size={18} className="text-[#B0B0B0] group-hover:text-[#FF5F1F] transition-colors" />
+                    <SkewContainer variant="ghost" className="p-2.5 group-hover:border-primary">
+                      <Mail size={18} className="text-secondary group-hover:text-primary transition-colors" />
                     </SkewContainer>
                   </a>
                 )}
               </div>
             </>
           )}
+        </div>
         </div>
       </DialogContent>
     </Dialog>

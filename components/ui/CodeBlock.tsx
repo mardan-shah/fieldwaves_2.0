@@ -20,19 +20,19 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, language = "js", className 
   }
 
   return (
-    <div className={`bg-[#0a0a0a] border border-[#333] rounded overflow-hidden ${className}`}>
-      <div className="flex justify-between items-center px-4 py-3 border-b border-[#333] bg-[#141414]">
-        <span className="font-mono text-xs text-[#B0B0B0]">{language}</span>
+    <div className={`bg-input border border-border rounded overflow-hidden ${className}`}>
+      <div className="flex justify-between items-center px-4 py-3 border-b border-border bg-card">
+        <span className="font-mono text-xs text-secondary">{language}</span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-2 font-mono text-xs text-[#B0B0B0] hover:text-[#FF5F1F] transition-colors"
+          className="flex items-center gap-2 font-mono text-xs text-secondary hover:text-primary transition-colors"
         >
           {copied ? <Check size={14} /> : <Copy size={14} />}
           <span>{copied ? "COPIED" : "COPY"}</span>
         </button>
       </div>
       <pre className="p-4 overflow-x-auto">
-        <code className="font-mono text-sm text-[#B0B0B0]">{code}</code>
+        <code className="font-mono text-sm text-secondary">{code}</code>
       </pre>
     </div>
   )

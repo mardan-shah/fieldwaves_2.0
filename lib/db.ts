@@ -31,6 +31,7 @@ async function connectToDatabase() {
 
   if (!cached.promise) {
     const opts = {
+      dbName: "fieldwaves",
       bufferCommands: false,
     };
 

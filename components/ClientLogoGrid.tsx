@@ -19,7 +19,7 @@ const ClientLogoGrid: React.FC<ClientLogoGridProps> = ({ clients }) => {
               alt={client.name}
               className="w-12 h-12 mx-auto mb-2 grayscale opacity-70"
             />
-            <p className="font-mono text-xs text-[#B0B0B0] text-center">{client.name}</p>
+            <p className="font-mono text-xs text-secondary text-center">{client.name}</p>
           </div>
         </SkewContainer>
       ))}

@@ -9,17 +9,18 @@ import ProjectList from "@/components/ProjectList"
 import EditProjectModal from "@/components/admin/EditProjectModal"
 import ConfirmDialog from "@/components/admin/ConfirmDialog"
 import type { Project } from "@/types"
-import { Boxes, Eye, Save, Loader2, Search, Upload, RefreshCw, X, ImageIcon } from "lucide-react"
+import ImageCropUpload from "@/components/admin/ImageCropUpload"
+import { Boxes, Eye, Save, Loader2, Search } from "lucide-react"
 import { toast } from "sonner"
-import { addProject, updateProject, deleteProject } from "@/app/actions/admin"
+import { addProject, updateProject, deleteProject, toggleProjectFeatured, reorderItem } from "@/app/actions/admin"
 import { getProjects } from "@/app/actions/public"
 
 interface ProjectsViewProps {
-  projects: Project[]
-  setProjects: (projects: Project[]) => void
+  initialProjects: Project[]
 }
 
-export default function ProjectsView({ projects, setProjects }: ProjectsViewProps) {
+export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
+  const [projects, setProjects] = useState<Project[]>(initialProjects)
   const [submitting, setSubmitting] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [newProject, setNewProject] = useState({
@@ -29,9 +30,6 @@ export default function ProjectsView({ projects, setProjects }: ProjectsViewProp
     techStack: "",
   })
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null)
-  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
-  const [previewLoading, setPreviewLoading] = useState(false)
-  const [previewError, setPreviewError] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Edit modal state
@@ -41,41 +39,6 @@ export default function ProjectsView({ projects, setProjects }: ProjectsViewProp
   // Delete confirm state
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
-
-  const fetchPreview = (url: string) => {
-    try {
-      new URL(url)
-    } catch {
-      return
-    }
-    setPreviewLoading(true)
-    setPreviewError(false)
-    setScreenshotPreview(`https://image.thum.io/get/wait/3000/width/600/crop/800/${url}`)
-  }
-
-  const handleUrlBlur = () => {
-    if (newProject.url && !screenshotFile) {
-      fetchPreview(newProject.url)
-    }
-  }
-
-  const handleUseCustomScreenshot = (file: File) => {
-    setScreenshotFile(file)
-    // Show local file preview instead of thum.io
-    const localUrl = URL.createObjectURL(file)
-    setScreenshotPreview(localUrl)
-    setPreviewError(false)
-  }
-
-  const handleClearCustomScreenshot = () => {
-    setScreenshotFile(null)
-    // Re-fetch auto preview if URL exists
-    if (newProject.url) {
-      fetchPreview(newProject.url)
-    } else {
-      setScreenshotPreview(null)
-    }
-  }
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -116,8 +79,6 @@ export default function ProjectsView({ projects, setProjects }: ProjectsViewProp
       toast.success(`PROJECT "${newProject.title}" DEPLOYED SUCCESSFULLY`)
       setNewProject({ title: "", url: "", description: "", techStack: "" })
       setScreenshotFile(null)
-      setScreenshotPreview(null)
-      setPreviewError(false)
       setErrors({})
     } catch (err: any) {
       toast.error(err.message || "Failed to add project")
@@ -139,6 +100,21 @@ export default function ProjectsView({ projects, setProjects }: ProjectsViewProp
     }
     await refreshProjects()
     toast.success("PROJECT UPDATED")
+  }
+
+  const handleReorder = async (id: string, direction: "up" | "down") => {
+    await reorderItem("project", id, direction)
+    await refreshProjects()
+  }
+
+  const handleToggleFeatured = async (id: string) => {
+    const result = await toggleProjectFeatured(id)
+    if (result.error) {
+      toast.error(result.error)
+      return
+    }
+    await refreshProjects()
+    toast.success(result.featured ? "FEATURED" : "UNFEATURED")
   }
 
   const handleDeleteClick = (id: string) => {
@@ -176,12 +152,12 @@ export default function ProjectsView({ projects, setProjects }: ProjectsViewProp
       {/* Add Project Form */}
       <section>
         <div className="flex items-center gap-3 mb-6">
-          <Boxes className="text-[#FF5F1F]" />
+          <Boxes className="text-primary" />
           <h2 className="font-mono font-bold text-lg tracking-wider">DEPLOY_PROJECT</h2>
         </div>
 
-        <SkewContainer variant="outline" className="p-8 bg-[#141414]">
-          <form onSubmit={handleAddProject} className="space-y-6 -skew-x-12">
+        <SkewContainer variant="outline" className="p-8 bg-card">
+          <form onSubmit={handleAddProject} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-4">
               <FormInput
                 type="text"
@@ -195,7 +171,6 @@ export default function ProjectsView({ projects, setProjects }: ProjectsViewProp
                 type="url"
                 value={newProject.url}
                 onChange={(e) => setNewProject(prev => ({ ...prev, url: e.target.value }))}
-                onBlur={handleUrlBlur}
                 label="LIVE_URL"
                 placeholder="https://..."
                 required
@@ -219,92 +194,16 @@ export default function ProjectsView({ projects, setProjects }: ProjectsViewProp
               placeholder="Next.js, React, Tailwind (comma separated)"
             />
 
-            {/* Screenshot Preview */}
-            <div>
-              <label className="block font-mono text-xs text-[#B0B0B0] mb-2 tracking-widest">SCREENSHOT_PREVIEW</label>
-
-              {screenshotPreview ? (
-                <div className="space-y-3">
-                  <div className="relative border border-[#333] bg-black overflow-hidden" style={{ maxHeight: 200 }}>
-                    {previewLoading && !previewError && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-10">
-                        <div className="flex items-center gap-2 text-[#B0B0B0] font-mono text-xs">
-                          <RefreshCw size={14} className="animate-spin" />
-                          FETCHING_PREVIEW...
-                        </div>
-                      </div>
-                    )}
-                    <img
-                      src={screenshotPreview}
-                      alt="Screenshot preview"
-                      className="w-full object-cover"
-                      onLoad={() => setPreviewLoading(false)}
-                      onError={() => { setPreviewLoading(false); setPreviewError(true) }}
-                    />
-                  </div>
-
-                  {previewError && (
-                    <p className="text-xs text-red-500 font-mono">PREVIEW_FAILED — upload a custom screenshot instead</p>
-                  )}
-
-                  <div className="flex items-center gap-3">
-                    <p className="text-[10px] font-mono text-[#666] flex-1">
-                      {screenshotFile ? `CUSTOM: ${screenshotFile.name}` : "AUTO-GENERATED via thum.io"}
-                    </p>
-
-                    {screenshotFile ? (
-                      <button
-                        type="button"
-                        onClick={handleClearCustomScreenshot}
-                        className="flex items-center gap-1 text-xs font-mono text-[#FF5F1F] hover:text-red-500 transition-colors"
-                      >
-                        <X size={12} />
-                        REMOVE
-                      </button>
-                    ) : null}
-
-                    <label className="cursor-pointer flex items-center gap-1 text-xs font-mono text-[#B0B0B0] hover:text-[#FF5F1F] transition-colors">
-                      <Upload size={12} />
-                      {screenshotFile ? "REPLACE" : "UPLOAD_CUSTOM"}
-                      <input
-                        type="file"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          if (file) handleUseCustomScreenshot(file)
-                        }}
-                        className="hidden"
-                        accept="image/*"
-                      />
-                    </label>
-                  </div>
-                </div>
-              ) : (
-                <div className="border border-dashed border-[#333] bg-[#0a0a0a] p-6 flex flex-col items-center gap-3">
-                  <ImageIcon size={24} className="text-[#666]" />
-                  <p className="text-xs font-mono text-[#666] text-center">
-                    Enter a URL above to auto-fetch a preview,<br />or upload a custom screenshot
-                  </p>
-                  <label className="cursor-pointer bg-[#333] hover:bg-[#FF5F1F] text-white px-4 py-2 text-xs font-bold font-mono transition-colors flex items-center gap-2">
-                    <Upload size={14} />
-                    UPLOAD
-                    <input
-                      type="file"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) handleUseCustomScreenshot(file)
-                      }}
-                      className="hidden"
-                      accept="image/*"
-                    />
-                  </label>
-                </div>
-              )}
-            </div>
+            <ImageCropUpload
+              onCropped={(file) => setScreenshotFile(file)}
+              label="SCREENSHOT"
+              aspect={16 / 9}
+            />
 
             <button type="submit" disabled={submitting} className="w-full group">
               <SkewContainer
                 variant="primary"
-                className="py-3 text-center flex items-center skew-x-0 justify-center gap-2"
+                className="py-3 text-center flex items-center justify-center gap-2"
                 hoverEffect
               >
                 <div className="flex items-center justify-center gap-2">
@@ -321,7 +220,7 @@ export default function ProjectsView({ projects, setProjects }: ProjectsViewProp
       <section>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Eye className="text-[#FF5F1F]" />
+            <Eye className="text-primary" />
             <h2 className="font-mono font-bold text-lg tracking-wider">ACTIVE_DEPLOYMENTS</h2>
           </div>
         </div>
@@ -329,13 +228,13 @@ export default function ProjectsView({ projects, setProjects }: ProjectsViewProp
         {/* Search */}
         <div className="mb-4">
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666]" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search projects..."
-              className="w-full bg-[#0a0a0a] border border-[#333] focus:border-[#FF5F1F] text-white pl-10 pr-4 py-2.5 outline-none font-mono text-sm placeholder:text-[#666] transition-colors"
+              className="w-full bg-input border border-border focus:border-primary text-white pl-10 pr-4 py-2.5 outline-none font-mono text-sm placeholder:text-muted transition-colors"
             />
           </div>
         </div>
@@ -344,6 +243,8 @@ export default function ProjectsView({ projects, setProjects }: ProjectsViewProp
           projects={filteredProjects}
           onDelete={handleDeleteClick}
           onEdit={handleEditProject}
+          onReorder={handleReorder}
+          onToggleFeatured={handleToggleFeatured}
         />
       </section>
 

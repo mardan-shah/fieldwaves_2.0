@@ -57,7 +57,7 @@ export default function SocialIconPicker({ selected, onChange }: SocialIconPicke
           >
             <SkewContainer
               variant={isSelected ? "primary" : "ghost"}
-              className="p-3 flex items-center justify-center skew-x-0"
+              className="p-3 flex items-center justify-center"
               hoverEffect
             >
               <Icon size={20} />

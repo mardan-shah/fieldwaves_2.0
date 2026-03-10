@@ -15,12 +15,12 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ size = "md", className 
   return (
     <div className={`inline-block ${sizes[size]} ${className}`}>
       <div
-        className={`w-full h-full border-[#FF5F1F] border-t-transparent border-solid rounded-full animate-spin`}
+        className={`w-full h-full border-primary border-t-transparent border-solid rounded-full animate-spin`}
         style={{
           borderTopColor: "transparent",
-          borderRightColor: "#FF5F1F",
+          borderRightColor: "var(--primary)",
           borderBottomColor: "transparent",
-          borderLeftColor: "#FF5F1F",
+          borderLeftColor: "var(--primary)",
         }}
       />
     </div>

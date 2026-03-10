@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { GlobalSettings, Project, TeamMember, Admin } from '@/lib/models';
+import { GlobalSettings, Project, TeamMember, Admin, CaseStudy, BlogPost, PageView } from '@/lib/models';
 import { revalidatePath } from 'next/cache';
 import connectToDatabase from '@/lib/db';
 import { writeFile, mkdir } from 'node:fs/promises';
@@ -41,19 +41,19 @@ function checkRateLimit(key: string): { allowed: boolean; retryAfterMs?: number 
 const ProjectSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters').max(200, 'Title too long'),
   url: z.string().url('Must be a valid URL').max(2000, 'URL too long'),
-  description: z.string().max(2000, 'Description too long').optional(),
-  techStack: z.string().max(500, 'Tech stack too long').optional(),
-  order: z.coerce.number().min(0).max(9999).optional(),
+  description: z.string().max(2000, 'Description too long').optional().nullable().transform(v => v ?? undefined),
+  techStack: z.string().max(500, 'Tech stack too long').optional().nullable().transform(v => v ?? undefined),
+  order: z.coerce.number().min(0).max(9999).optional().nullable().transform(v => v ?? undefined),
 });
 
 const TeamMemberSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
   role: z.string().min(2, 'Role must be at least 2 characters').max(100, 'Role too long'),
-  bio: z.string().max(2000, 'Bio too long').optional(),
-  socialLinks: z.string().max(5000, 'Social links data too long').optional(),
-  backgroundColor: z.string().max(20, 'Color value too long').optional(),
-  isOwner: z.string().optional(),
-  order: z.coerce.number().min(0).max(9999).optional(),
+  bio: z.string().max(2000, 'Bio too long').optional().nullable().transform(v => v ?? undefined),
+  socialLinks: z.string().max(5000, 'Social links data too long').optional().nullable().transform(v => v ?? undefined),
+  backgroundColor: z.string().max(20, 'Color value too long').optional().nullable().transform(v => v ?? undefined),
+  isOwner: z.string().optional().nullable().transform(v => v ?? undefined),
+  order: z.coerce.number().min(0).max(9999).optional().nullable().transform(v => v ?? undefined),
 });
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]).{8,}$/;
@@ -256,8 +256,7 @@ export async function addProject(formData: FormData) {
   if (screenshotFile && screenshotFile.size > 0) {
     screenshotUrl = await saveUploadedFile(screenshotFile, 'projects');
   } else {
-    // Auto-generate via thum.io
-    screenshotUrl = `https://image.thum.io/get/wait/3000/width/600/crop/800/${url}`;
+    screenshotUrl = '/placeholder.svg';
   }
 
   // Process techStack (comma-separated string to array)
@@ -309,9 +308,6 @@ export async function updateProject(id: string, formData: FormData) {
 
   if (screenshotFile && screenshotFile.size > 0) {
     screenshotUrl = await saveUploadedFile(screenshotFile, 'projects');
-  } else if (url !== project.liveUrl) {
-    // URL changed, regenerate screenshot
-    screenshotUrl = `https://image.thum.io/get/wait/3000/width/600/crop/800/${url}`;
   }
 
   const techStackArray = techStack
@@ -338,6 +334,55 @@ export async function deleteProject(id: string) {
 
   await connectToDatabase();
   await Project.findByIdAndDelete(id);
+  revalidatePath('/');
+  revalidatePath('/admin');
+  return { success: true };
+}
+
+export async function toggleProjectFeatured(id: string) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+  if (!validateObjectId(id)) return { error: 'Invalid ID' };
+
+  await connectToDatabase();
+  const project = await Project.findById(id);
+  if (!project) return { error: 'Project not found' };
+
+  project.featured = !project.featured;
+  await project.save();
+
+  revalidatePath('/');
+  revalidatePath('/admin');
+  return { success: true, featured: project.featured };
+}
+
+export async function reorderItem(collection: 'project' | 'team' | 'case_study' | 'blog', id: string, direction: 'up' | 'down') {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+  if (!validateObjectId(id)) return { error: 'Invalid ID' };
+
+  await connectToDatabase();
+
+  const ModelMap: Record<string, any> = { project: Project, team: TeamMember, case_study: CaseStudy, blog: BlogPost };
+  const Model = ModelMap[collection];
+
+  const item = await Model.findById(id);
+  if (!item) return { error: 'Item not found' };
+
+  const currentOrder = item.order || 0;
+  const newOrder = direction === 'up' ? currentOrder - 1 : currentOrder + 1;
+  if (newOrder < 0) return { success: true };
+
+  // Swap with the item that has the target order
+  const swapItem = await Model.findOne({ order: newOrder });
+  if (swapItem) {
+    swapItem.order = currentOrder;
+    await swapItem.save();
+  }
+
+  item.order = newOrder;
+  await item.save();
+
   revalidatePath('/');
   revalidatePath('/admin');
   return { success: true };
@@ -509,4 +554,492 @@ export async function deleteTeamMember(id: string) {
   revalidatePath('/');
   revalidatePath('/admin');
   return { success: true };
+}
+
+// --- Case Study Actions ---
+
+const CaseStudyZodSchema = z.object({
+  title: z.string().min(2, 'Title must be at least 2 characters').max(200, 'Title too long'),
+  subtitle: z.string().max(200, 'Subtitle too long').optional(),
+  overview: z.string().max(500, 'Overview too long').optional(),
+  description: z.string().max(50000, 'Description too long').optional(),
+  techStack: z.string().max(500, 'Tech stack too long').optional(),
+  metricCards: z.string().max(5000, 'Metric cards data too long').optional(),
+  published: z.string().optional(),
+  order: z.coerce.number().min(0).max(9999).optional(),
+});
+
+function generateSlug(title: string): string {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+async function ensureUniqueSlug(slug: string, excludeId?: string): Promise<string> {
+  let candidate = slug;
+  let suffix = 2;
+  while (true) {
+    const query: any = { slug: candidate };
+    if (excludeId) query._id = { $ne: excludeId };
+    const existing = await CaseStudy.findOne(query);
+    if (!existing) return candidate;
+    candidate = `${slug}-${suffix}`;
+    suffix++;
+  }
+}
+
+export async function addCaseStudy(formData: FormData) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+
+  await connectToDatabase();
+
+  const validated = CaseStudyZodSchema.safeParse({
+    title: formData.get('title'),
+    subtitle: formData.get('subtitle'),
+    overview: formData.get('overview'),
+    description: formData.get('description'),
+    techStack: formData.get('techStack'),
+    metricCards: formData.get('metricCards'),
+    published: formData.get('published'),
+    order: formData.get('order'),
+  });
+
+  if (!validated.success) {
+    return { error: 'Invalid fields', details: validated.error.flatten().fieldErrors };
+  }
+
+  const { title, subtitle, overview, description, techStack, metricCards, published, order } = validated.data;
+
+  const slug = await ensureUniqueSlug(generateSlug(title));
+
+  // Handle cover image upload
+  const coverFile = formData.get('coverImage') as File;
+  let coverImage = '';
+  if (coverFile && coverFile.size > 0) {
+    coverImage = await saveUploadedFile(coverFile, 'cases');
+  }
+
+  // Parse tech stack
+  const techStackArray = techStack
+    ? techStack.split(',').map(t => t.trim()).filter(Boolean)
+    : [];
+
+  // Parse metric cards
+  let metricCardsArray: { label: string; value: string; unit: string }[] = [];
+  if (metricCards) {
+    try {
+      metricCardsArray = JSON.parse(metricCards);
+    } catch (e) {
+      console.error('Failed to parse metric cards', e);
+    }
+  }
+
+  await CaseStudy.create({
+    title,
+    slug,
+    subtitle: subtitle || '',
+    overview: overview || '',
+    description: description || '',
+    coverImage,
+    metricCards: metricCardsArray,
+    techStack: techStackArray,
+    published: published === 'true',
+    order: order ?? 0,
+  });
+
+  revalidatePath('/cases');
+  revalidatePath('/admin');
+  return { success: true };
+}
+
+export async function updateCaseStudy(id: string, formData: FormData) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+  if (!validateObjectId(id)) return { error: 'Invalid ID' };
+
+  await connectToDatabase();
+
+  const validated = CaseStudyZodSchema.safeParse({
+    title: formData.get('title'),
+    subtitle: formData.get('subtitle'),
+    overview: formData.get('overview'),
+    description: formData.get('description'),
+    techStack: formData.get('techStack'),
+    metricCards: formData.get('metricCards'),
+    published: formData.get('published'),
+    order: formData.get('order'),
+  });
+
+  if (!validated.success) {
+    return { error: 'Invalid fields', details: validated.error.flatten().fieldErrors };
+  }
+
+  const { title, subtitle, overview, description, techStack, metricCards, published, order } = validated.data;
+
+  const caseStudy = await CaseStudy.findById(id);
+  if (!caseStudy) return { error: 'Case study not found' };
+
+  // Update slug if title changed
+  if (title !== caseStudy.title) {
+    caseStudy.slug = await ensureUniqueSlug(generateSlug(title), id);
+  }
+
+  // Handle cover image upload
+  const coverFile = formData.get('coverImage') as File;
+  if (coverFile && coverFile.size > 0) {
+    caseStudy.coverImage = await saveUploadedFile(coverFile, 'cases');
+  }
+
+  const techStackArray = techStack
+    ? techStack.split(',').map(t => t.trim()).filter(Boolean)
+    : caseStudy.techStack;
+
+  let metricCardsArray = caseStudy.metricCards;
+  if (metricCards) {
+    try {
+      metricCardsArray = JSON.parse(metricCards);
+    } catch (e) {
+      console.error('Failed to parse metric cards', e);
+    }
+  }
+
+  caseStudy.title = title;
+  caseStudy.subtitle = subtitle || '';
+  caseStudy.overview = overview || '';
+  caseStudy.description = description || '';
+  caseStudy.metricCards = metricCardsArray;
+  caseStudy.techStack = techStackArray;
+  caseStudy.published = published === 'true';
+  caseStudy.order = order ?? caseStudy.order;
+  await caseStudy.save();
+
+  revalidatePath('/cases');
+  revalidatePath(`/cases/${caseStudy.slug}`);
+  revalidatePath('/admin');
+  return { success: true };
+}
+
+export async function deleteCaseStudy(id: string) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+  if (!validateObjectId(id)) return { error: 'Invalid ID' };
+
+  await connectToDatabase();
+  await CaseStudy.findByIdAndDelete(id);
+  revalidatePath('/cases');
+  revalidatePath('/admin');
+  return { success: true };
+}
+
+export async function getAllCaseStudies() {
+  const session = await requireAuth();
+  if (!session) return [];
+
+  await connectToDatabase();
+  const cases = await CaseStudy.find().sort({ order: 1, _id: -1 }).lean();
+  return cases.map(c => ({
+    _id: c._id.toString(),
+    title: c.title,
+    slug: c.slug,
+    subtitle: c.subtitle || '',
+    overview: c.overview || '',
+    description: c.description || '',
+    coverImage: c.coverImage || '',
+    metricCards: c.metricCards || [],
+    techStack: c.techStack || [],
+    published: c.published,
+    featured: (c as any).featured || false,
+    order: c.order || 0,
+    createdAt: (c as any).createdAt?.toISOString?.() || '',
+    updatedAt: (c as any).updatedAt?.toISOString?.() || '',
+  }));
+}
+
+export async function toggleCaseStudyFeatured(id: string) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+  if (!validateObjectId(id)) return { error: 'Invalid ID' };
+
+  await connectToDatabase();
+  const cs = await CaseStudy.findById(id);
+  if (!cs) return { error: 'Case study not found' };
+
+  cs.featured = !cs.featured;
+  await cs.save();
+
+  revalidatePath('/cases');
+  revalidatePath('/admin');
+  return { success: true, featured: cs.featured };
+}
+
+export async function updateCasesDisplayCount(count: number) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+
+  if (count < 1 || count > 50) return { error: 'Count must be between 1 and 50' };
+
+  await connectToDatabase();
+  const settings = await GlobalSettings.findOne();
+  if (!settings) {
+    await GlobalSettings.create({ casesDisplayCount: count });
+  } else {
+    (settings as any).casesDisplayCount = count;
+    await settings.save();
+  }
+
+  revalidatePath('/cases');
+  revalidatePath('/admin');
+  return { success: true };
+}
+
+// --- Blog Post Actions ---
+
+const BlogPostZodSchema = z.object({
+  title: z.string().min(2, 'Title must be at least 2 characters').max(200, 'Title too long'),
+  excerpt: z.string().max(500, 'Excerpt too long').optional().nullable().transform(v => v ?? undefined),
+  content: z.string().max(100000, 'Content too long').optional().nullable().transform(v => v ?? undefined),
+  keywords: z.string().max(1000, 'Keywords too long').optional().nullable().transform(v => v ?? undefined),
+  tags: z.string().max(500, 'Tags too long').optional().nullable().transform(v => v ?? undefined),
+  author: z.string().max(100, 'Author too long').optional().nullable().transform(v => v ?? undefined),
+  published: z.string().optional().nullable().transform(v => v ?? undefined),
+  order: z.coerce.number().min(0).max(9999).optional().nullable().transform(v => v ?? undefined),
+});
+
+async function ensureUniqueBlogSlug(slug: string, excludeId?: string): Promise<string> {
+  let candidate = slug;
+  let suffix = 2;
+  while (true) {
+    const query: any = { slug: candidate };
+    if (excludeId) query._id = { $ne: excludeId };
+    const existing = await BlogPost.findOne(query);
+    if (!existing) return candidate;
+    candidate = `${slug}-${suffix}`;
+    suffix++;
+  }
+}
+
+export async function addBlogPost(formData: FormData) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+
+  await connectToDatabase();
+
+  const validated = BlogPostZodSchema.safeParse({
+    title: formData.get('title'),
+    excerpt: formData.get('excerpt'),
+    content: formData.get('content'),
+    keywords: formData.get('keywords'),
+    tags: formData.get('tags'),
+    author: formData.get('author'),
+    published: formData.get('published'),
+    order: formData.get('order'),
+  });
+
+  if (!validated.success) {
+    return { error: 'Invalid fields', details: validated.error.flatten().fieldErrors };
+  }
+
+  const { title, excerpt, content, keywords, tags, author, published, order } = validated.data;
+
+  const slug = await ensureUniqueBlogSlug(generateSlug(title));
+
+  const coverFile = formData.get('coverImage') as File;
+  let coverImage = '';
+  if (coverFile && coverFile.size > 0) {
+    coverImage = await saveUploadedFile(coverFile, 'blog');
+  }
+
+  const keywordsArray = keywords ? keywords.split(',').map(k => k.trim()).filter(Boolean) : [];
+  const tagsArray = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+  await BlogPost.create({
+    title,
+    slug,
+    excerpt: excerpt || '',
+    content: content || '',
+    coverImage,
+    keywords: keywordsArray,
+    tags: tagsArray,
+    author: author || '',
+    published: published === 'true',
+    order: order ?? 0,
+    views: 0,
+  });
+
+  revalidatePath('/blog');
+  revalidatePath('/admin');
+  return { success: true };
+}
+
+export async function updateBlogPost(id: string, formData: FormData) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+  if (!validateObjectId(id)) return { error: 'Invalid ID' };
+
+  await connectToDatabase();
+
+  const validated = BlogPostZodSchema.safeParse({
+    title: formData.get('title'),
+    excerpt: formData.get('excerpt'),
+    content: formData.get('content'),
+    keywords: formData.get('keywords'),
+    tags: formData.get('tags'),
+    author: formData.get('author'),
+    published: formData.get('published'),
+    order: formData.get('order'),
+  });
+
+  if (!validated.success) {
+    return { error: 'Invalid fields', details: validated.error.flatten().fieldErrors };
+  }
+
+  const { title, excerpt, content, keywords, tags, author, published, order } = validated.data;
+
+  const post = await BlogPost.findById(id);
+  if (!post) return { error: 'Blog post not found' };
+
+  if (title !== post.title) {
+    post.slug = await ensureUniqueBlogSlug(generateSlug(title), id);
+  }
+
+  const coverFile = formData.get('coverImage') as File;
+  if (coverFile && coverFile.size > 0) {
+    post.coverImage = await saveUploadedFile(coverFile, 'blog');
+  }
+
+  post.title = title;
+  post.excerpt = excerpt || '';
+  post.content = content || '';
+  post.keywords = keywords ? keywords.split(',').map(k => k.trim()).filter(Boolean) : post.keywords;
+  post.tags = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : post.tags;
+  post.author = author || '';
+  post.published = published === 'true';
+  post.order = order ?? post.order;
+  await post.save();
+
+  revalidatePath('/blog');
+  revalidatePath(`/blog/${post.slug}`);
+  revalidatePath('/admin');
+  return { success: true };
+}
+
+export async function toggleBlogPostFeatured(id: string) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+  if (!validateObjectId(id)) return { error: 'Invalid ID' };
+
+  await connectToDatabase();
+  const post = await BlogPost.findById(id);
+  if (!post) return { error: 'Blog post not found' };
+
+  post.featured = !post.featured;
+  await post.save();
+
+  revalidatePath('/blog');
+  revalidatePath('/admin');
+  return { success: true, featured: post.featured };
+}
+
+export async function deleteBlogPost(id: string) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+  if (!validateObjectId(id)) return { error: 'Invalid ID' };
+
+  await connectToDatabase();
+  await BlogPost.findByIdAndDelete(id);
+  revalidatePath('/blog');
+  revalidatePath('/admin');
+  return { success: true };
+}
+
+export async function getAllBlogPosts() {
+  const session = await requireAuth();
+  if (!session) return [];
+
+  await connectToDatabase();
+  const posts = await BlogPost.find().sort({ order: 1, _id: -1 }).lean();
+  return posts.map(p => ({
+    _id: p._id.toString(),
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt || '',
+    content: p.content || '',
+    coverImage: p.coverImage || '',
+    keywords: p.keywords || [],
+    tags: p.tags || [],
+    author: p.author || '',
+    published: p.published,
+    featured: (p as any).featured || false,
+    order: p.order || 0,
+    views: p.views || 0,
+    createdAt: (p as any).createdAt?.toISOString?.() || '',
+    updatedAt: (p as any).updatedAt?.toISOString?.() || '',
+  }));
+}
+
+// --- Analytics Actions ---
+
+export async function trackPageView(path: string, contentType: 'case_study' | 'blog' | 'page', contentId: string = '') {
+  await connectToDatabase();
+  const date = new Date().toISOString().split('T')[0];
+
+  await PageView.findOneAndUpdate(
+    { path, date },
+    { $inc: { count: 1 }, $setOnInsert: { contentType, contentId } },
+    { upsert: true }
+  );
+
+  if (contentType === 'blog' && contentId) {
+    await BlogPost.findByIdAndUpdate(contentId, { $inc: { views: 1 } });
+  } else if (contentType === 'case_study' && contentId) {
+    await CaseStudy.findByIdAndUpdate(contentId, { $inc: { views: 1 } });
+  }
+}
+
+export async function getAnalytics() {
+  const session = await requireAuth();
+  if (!session) return null;
+
+  await connectToDatabase();
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const dateStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+  const recentViews = await PageView.find({ date: { $gte: dateStr } }).sort({ date: -1 }).lean();
+
+  const totalViews = recentViews.reduce((sum, v) => sum + v.count, 0);
+
+  const viewsByDay: Record<string, number> = {};
+  recentViews.forEach(v => {
+    viewsByDay[v.date] = (viewsByDay[v.date] || 0) + v.count;
+  });
+
+  const pageMap: Record<string, number> = {};
+  recentViews.forEach(v => {
+    pageMap[v.path] = (pageMap[v.path] || 0) + v.count;
+  });
+  const topPages = Object.entries(pageMap)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 10)
+    .map(([path, views]) => ({ path, views }));
+
+  const topCases = await CaseStudy.find()
+    .sort({ views: -1 })
+    .limit(5)
+    .select('title slug views')
+    .lean();
+
+  const topPosts = await BlogPost.find()
+    .sort({ views: -1 })
+    .limit(5)
+    .select('title slug views')
+    .lean();
+
+  return {
+    totalViews,
+    viewsByDay,
+    topPages,
+    topCases: topCases.map(c => ({ title: c.title, slug: c.slug, views: (c as any).views || 0 })),
+    topPosts: topPosts.map(p => ({ title: p.title, slug: p.slug, views: (p as any).views || 0 })),
+  };
 }

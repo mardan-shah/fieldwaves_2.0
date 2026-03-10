@@ -1,6 +1,20 @@
 # FieldWaves
 
-Portfolio/agency website built with Next.js 16, React 19, TypeScript, Tailwind CSS 4, and MongoDB.
+A portfolio/agency website with a full-featured admin panel. Built with Next.js 16, React 19, TypeScript, Tailwind CSS 4, and MongoDB.
+
+**Industrial Brutalism** design system — parallelogram geometry, hard edges, no rounded corners.
+
+## Tech Stack
+
+| Category | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router + Turbopack) |
+| UI | React 19, Tailwind CSS 4, shadcn/ui |
+| Database | MongoDB (Mongoose 9) |
+| Auth | bcrypt + HMAC-signed HTTP-only cookies |
+| Email | Nodemailer (Gmail SMTP) + Resend fallback |
+| Package Manager | Bun |
+| Deployment | nixpacks (Railway/Render) |
 
 ## Quick Start
 
@@ -12,35 +26,114 @@ bun run build                 # Production build
 bun run lint                  # Lint
 ```
 
-## Architecture
-
-- **Framework:** Next.js 16 App Router + Turbopack
-- **Data:** MongoDB (Mongoose 9), no API routes — Server Actions only
-- **Auth:** bcrypt-based admin auth via HTTP-only signed cookies (server-side sessions)
-- **Email:** Nodemailer (Gmail SMTP) primary, Resend fallback
-- **UI:** shadcn/ui + custom brutalist design system (parallelogram geometry, `-skew-x-12`)
-- **Deployment:** nixpacks (Railway/Render)
-
-### Key Directories
+## Project Structure
 
 ```
-app/actions/admin.ts    Server actions for CRUD (projects, team, admin auth)
-app/actions/public.ts   Server actions for reads + contact form
-app/admin/              Admin dashboard (decomposed into _components/)
-lib/models.ts           Mongoose schemas (Project, TeamMember, Admin, GlobalSettings)
-lib/email-templates.ts  Branded HTML email builders
-lib/db.ts               MongoDB singleton connection
-components/admin/       Admin-specific components (modals, dialogs)
-components/ui/          shadcn/ui primitives + custom form components
-types.ts                Shared TypeScript interfaces
+app/
+├── actions/
+│   ├── admin.ts              Server actions: CRUD, auth, analytics, reorder, featured
+│   └── public.ts             Server actions: reads, contact form, featured queries
+├── admin/
+│   ├── layout.tsx            Admin layout with sidebar + auth guard
+│   ├── page.tsx              Dashboard overview (stats, quick actions)
+│   ├── projects/page.tsx     Project management
+│   ├── team/page.tsx         Team management
+│   ├── cases/page.tsx        Case study management
+│   ├── blog/page.tsx         Blog management
+│   ├── analytics/page.tsx    Site analytics
+│   ├── settings/page.tsx     Global settings
+│   └── _components/          Admin UI components (views, sidebar, login)
+├── blog/
+│   ├── page.tsx              Blog landing (featured + latest)
+│   ├── all/page.tsx          All posts (search + filter)
+│   └── [slug]/page.tsx       Blog post detail (TOC, markdown)
+├── cases/
+│   ├── page.tsx              Cases landing (featured + more work)
+│   ├── all/page.tsx          All cases (search + filter)
+│   └── [slug]/page.tsx       Case study detail (metrics, TOC)
+├── contact/page.tsx          Contact form
+├── projects/page.tsx         Project grid
+├── team/page.tsx             Team grid
+├── services/page.tsx         Services
+├── about/page.tsx            About
+├── philosophy/page.tsx       Philosophy
+└── privacy/page.tsx          Privacy policy
+components/
+├── ui/                       Primitives: SkewContainer, FormInput, MarkdownEditor, etc.
+├── admin/                    Edit modals, confirm dialogs
+├── BlogGrid.tsx              Blog card grid with search
+├── CaseStudyCard.tsx         Case study showcase card
+├── CaseStudyGrid.tsx         Case study grid with search
+├── ProjectGrid.tsx           Project card grid
+├── TeamGrid.tsx              Team member grid
+├── SearchFilterBar.tsx       Unified search + tag filter
+├── Navbar.tsx                Navigation bar
+└── Footer.tsx                Site footer
+lib/
+├── models.ts                 Mongoose schemas (7 models)
+├── db.ts                     MongoDB singleton connection
+├── session.ts                HMAC-SHA256 signed cookie sessions
+└── email-templates.ts        Branded HTML email builders
+hooks/
+└── use-in-view.ts            IntersectionObserver hook (respects prefers-reduced-motion)
+types.ts                      Shared TypeScript interfaces
 ```
 
-### Design System
+## Design System
 
-- **Primary:** `#FF5F1F` (orange) | **Secondary:** `#B0B0B0` | **BG:** `#1a1a1a` / `#141414`
-- All containers use `-skew-x-12` with inner `skew-x-12` for legibility
-- Hard 1-2px borders, no rounded corners, no soft shadows
-- `font-display` for headings, `font-mono` for labels
+CSS variables defined in `globals.css`, mapped to Tailwind via `@theme inline`:
+
+- **Primary:** `var(--primary)` / `#FF5F1F` (orange)
+- **Background:** `var(--background)` / `#1a1a1a`
+- **Card:** `var(--card)` / `#141414`
+- **Border:** `var(--border)` / `#333`
+
+### Skew Rules
+
+- All containers use `SkewContainer` component with `-skew-x-12` — content flows with the skew (no counter-skew)
+- `noSkewMobile` prop: cards stay square on mobile, skew on desktop
+- Small decorative elements (dots, lines, dividers) use standalone `-skew-x-12`
+
+### Typography
+
+- `font-display` — Bold uppercase headings
+- `font-mono` — Labels, codes, status text
+- All animations respect `prefers-reduced-motion`
+
+## Admin Panel
+
+Route-based admin at `/admin` with persistent sidebar navigation:
+
+| Route | Purpose |
+|---|---|
+| `/admin` | Dashboard: stats, views, quick actions |
+| `/admin/projects` | CRUD projects with screenshot upload, reorder, featured |
+| `/admin/team` | CRUD team members with avatar upload, reorder |
+| `/admin/cases` | CRUD case studies with markdown, metrics, cover images, featured |
+| `/admin/blog` | CRUD blog posts with markdown preview, cover images, featured |
+| `/admin/analytics` | Page views, daily chart, top pages/posts |
+| `/admin/settings` | Solo mode, display count, security info, featured summary |
+
+### Admin Features
+
+- Reorder items with up/down arrows
+- Toggle featured status (star icon) — featured items appear in "Top Picks"
+- Markdown editor with live preview
+- Image upload for projects, team, cases, blog
+- Published/Draft toggle for cases and blog
+- Search/filter in all list views
+- Mobile sidebar with hamburger menu
+
+## Security
+
+- HMAC-SHA256 signed HTTP-only session cookies (24h expiry)
+- Rate limiting: 5 auth attempts per 15-minute window
+- CSRF protection via origin header verification
+- Password complexity: uppercase, lowercase, digit, special character
+- File uploads: type whitelist, 5MB max, UUID filenames
+- Zod validation on all inputs with max length constraints
+- Security headers in middleware
+- All admin actions guarded with `requireAuth()`
 
 ## Environment Variables
 
@@ -48,85 +141,17 @@ types.ts                Shared TypeScript interfaces
 |---|---|---|
 | `MONGODB_URI` | Yes | MongoDB connection string |
 | `GMAIL_USER` | Yes | Gmail address for SMTP |
-| `GMAIL_APP_PASSWORD` | Yes | Gmail app password ([generate here](https://myaccount.google.com/apppasswords)) |
-| `CONTACT_EMAIL` | Yes | Where contact form submissions are sent |
-| `RESEND_API_KEY` | No | Resend key for branded confirmation emails |
+| `GMAIL_APP_PASSWORD` | Yes | Gmail app password |
+| `CONTACT_EMAIL` | Yes | Contact form destination |
+| `RESEND_API_KEY` | No | Resend key for confirmation emails |
 | `SESSION_SECRET` | No | Cookie signing secret (falls back to `MONGODB_URI`) |
 
-## Security Measures
+## Data Model
 
-- **Server-side sessions** via HMAC-signed HTTP-only cookies (no client-side spoofing)
-- **Rate limiting** on auth endpoints (5 attempts per 15-minute window per email)
-- **CSRF protection** via origin header verification in middleware
-- **Password complexity** enforcement (uppercase, lowercase, number, special character required)
-- File uploads validated: type whitelist (JPEG/PNG/WebP/GIF/SVG), 5MB max, UUID filenames
-- All admin server actions protected with session auth guards
-- All user input in emails is HTML-escaped to prevent injection
-- Zod validation with max length constraints on all inputs
-- Security headers: `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy`, `Permissions-Policy`
-- Error messages sanitized before sending to client
-- `.env*` files excluded from git via `.gitignore`
-- TypeScript strict mode enabled (no `ignoreBuildErrors`)
-- Public pages are Server Components (SSR for SEO, no client-side data fetching)
-
----
-
-## What's Still Missing (Improvement Roadmap)
-
-### High Priority
-
-1. **Password reset flow** — No way to recover/change the admin password once created. Need email-based reset or a CLI reset command.
-
-### Medium Priority
-
-2. **Maintenance mode implementation** — `GlobalSettings.maintenanceMode` exists in the schema but is never checked. Need middleware or layout-level guard that returns a 503 page.
-
-9. **Drag-and-drop reordering** — Projects and team members have an `order` field but reordering is manual (type a number). Add drag-and-drop with `@dnd-kit/core`.
-
-10. **SEO: per-page metadata + Open Graph** — Only root layout has metadata. Each page (`/projects`, `/team`, `/about`, etc.) needs its own `title`, `description`, `og:image`.
-
-11. **Sitemap + robots.txt** — Missing `app/sitemap.ts` and `app/robots.ts` for search engine crawling.
-
-12. **Structured data (JSON-LD)** — No Schema.org markup for Organization, Person, or CreativeWork. Hurts rich snippet appearance.
-
-13. **Image optimization** — `images.unoptimized: true` disables Next.js image optimization. Should use `next/image` with proper `remotePatterns` config.
-
-14. **Pagination** — Project/team lists load everything at once. Will degrade with 50+ items. Add cursor-based pagination or at least a "load more" pattern.
-
-15. **Activity/audit logging** — No record of who did what. Admin actions (create/edit/delete) should be logged with timestamp and actor.
-
-16. **Social link URL validation** — Social links in team member forms accept any string. Should validate URLs match expected platform patterns.
-
-17. **Contact form: persist submissions to DB** — Submissions are only emailed. If email fails, the lead is lost. Store in a `ContactSubmission` model as backup.
-
-18. **Admin: bulk operations** — No way to delete multiple projects/members at once, or bulk update order.
-
-### Low Priority
-
-19. **Dark/light theme toggle** — Currently hardcoded dark theme. Not a priority for brutalist design, but accessibility-wise a high-contrast light option would help.
-
-20. **Animations/transitions** — Page transitions are abrupt. Could add subtle enter animations with Framer Motion on route changes.
-
-21. **Project detail pages** — `/projects` only shows a grid. No individual project page (`/projects/[slug]`) with full description, gallery, case study.
-
-22. **Blog/case studies section** — `/cases` page exists but likely has placeholder content. A proper Markdown/MDX blog system would add content marketing value.
-
-23. **Analytics dashboard in admin** — Show page views, contact form conversion rate, popular projects. Could integrate with Vercel Analytics API.
-
-24. **Multi-admin support** — Currently single-admin. Adding roles (owner, editor, viewer) would be useful for teams.
-
-25. **Testimonials/reviews section** — No client testimonials. Adding a testimonial model + display section builds credibility.
-
-26. **i18n/localization** — English-only. If targeting international clients, add `next-intl` or similar.
-
-27. **PWA support** — No `manifest.json`, no service worker. Adding would enable "install" on mobile.
-
-28. **Accessibility audit** — No ARIA labels on custom toggle switches, no skip-to-content link, no keyboard navigation testing, color contrast not verified for all text combinations.
-
-29. **Error boundary per-route** — Single global `ErrorBoundary`. Per-route `error.tsx` files would give better error isolation.
-
-30. **Database indexes** — No explicit indexes beyond `_id`. Add indexes on `Project.order`, `TeamMember.order`, `Admin.email` for query performance.
-
-31. **Content Security Policy** — No CSP header. Should restrict script/style/image sources to prevent XSS via injected resources.
-
-32. **Caching strategy** — No `revalidate` or ISR configuration. Server component data fetches happen on every request.
+- **Project** — title, liveUrl, screenshotUrl, techStack[], description, order, featured
+- **TeamMember** — name, role, bio, socialLinks (Map), avatarUrl, order, isOwner
+- **CaseStudy** — title, slug, subtitle, overview, description (markdown), coverImage, metricCards[], techStack[], published, featured, views
+- **BlogPost** — title, slug, excerpt, content (markdown), coverImage, tags[], keywords[], author, published, featured, views
+- **GlobalSettings** — soloMode, maintenanceMode, casesDisplayCount
+- **PageView** — path, contentType, contentId, date, count
+- **Admin** — email, passwordHash, isOwner

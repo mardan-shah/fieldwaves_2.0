@@ -29,13 +29,13 @@ class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-[#141414] border border-red-500 p-8 text-center">
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-card border border-red-500 p-8 text-center">
             <h1 className="font-display text-3xl font-bold mb-4 text-red-500">ERROR_DETECTED</h1>
-            <p className="text-[#B0B0B0] mb-6 font-mono text-sm">{this.state.error?.message || "An error occurred"}</p>
+            <p className="text-secondary mb-6 font-mono text-sm">{this.state.error?.message || "An error occurred"}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-[#FF5F1F] text-white font-mono text-sm font-bold hover:bg-[#FF5F1F]/80 transition-colors"
+              className="px-6 py-2 bg-primary text-white font-mono text-sm font-bold hover:bg-primary/80 transition-colors"
             >
               RESTART_SYSTEM
             </button>

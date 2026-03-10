@@ -9,14 +9,14 @@ import ConfirmDialog from "@/components/admin/ConfirmDialog"
 import type { TeamMember } from "@/types"
 import { Users, Eye, Search } from "lucide-react"
 import { toast } from "sonner"
-import { addTeamMember, updateTeamMember, deleteTeamMember, getAllTeamMembers } from "@/app/actions/admin"
+import { addTeamMember, updateTeamMember, deleteTeamMember, getAllTeamMembers, reorderItem } from "@/app/actions/admin"
 
 interface TeamViewProps {
-  team: TeamMember[]
-  setTeam: (team: TeamMember[]) => void
+  initialTeam: TeamMember[]
 }
 
-export default function TeamView({ team, setTeam }: TeamViewProps) {
+export default function TeamView({ initialTeam }: TeamViewProps) {
+  const [team, setTeam] = useState<TeamMember[]>(initialTeam)
   const [submitting, setSubmitting] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -62,6 +62,11 @@ export default function TeamView({ team, setTeam }: TeamViewProps) {
     toast.success("MEMBER UPDATED")
   }
 
+  const handleReorder = async (id: string, direction: "up" | "down") => {
+    await reorderItem("team", id, direction)
+    await refreshTeam()
+  }
+
   const handleDeleteClick = (id: string) => {
     setDeleteTarget(id)
     setConfirmOpen(true)
@@ -96,20 +101,20 @@ export default function TeamView({ team, setTeam }: TeamViewProps) {
       {/* Team List */}
       <section>
         <div className="flex items-center gap-3 mb-6">
-          <Eye className="text-[#FF5F1F]" />
+          <Eye className="text-primary" />
           <h2 className="font-mono font-bold text-lg tracking-wider">ACTIVE_PERSONNEL</h2>
         </div>
 
         {/* Search */}
         <div className="mb-4">
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666]" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search team members..."
-              className="w-full bg-[#0a0a0a] border border-[#333] focus:border-[#FF5F1F] text-white pl-10 pr-4 py-2.5 outline-none font-mono text-sm placeholder:text-[#666] transition-colors"
+              className="w-full bg-input border border-border focus:border-primary text-white pl-10 pr-4 py-2.5 outline-none font-mono text-sm placeholder:text-muted transition-colors"
             />
           </div>
         </div>
@@ -118,17 +123,18 @@ export default function TeamView({ team, setTeam }: TeamViewProps) {
           team={filteredTeam}
           onDelete={handleDeleteClick}
           onEdit={handleEditMember}
+          onReorder={handleReorder}
         />
       </section>
 
       {/* Add Team Member Form */}
       <section>
         <div className="flex items-center gap-3 mb-6">
-          <Users className="text-[#FF5F1F]" />
+          <Users className="text-primary" />
           <h2 className="font-mono font-bold text-lg tracking-wider">ADD_TEAM_MEMBER</h2>
         </div>
 
-        <SkewContainer variant="outline" className="p-8 bg-[#141414]">
+        <SkewContainer variant="outline" className="p-8 bg-card">
           <TeamMemberFormEnhanced onSubmit={handleAddTeamMember} loading={submitting} />
         </SkewContainer>
       </section>

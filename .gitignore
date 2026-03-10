@@ -30,3 +30,6 @@ next-env.d.ts
 
 CLAUDE.md
 bun.lock
+
+
+public/team/*

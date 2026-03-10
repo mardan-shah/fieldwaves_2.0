@@ -11,18 +11,18 @@ interface ServiceCardProps {
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ icon: Icon, title, description, features }) => {
   return (
-    <SkewContainer variant="glass" className="p-8 h-full group hover:bg-[#1a1a1a]/60 transition-all">
-      <div className="space-y-6 -skew-x-12">
-        <Icon className="text-[#FF5F1F] group-hover:scale-110 transition-transform" size={32} strokeWidth={2} />
+    <SkewContainer variant="glass" className="p-8 h-full group hover:bg-background/60 transition-all">
+      <div className="space-y-6">
+        <Icon className="text-primary group-hover:scale-110 transition-transform" size={32} strokeWidth={2} />
         <div>
           <h3 className="font-display text-2xl font-bold mb-3 uppercase">{title}</h3>
-          <p className="text-[#B0B0B0] text-sm leading-relaxed mb-4">{description}</p>
+          <p className="text-secondary text-sm leading-relaxed mb-4">{description}</p>
         </div>
         <div className="space-y-2">
           {features.map((feature, i) => (
             <div key={i} className="flex gap-3 items-start text-sm">
-              <div className="w-1.5 h-1.5 bg-[#FF5F1F] rounded-full mt-2 shrink-0"></div>
-              <span className="text-[#B0B0B0]">{feature}</span>
+              <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 shrink-0"></div>
+              <span className="text-secondary">{feature}</span>
             </div>
           ))}
         </div>

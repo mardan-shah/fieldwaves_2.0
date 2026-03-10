@@ -12,7 +12,8 @@ import MarkdownEditor from "@/components/ui/MarkdownEditor"
 import SocialIconPicker, { SOCIAL_PLATFORMS } from "@/components/ui/SocialIconPicker"
 import SkewContainer from "@/components/ui/SkewContainer"
 import type { TeamMember } from "@/types"
-import { Loader2, Save, Upload, Plus, X } from "lucide-react"
+import ImageCropUpload from "@/components/admin/ImageCropUpload"
+import { Loader2, Save, Plus, X } from "lucide-react"
 
 interface EditTeamMemberModalProps {
   member: TeamMember | null
@@ -127,20 +128,20 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="bg-[#141414] border border-[#333] rounded-none max-w-lg max-h-[90vh] overflow-y-auto" showCloseButton={false}>
+      <DialogContent className="bg-card border border-border rounded-none max-w-lg max-h-[90vh] overflow-y-auto" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle className="font-display text-xl font-bold text-[#FF5F1F] tracking-wider uppercase">
+          <DialogTitle className="font-display text-xl font-bold text-primary tracking-wider uppercase">
             EDIT TEAM MEMBER
           </DialogTitle>
         </DialogHeader>
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-[#333]">
+        <div className="flex gap-2 border-b border-border">
           <button
             type="button"
             onClick={() => setActiveTab("basics")}
             className={`px-4 py-2 font-mono text-sm transition-colors ${
-              activeTab === "basics" ? "border-b-2 border-[#FF5F1F] text-[#FF5F1F]" : "text-[#B0B0B0] hover:text-white"
+              activeTab === "basics" ? "border-b-2 border-primary text-primary" : "text-secondary hover:text-white"
             }`}
           >
             BASICS
@@ -149,7 +150,7 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
             type="button"
             onClick={() => setActiveTab("socials")}
             className={`px-4 py-2 font-mono text-sm transition-colors ${
-              activeTab === "socials" ? "border-b-2 border-[#FF5F1F] text-[#FF5F1F]" : "text-[#B0B0B0] hover:text-white"
+              activeTab === "socials" ? "border-b-2 border-primary text-primary" : "text-secondary hover:text-white"
             }`}
           >
             SOCIALS ({socials.length})
@@ -159,27 +160,13 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
         <form onSubmit={handleSubmit} className="space-y-4">
           {activeTab === "basics" && (
             <div className="space-y-4">
-              {/* Avatar Preview */}
-              {member?.avatarUrl && (
-                <div className="flex items-center gap-4">
-                  <div
-                    className="w-16 h-16 border border-[#333] overflow-hidden"
-                    style={{ backgroundColor: form.backgroundColor }}
-                  >
-                    <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover" />
-                  </div>
-                  <label className="cursor-pointer bg-[#0a0a0a] border border-[#333] hover:border-[#FF5F1F] text-[#B0B0B0] px-4 py-2 text-xs font-mono transition-colors flex items-center gap-2">
-                    <Upload size={14} />
-                    {avatarFile ? avatarFile.name : "CHANGE_AVATAR"}
-                    <input
-                      type="file"
-                      onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
-                      className="hidden"
-                      accept="image/*"
-                    />
-                  </label>
-                </div>
-              )}
+              <ImageCropUpload
+                currentImage={member?.avatarUrl || null}
+                onCropped={(file) => setAvatarFile(file)}
+                label="AVATAR"
+                aspect={1}
+                height="h-40"
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <FormInput
@@ -210,7 +197,7 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="group">
-                  <label className="block font-mono text-xs text-[#B0B0B0] mb-2 tracking-widest">BG_COLOR</label>
+                  <label className="block font-mono text-xs text-secondary mb-2 tracking-widest">BG_COLOR</label>
                   <div className="flex gap-2">
                     <input
                       type="color"
@@ -229,14 +216,14 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
                 />
 
                 <div className="group">
-                  <label className="block font-mono text-xs text-[#B0B0B0] mb-2 tracking-widest">IS_OWNER</label>
+                  <label className="block font-mono text-xs text-secondary mb-2 tracking-widest">IS_OWNER</label>
                   <button
                     type="button"
                     onClick={() => setForm(prev => ({ ...prev, isOwner: !prev.isOwner }))}
                     className={`w-full h-10 border font-mono text-xs tracking-wider transition-colors ${
                       form.isOwner
-                        ? "bg-[#FF5F1F] border-[#FF5F1F] text-white"
-                        : "bg-[#0a0a0a] border-[#333] text-[#666]"
+                        ? "bg-primary border-primary text-white"
+                        : "bg-input border-border text-muted"
                     }`}
                   >
                     {form.isOwner ? "YES" : "NO"}
@@ -249,7 +236,7 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
           {activeTab === "socials" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <label className="block font-mono text-xs text-[#B0B0B0] tracking-widest">SELECT PLATFORM</label>
+                <label className="block font-mono text-xs text-secondary tracking-widest">SELECT PLATFORM</label>
                 <SocialIconPicker
                   selected={newSocial.platform}
                   onChange={(p) => setNewSocial({ ...newSocial, platform: p })}
@@ -267,7 +254,7 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
               <button type="button" onClick={handleAddSocial} className="w-full group">
                 <SkewContainer
                   variant="secondary"
-                  className="py-2 text-center flex items-center justify-center gap-2 skew-x-0"
+                  className="py-2 text-center flex items-center justify-center gap-2"
                   hoverEffect
                 >
                   <div className="flex items-center justify-center gap-2">
@@ -282,15 +269,15 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
                   const platform = SOCIAL_PLATFORMS.find(s => s.name === social.platform)
                   const Icon = platform?.icon
                   return (
-                    <div key={i} className="flex items-center justify-between bg-[#0a0a0a] border border-[#333] p-3">
+                    <div key={i} className="flex items-center justify-between bg-input border border-border p-3">
                       <div className="flex items-center gap-3">
-                        {Icon && <Icon size={16} className="text-[#FF5F1F]" />}
-                        <span className="text-sm text-[#B0B0B0] truncate">{social.url}</span>
+                        {Icon && <Icon size={16} className="text-primary" />}
+                        <span className="text-sm text-secondary truncate">{social.url}</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => setSocials(socials.filter((_, idx) => idx !== i))}
-                        className="text-[#FF5F1F] hover:text-red-500"
+                        className="text-primary hover:text-red-500"
                       >
                         <X size={16} />
                       </button>
@@ -305,12 +292,12 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="flex-1 py-3 bg-[#0a0a0a] border border-[#333] text-[#B0B0B0] hover:text-white font-mono text-xs tracking-wider transition-colors"
+              className="flex-1 py-3 bg-input border border-border text-secondary hover:text-white font-mono text-xs tracking-wider transition-colors"
             >
               CANCEL
             </button>
             <button type="submit" disabled={loading} className="flex-1 group">
-              <SkewContainer variant="primary" className="py-3 text-center flex items-center justify-center gap-2 skew-x-0" hoverEffect>
+              <SkewContainer variant="primary" className="py-3 text-center flex items-center justify-center gap-2" hoverEffect>
                 <div className="flex items-center justify-center gap-2">
                   {loading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                   <span className="font-bold tracking-widest text-xs">SAVE</span>

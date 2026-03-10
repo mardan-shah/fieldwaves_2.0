@@ -20,6 +20,7 @@
   --destructive-foreground: #ffffff;
   --border: #333333;
   --input: #0a0a0a;
+  --surface: #0f0f0f;
   --ring: #ff5f1f;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -62,6 +63,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-surface: var(--surface);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -91,8 +93,20 @@
     scroll-behavior: smooth;
   }
 
+  /* Reduced motion: respect user accessibility preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
   }
 
   /* Typography */
@@ -125,13 +139,14 @@
 }
 
 @layer utilities {
-  /* Skew utilities */
+  /* Skew utilities — content flows with the skew, no counter-skew */
   .skew-container {
     @apply relative transform -skew-x-12;
   }
 
-  .skew-content {
-    @apply transform skew-x-12;
+  /* Cards/grids: square on mobile, skewed on desktop only */
+  .skew-container-desktop {
+    @apply relative transform md:-skew-x-12;
   }
 
   /* Animation utilities */
@@ -176,6 +191,30 @@
   .animate-fade-in {
     animation: fade-in 0.3s ease-out;
   }
+
+  /* Scroll-triggered entrance animation */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.4s ease-out both;
+  }
+
+  /* Staggered delays for children */
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.3s; }
 
   /* Glassmorphism */
   .glass {

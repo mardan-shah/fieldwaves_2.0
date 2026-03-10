@@ -33,41 +33,41 @@ const TeamMemberForm: React.FC<TeamMemberFormProps> = ({ onSubmit, loading }) =>
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid md:grid-cols-2 gap-4">
         <div>
-          <label className="block font-mono text-xs text-[#B0B0B0] mb-2">NAME</label>
+          <label className="block font-mono text-xs text-secondary mb-2">NAME</label>
           <input
             type="text"
             value={formData.name}
             onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-            className="w-full bg-[#0a0a0a] border border-[#333] text-white p-3 focus:border-[#FF5F1F] outline-none"
+            className="w-full bg-input border border-border text-white p-3 focus:border-primary outline-none"
           />
         </div>
         <div>
-          <label className="block font-mono text-xs text-[#B0B0B0] mb-2">ROLE</label>
+          <label className="block font-mono text-xs text-secondary mb-2">ROLE</label>
           <input
             type="text"
             value={formData.role}
             onChange={(e) => setFormData((prev) => ({ ...prev, role: e.target.value }))}
-            className="w-full bg-[#0a0a0a] border border-[#333] text-white p-3 focus:border-[#FF5F1F] outline-none"
+            className="w-full bg-input border border-border text-white p-3 focus:border-primary outline-none"
           />
         </div>
       </div>
 
       <div>
-        <label className="block font-mono text-xs text-[#B0B0B0] mb-2">BIO</label>
+        <label className="block font-mono text-xs text-secondary mb-2">BIO</label>
         <textarea
           value={formData.bio}
           onChange={(e) => setFormData((prev) => ({ ...prev, bio: e.target.value }))}
-          className="w-full bg-[#0a0a0a] border border-[#333] text-white p-3 focus:border-[#FF5F1F] outline-none h-24"
+          className="w-full bg-input border border-border text-white p-3 focus:border-primary outline-none h-24"
         />
       </div>
 
       <div>
-        <label className="block font-mono text-xs text-[#B0B0B0] mb-2">AVATAR_URL</label>
+        <label className="block font-mono text-xs text-secondary mb-2">AVATAR_URL</label>
         <input
           type="url"
           value={formData.avatarUrl}
           onChange={(e) => setFormData((prev) => ({ ...prev, avatarUrl: e.target.value }))}
-          className="w-full bg-[#0a0a0a] border border-[#333] text-white p-3 focus:border-[#FF5F1F] outline-none"
+          className="w-full bg-input border border-border text-white p-3 focus:border-primary outline-none"
         />
       </div>
 

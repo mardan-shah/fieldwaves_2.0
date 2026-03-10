@@ -45,19 +45,19 @@ export default function AdminLoginForm({ needsSetup }: AdminLoginFormProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center p-4">
-      <SkewContainer variant="outline" className="w-full max-w-md p-10 bg-[#141414]">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <SkewContainer variant="outline" className="w-full max-w-md p-10 bg-card">
         <div className="mb-8 text-center">
-          <Terminal size={48} className="mx-auto text-[#FF5F1F] mb-4" />
+          <Terminal size={48} className="mx-auto text-primary mb-4" />
           <h1 className="font-display text-3xl font-bold">
             {needsSetup ? "SYSTEM_INIT" : "SECURE_GATE"}
           </h1>
-          <p className="font-mono text-xs text-[#B0B0B0]">
+          <p className="font-mono text-xs text-secondary">
             {needsSetup ? "CREATE ROOT CREDENTIALS" : "RESTRICTED ACCESS ONLY"}
           </p>
         </div>
 
-        <form onSubmit={handleAuth} className="space-y-6 -skew-x-12">
+        <form onSubmit={handleAuth} className="space-y-6">
           <FormInput
             type="email"
             value={email}
@@ -77,7 +77,7 @@ export default function AdminLoginForm({ needsSetup }: AdminLoginFormProps) {
           />
 
           {needsSetup && (
-            <p className="text-xs text-[#666] font-mono skew-x-12">
+            <p className="text-xs text-muted font-mono">
               Must include uppercase, lowercase, number, and special character
             </p>
           )}
@@ -91,7 +91,7 @@ export default function AdminLoginForm({ needsSetup }: AdminLoginFormProps) {
           <button type="submit" disabled={isSubmitting} className="w-full group">
             <SkewContainer
               variant="primary"
-              className="py-3 text-center flex items-center justify-center gap-2 skew-x-0"
+              className="py-3 text-center flex items-center justify-center gap-2"
               hoverEffect
             >
               <div className="flex items-center justify-center gap-2">

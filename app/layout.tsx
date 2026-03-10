@@ -1,10 +1,11 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
+import Script from "next/script"
 import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
 import ErrorBoundary from "../components/ErrorBoundary"
 import ScrollToTop from "../components/ScrollToTop"
 import { Toaster } from "sonner"
+import AdSenseScript from "@/components/ads/AdSenseScript"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
@@ -31,11 +32,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-N9W6MQTJ7C" strategy="afterInteractive" />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){window.dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-N9W6MQTJ7C');
+          `}
+        </Script>
+      </head>
       <body className={`font-sans antialiased`}>
         <ErrorBoundary>
           {children}
           <ScrollToTop />
-          <Analytics />
+          <AdSenseScript />
           <Toaster position="top-right" theme="dark" richColors />
         </ErrorBoundary>
       </body>

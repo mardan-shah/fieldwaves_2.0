@@ -16,17 +16,17 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({ quote, author, title,
     <SkewContainer variant="glass" className="p-8 h-full flex flex-col">
       <div className="flex gap-1 mb-4">
         {[...Array(rating)].map((_, i) => (
-          <Star key={i} size={16} fill="#FF5F1F" color="#FF5F1F" />
+          <Star key={i} size={16} fill="var(--primary)" color="var(--primary)" />
         ))}
       </div>
 
-      <p className="text-lg text-[#B0B0B0] mb-8 flex-grow italic">"{quote}"</p>
+      <p className="text-lg text-secondary mb-8 flex-grow italic">"{quote}"</p>
 
-      <div className="flex items-center gap-4 border-t border-[#333] pt-6">
+      <div className="flex items-center gap-4 border-t border-border pt-6">
         <img src={avatar || "/placeholder.svg"} alt={author} className="w-12 h-12 rounded-full grayscale" />
         <div>
           <p className="font-display font-bold text-white">{author}</p>
-          <p className="font-mono text-xs text-[#FF5F1F]">
+          <p className="font-mono text-xs text-primary">
             {title} @ {company}
           </p>
         </div>

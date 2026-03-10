@@ -1,7 +1,7 @@
 'use server'
 
 import connectToDatabase from '@/lib/db';
-import { Project, TeamMember, GlobalSettings } from '@/lib/models';
+import { Project, TeamMember, GlobalSettings, CaseStudy, BlogPost } from '@/lib/models';
 import { Resend } from 'resend';
 import { z } from 'zod';
 
@@ -183,7 +183,7 @@ export async function submitContactForm(formData: FormData) {
   }
 }
 
-export async function getProjects(): Promise<{ _id: string; title: string; description: string; liveUrl: string; screenshotUrl: string; techStack: string[]; order: number }[]> {
+export async function getProjects(): Promise<{ _id: string; title: string; description: string; liveUrl: string; screenshotUrl: string; techStack: string[]; order: number; featured: boolean }[]> {
   await connectToDatabase();
   let projects = await Project.find().sort({ order: 1, _id: -1 }).lean();
 
@@ -201,6 +201,7 @@ export async function getProjects(): Promise<{ _id: string; title: string; descr
     screenshotUrl: p.screenshotUrl,
     techStack: p.techStack,
     order: (p as any).order || 0,
+    featured: (p as any).featured || false,
   }));
 }
 
@@ -243,12 +244,146 @@ export async function getTeam(): Promise<{ _id: string; name: string; role: stri
   return result;
 }
 
-export async function getSettings(): Promise<{ soloMode: boolean; maintenanceMode: boolean } | null> {
+export async function getSettings(): Promise<{ soloMode: boolean; maintenanceMode: boolean; casesDisplayCount: number } | null> {
   await connectToDatabase();
   let settings = await GlobalSettings.findOne().lean();
   if (!settings) {
      await GlobalSettings.create(INITIAL_SETTINGS);
      settings = await GlobalSettings.findOne().lean();
   }
-  return settings ? { soloMode: settings.soloMode, maintenanceMode: settings.maintenanceMode } : null;
+  return settings ? { soloMode: settings.soloMode, maintenanceMode: settings.maintenanceMode, casesDisplayCount: (settings as any).casesDisplayCount ?? 3 } : null;
+}
+
+export async function getCaseStudies() {
+  await connectToDatabase();
+  const cases = await CaseStudy.find({ published: true }).sort({ order: 1, _id: -1 }).lean();
+  return cases.map(c => ({
+    _id: c._id.toString(),
+    title: c.title,
+    slug: c.slug,
+    subtitle: c.subtitle || '',
+    overview: c.overview || '',
+    description: c.description || '',
+    coverImage: c.coverImage || '',
+    metricCards: (c.metricCards || []).map((m: any) => ({ label: m.label || '', value: m.value || '', unit: m.unit || '' })),
+    techStack: c.techStack || [],
+    published: c.published,
+    featured: (c as any).featured || false,
+    order: c.order || 0,
+    views: (c as any).views || 0,
+    createdAt: (c as any).createdAt?.toISOString?.() || '',
+    updatedAt: (c as any).updatedAt?.toISOString?.() || '',
+  }));
+}
+
+export async function getCaseStudyBySlug(slug: string) {
+  await connectToDatabase();
+  const c = await CaseStudy.findOne({ slug, published: true }).lean();
+  if (!c) return null;
+  return {
+    _id: c._id.toString(),
+    title: c.title,
+    slug: c.slug,
+    subtitle: c.subtitle || '',
+    overview: c.overview || '',
+    description: c.description || '',
+    coverImage: c.coverImage || '',
+    metricCards: (c.metricCards || []).map((m: any) => ({ label: m.label || '', value: m.value || '', unit: m.unit || '' })),
+    techStack: c.techStack || [],
+    published: c.published,
+    featured: (c as any).featured || false,
+    order: c.order || 0,
+    views: (c as any).views || 0,
+    createdAt: (c as any).createdAt?.toISOString?.() || '',
+    updatedAt: (c as any).updatedAt?.toISOString?.() || '',
+  };
+}
+
+export async function getBlogPosts() {
+  await connectToDatabase();
+  const posts = await BlogPost.find({ published: true }).sort({ order: 1, _id: -1 }).lean();
+  return posts.map(p => ({
+    _id: p._id.toString(),
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt || '',
+    content: p.content || '',
+    coverImage: p.coverImage || '',
+    keywords: p.keywords || [],
+    tags: p.tags || [],
+    author: p.author || '',
+    published: p.published,
+    featured: (p as any).featured || false,
+    order: p.order || 0,
+    views: p.views || 0,
+    createdAt: (p as any).createdAt?.toISOString?.() || '',
+    updatedAt: (p as any).updatedAt?.toISOString?.() || '',
+  }));
+}
+
+export async function getFeaturedBlogPosts() {
+  await connectToDatabase();
+  const posts = await BlogPost.find({ published: true, featured: true }).sort({ order: 1, _id: -1 }).lean();
+  return posts.map(p => ({
+    _id: p._id.toString(),
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt || '',
+    content: p.content || '',
+    coverImage: p.coverImage || '',
+    keywords: p.keywords || [],
+    tags: p.tags || [],
+    author: p.author || '',
+    published: p.published,
+    featured: (p as any).featured || false,
+    order: p.order || 0,
+    views: p.views || 0,
+    createdAt: (p as any).createdAt?.toISOString?.() || '',
+    updatedAt: (p as any).updatedAt?.toISOString?.() || '',
+  }));
+}
+
+export async function getFeaturedCaseStudies() {
+  await connectToDatabase();
+  const cases = await CaseStudy.find({ published: true, featured: true }).sort({ order: 1, _id: -1 }).lean();
+  return cases.map(c => ({
+    _id: c._id.toString(),
+    title: c.title,
+    slug: c.slug,
+    subtitle: c.subtitle || '',
+    overview: c.overview || '',
+    description: c.description || '',
+    coverImage: c.coverImage || '',
+    metricCards: (c.metricCards || []).map((m: any) => ({ label: m.label || '', value: m.value || '', unit: m.unit || '' })),
+    techStack: c.techStack || [],
+    published: c.published,
+    featured: (c as any).featured || false,
+    order: c.order || 0,
+    views: (c as any).views || 0,
+    createdAt: (c as any).createdAt?.toISOString?.() || '',
+    updatedAt: (c as any).updatedAt?.toISOString?.() || '',
+  }));
+}
+
+export async function getBlogPostBySlug(slug: string) {
+  await connectToDatabase();
+  const p = await BlogPost.findOne({ slug, published: true }).lean();
+  if (!p) return null;
+  return {
+    _id: p._id.toString(),
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt || '',
+    content: p.content || '',
+    coverImage: p.coverImage || '',
+    keywords: p.keywords || [],
+    tags: p.tags || [],
+    author: p.author || '',
+    published: p.published,
+    featured: (p as any).featured || false,
+    order: p.order || 0,
+    views: p.views || 0,
+    createdAt: (p as any).createdAt?.toISOString?.() || '',
+    updatedAt: (p as any).updatedAt?.toISOString?.() || '',
+  };
 }

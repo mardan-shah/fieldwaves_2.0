@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun run build:*)",
+      "Bash(npx next:*)",
+      "Bash(bun:*)",
+      "Bash(rm:*)",
+      "Bash(sed:*)",
+      "mcp__mongodb-fieldwaves__list-databases",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" bun run:*)",
+      "Bash(mkdir:*)",
+      "Bash(do mv:*)",
+      "Bash(ls:*)",
+      "Bash(cp:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "mongodb-fieldwaves"
+  ]
+}

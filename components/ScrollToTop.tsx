@@ -25,12 +25,10 @@ const ScrollToTop = () => {
   return isVisible ? (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-8 right-8 p-3 bg-[#FF5F1F] text-white hover:bg-[#FF5F1F]/80 transition-all transform -skew-x-12 z-40"
+      className="fixed bottom-8 right-8 p-3 bg-primary text-white hover:bg-primary/80 transition-all transform -skew-x-12 z-40"
       aria-label="Scroll to top"
     >
-      <div className="transform skew-x-12">
-        <ArrowUp size={20} />
-      </div>
+      <ArrowUp size={20} />
     </button>
   ) : null
 }
