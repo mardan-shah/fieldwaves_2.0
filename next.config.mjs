@@ -9,6 +9,8 @@ const nextConfig = {
   },
   experimental: {
     mcpServer: true,
+    workerThreads: false,
+    cpus: 1
   },
   async headers() {
     return [

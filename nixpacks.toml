@@ -1,11 +1,14 @@
 [phases.setup]
-nixPkgs = ["bun"]
+# Include both runtimes
+nixPkgs = ["bun", "nodejs_22"] 
 
 [phases.install]
 cmds = ["bun install"]
 
 [phases.build]
-cmds = ["bun run build"]
+# Use node specifically for the build to avoid Bun's worker_thread bugs
+cmds = ["node_modules/.bin/next build"]
 
 [start]
+# You can stick with bun for the runtime as it's lighter
 cmd = "bun run start"
