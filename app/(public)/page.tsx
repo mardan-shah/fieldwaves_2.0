@@ -5,7 +5,7 @@ import StatCard from "@/components/ui/StatCard"
 import SectionHeading from "@/components/ui/SectionHeading"
 import ProjectGrid from "@/components/ProjectGrid"
 import ServiceCard from "@/components/ServiceCard"
-import { getProjects } from "@/app/actions/public"
+import { getProjects, getServices } from "@/app/actions/public"
 import { Lightbulb, Cpu, Lock, Zap, Code, ShieldCheck, Clock, Users, Target } from "lucide-react"
 
 export const metadata: Metadata = {
@@ -16,27 +16,27 @@ export const metadata: Metadata = {
 const services = [
   {
     icon: Cpu,
-    title: "Full-Stack Architecture",
-    description: "Enterprise-grade systems built for scale, security, and performance.",
-    features: ["Microservices design", "API optimization", "Database sharding", "Load balancing"],
+    title: "Bespoke Digital Platforms",
+    description: "Architectural excellence meets unique design. We build high-fidelity systems that scale with your ambitions.",
+    features: ["Custom UI/UX implementation", "Performance-first architecture", "Cloud-native infrastructure", "Real-time data streaming"],
   },
   {
-    icon: Lock,
-    title: "Security Hardening",
-    description: "Comprehensive security audits and hardening from the ground up.",
-    features: ["Penetration testing", "Vulnerability assessment", "Compliance audit", "Security protocols"],
+    icon: ShieldCheck,
+    title: "Enterprise Hardening",
+    description: "Military-grade security and reliability for your most critical digital assets.",
+    features: ["Offensive security audits", "Compliance-ready systems", "End-to-end encryption", "Zero-trust architecture"],
   },
   {
     icon: Zap,
-    title: "Performance Optimization",
-    description: "Extract maximum efficiency from your infrastructure.",
-    features: ["Code profiling", "CDN integration", "Caching strategy", "Query optimization"],
+    title: "Rapid Deployment",
+    description: "We use AI to accelerate the build without compromising on senior-level engineering standards.",
+    features: ["Accelerated prototyping", "CI/CD automation", "Automated testing", "Cloud-edge optimization"],
   },
   {
     icon: Code,
-    title: "AI-Powered Development",
-    description: "Accelerate development with AI-assisted code generation and review.",
-    features: ["Code generation", "Automated testing", "Performance analysis", "Best practices"],
+    title: "System Refactoring",
+    description: "Modernize legacy systems into high-performance, maintenance-free infrastructure.",
+    features: ["Database optimization", "API modernization", "Microservices migration", "Security audits"],
   },
 ]
 
@@ -65,6 +65,7 @@ const whyUs = [
 
 export default async function Home() {
   const projects = await getProjects()
+  const services = await getServices()
 
   return (
     <>
@@ -79,27 +80,28 @@ export default async function Home() {
           }}
         />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-14 md:px-6 w-full">
+        <div className="relative z-10 max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6 w-full">
           <div className="flex flex-col items-start gap-4">
-            <SkewContainer variant="secondary" className="px-3 py-1 mb-4">
-              <span className="font-mono text-xs font-bold tracking-widest">SYS_ONLINE // V.2.5.0</span>
+            <SkewContainer variant="secondary" className="px-3 py-1 mb-4 flex items-center gap-2">
+              <span className="w-2 h-2 bg-primary animate-pulse rounded-full" />
+              <span className="font-mono text-[10px] font-bold tracking-widest uppercase">SYSTM_READY // BUILD_V2.5.0</span>
             </SkewContainer>
 
             <h1 className="font-display text-6xl md:text-8xl font-bold leading-[0.9] tracking-tighter uppercase mb-6 max-w-5xl">
-              Engineering <br />
+              Engineered <br />
               <span className="text-transparent" style={{ WebkitTextStroke: "2px var(--primary)" }}>
-                Over Vibe
+                Aesthetics
               </span>{" "}
               <br />
-              Coding
+              Infrastructure
             </h1>
 
-            <div className="max-w-2xl bg-background/80 backdrop-blur-sm border-l-4 border-primary pl-6 py-2 -skew-x-12">
-              <div>
-                <p className="text-xl md:text-2xl text-secondary font-light">
-                  We use AI not to copy-paste, but to accelerate{" "}
-                  <span className="text-white font-bold">senior-level security</span> and{" "}
-                  <span className="text-white font-bold">architectural rigor</span>.
+            <div className="max-w-2xl bg-background/80 backdrop-blur-sm border-l-4 border-primary pl-6 py-4 -skew-x-12">
+              <div className="skew-x-12">
+                <p className="text-xl md:text-2xl text-secondary font-light leading-relaxed">
+                  We build <span className="text-white font-bold">unique digital identities</span> with
+                  <span className="text-white font-bold"> enterprise-grade rigor</span>. High-performance
+                  infrastructure for ambitious startups and global industry leaders.
                 </p>
               </div>
             </div>
@@ -116,16 +118,18 @@ export default async function Home() {
 
       {/* --- STATS SECTION --- */}
       <section className="py-24 bg-card">
-        <div className="max-w-7xl mx-auto px-14 md:px-6">
+        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6">
           <div className="grid md:grid-cols-4 gap-6">
             <StatCard
+              index={1}
               label="Projects Delivered"
               value={`${projects.length}+`}
               description="Enterprise-scale solutions"
             />
-            <StatCard label="Uptime" value="99.99%" description="Average reliability" />
-            <StatCard label="Performance" value="89%" description="Average improvement" />
+            <StatCard index={2} label="Uptime" value="99.99%" description="Average reliability" />
+            <StatCard index={3} label="Performance" value="89%" description="Average improvement" />
             <StatCard
+              index={4}
               label="Services"
               value="6+"
               description="Core capabilities"
@@ -136,7 +140,7 @@ export default async function Home() {
 
       {/* --- FEATURED PROJECTS PREVIEW --- */}
       <section className="py-24 bg-card">
-        <div className="max-w-7xl mx-auto px-14 md:px-6">
+        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6">
           <SectionHeading
             label="Recent Work"
             title="Featured Deployments"
@@ -157,7 +161,7 @@ export default async function Home() {
 
       {/* --- SERVICES PREVIEW --- */}
       <section className="py-24 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-14 md:px-6 relative z-10">
+        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6 relative z-10">
           <SectionHeading
             label="Our Arsenal"
             title="What We Do"
@@ -167,8 +171,8 @@ export default async function Home() {
           />
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {services.map((service, i) => (
-              <ServiceCard key={i} {...service} />
+            {services.slice(0, 4).map((service, i) => (
+              <ServiceCard key={service._id} index={i + 1} {...service} />
             ))}
           </div>
 
@@ -180,7 +184,7 @@ export default async function Home() {
 
       {/* --- WHY US --- */}
       <section className="py-24 bg-card">
-        <div className="max-w-7xl mx-auto px-14 md:px-6">
+        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6">
           <SectionHeading
             label="The Difference"
             title="Why FieldWaves"

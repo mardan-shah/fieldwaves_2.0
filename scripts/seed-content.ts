@@ -45,8 +45,18 @@ const caseStudySchema = new mongoose.Schema({
   views: { type: Number, default: 0 },
 }, { timestamps: true })
 
+const serviceSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+  iconName: String,
+  features: [String],
+  order: { type: Number, default: 0 },
+  active: { type: Boolean, default: true },
+})
+
 const BlogPost = mongoose.models.BlogPost || mongoose.model('BlogPost', blogPostSchema)
 const CaseStudy = mongoose.models.CaseStudy || mongoose.model('CaseStudy', caseStudySchema)
+const Service = mongoose.models.Service || mongoose.model('Service', serviceSchema)
 
 // ---- Dummy Blog Posts ----
 
@@ -717,6 +727,59 @@ Headless commerce isn't just a technical upgrade — it's a business transformat
   }
 ]
 
+// ---- Services ----
+
+const services = [
+  {
+    title: "Bespoke Digital Platforms",
+    description: "Architectural excellence meets unique design. We build high-fidelity systems that scale with your ambitions.",
+    iconName: "Cpu",
+    features: ["Custom UI/UX implementation", "Performance-first architecture", "Cloud-native infrastructure", "Real-time data streaming"],
+    order: 1,
+    active: true,
+  },
+  {
+    title: "Enterprise Hardening",
+    description: "Military-grade security and reliability for your most critical digital assets.",
+    iconName: "ShieldCheck",
+    features: ["Offensive security audits", "Compliance-ready systems", "End-to-end encryption", "Zero-trust architecture"],
+    order: 2,
+    active: true,
+  },
+  {
+    title: "Rapid Deployment",
+    description: "We use AI to accelerate the build without compromising on senior-level engineering standards.",
+    iconName: "Zap",
+    features: ["Accelerated prototyping", "CI/CD automation", "Automated testing", "Cloud-edge optimization"],
+    order: 3,
+    active: true,
+  },
+  {
+    title: "System Refactoring",
+    description: "Modernize legacy systems into high-performance, maintenance-free infrastructure.",
+    iconName: "Code",
+    features: ["Database optimization", "API modernization", "Microservices migration", "Security audits"],
+    order: 4,
+    active: true,
+  },
+  {
+    title: "Strategic Analytics",
+    description: "High-fidelity monitoring and custom dashboards for total operational visibility.",
+    iconName: "BarChart3",
+    features: ["Real-time visualizers", "Predictive maintenance", "Behavioral analysis", "Metric-driven pivots"],
+    order: 5,
+    active: true,
+  },
+  {
+    title: "Infrastructure Design",
+    description: "Robust, automated deployment pipelines that eliminate human error.",
+    iconName: "Wrench",
+    features: ["Kubernetes orchestration", "Infrastructure as Code", "Global-scale networking", "High-availability nodes"],
+    order: 6,
+    active: true,
+  },
+]
+
 // ---- Execute ----
 
 async function seed() {
@@ -744,7 +807,17 @@ async function seed() {
     console.log(`  Case: "${cs.title}" ✓`)
   }
 
-  console.log('\nDone! Seeded 3 blog posts and 3 case studies.')
+  // Upsert services
+  for (const s of services) {
+    await Service.findOneAndUpdate(
+      { title: s.title },
+      s,
+      { upsert: true, new: true }
+    )
+    console.log(`  Service: "${s.title}" ✓`)
+  }
+
+  console.log('\nDone! Seeded 3 blog posts, 3 case studies, and 6 services.')
   await mongoose.disconnect()
   process.exit(0)
 }

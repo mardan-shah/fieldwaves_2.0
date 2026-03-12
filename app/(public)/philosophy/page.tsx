@@ -24,31 +24,35 @@ export default function PhilosophyPage() {
         />
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
-          <SectionHeading label="Our Core Values" title="SYS_DIAGNOSTIC" subtitle="What sets us apart from the rest" />
+          <SectionHeading 
+            label="PHILOSOPHY_CORE" 
+            title="Architectural Rigor" 
+            subtitle="We don't just build—we engineer digital legacy" 
+          />
         </div>
       </section>
 
       {/* Philosophy Comparison */}
       <section className="py-24 bg-card">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-16 mb-24">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-16 mb-24 items-stretch">
             {/* The Others */}
-            <div className="opacity-60 hover:opacity-100 transition-opacity">
+            <div className="opacity-60 hover:opacity-100 transition-opacity flex flex-col">
               <h3 className="font-mono text-secondary mb-6 text-xl">// OTHERS.EXE</h3>
-              <div className="space-y-4">
-                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6">
+              <div className="space-y-4 grow flex flex-col">
+                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
                   <h4 className="font-bold text-red-500 mb-2">SPAGHETTI CODE</h4>
                   <p className="text-sm text-gray-500">Unmaintainable AI-generated slop that breaks in production.</p>
                 </SkewContainer>
-                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6">
+                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
                   <h4 className="font-bold text-red-500 mb-2">SECURITY HOLES</h4>
                   <p className="text-sm text-gray-500">Exposed ENV variables and weak auth patterns.</p>
                 </SkewContainer>
-                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6">
+                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
                   <h4 className="font-bold text-red-500 mb-2">UNSCALABLE DESIGN</h4>
                   <p className="text-sm text-gray-500">Monoliths that crumble under real-world load.</p>
                 </SkewContainer>
-                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6">
+                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
                   <h4 className="font-bold text-red-500 mb-2">TECHNICAL DEBT</h4>
                   <p className="text-sm text-gray-500">Shortcuts that compound costs over time.</p>
                 </SkewContainer>
@@ -56,10 +60,10 @@ export default function PhilosophyPage() {
             </div>
 
             {/* FieldWaves */}
-            <div>
-              <h3 className="font-mono text-primary mb-6 text-xl">// FIELDWAVES.SYS</h3>
-              <div className="space-y-4">
-                <SkewContainer variant="glass" className="p-6">
+            <div className="flex flex-col">
+              <h3 className="font-mono text-primary mb-6 text-xl">// FIELDWAVES.SYS [ACTIVE]</h3>
+              <div className="space-y-4 grow flex flex-col">
+                <SkewContainer variant="glass" className="p-6 h-full">
                   <div className="flex gap-4 items-start">
                     <GitBranch className="text-primary shrink-0" size={24} />
                     <div>
@@ -71,7 +75,7 @@ export default function PhilosophyPage() {
                   </div>
                 </SkewContainer>
 
-                <SkewContainer variant="glass" className="p-6">
+                <SkewContainer variant="glass" className="p-6 h-full">
                   <div className="flex gap-4 items-start">
                     <Lock className="text-primary shrink-0" size={24} />
                     <div>
@@ -83,7 +87,7 @@ export default function PhilosophyPage() {
                   </div>
                 </SkewContainer>
 
-                <SkewContainer variant="glass" className="p-6">
+                <SkewContainer variant="glass" className="p-6 h-full">
                   <div className="flex gap-4 items-start">
                     <Zap className="text-primary shrink-0" size={24} />
                     <div>
@@ -95,7 +99,7 @@ export default function PhilosophyPage() {
                   </div>
                 </SkewContainer>
 
-                <SkewContainer variant="glass" className="p-6">
+                <SkewContainer variant="glass" className="p-6 h-full">
                   <div className="flex gap-4 items-start">
                     <Code2 className="text-primary shrink-0" size={24} />
                     <div>

@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import Script from "next/script"
 import { Geist, Geist_Mono } from "next/font/google"
+import { Suspense } from "react"
 import ErrorBoundary from "../components/ErrorBoundary"
 import ScrollToTop from "../components/ScrollToTop"
 import { Toaster } from "sonner"
@@ -45,7 +46,9 @@ export default function RootLayout({
       </head>
       <body className={`font-sans antialiased`}>
         <ErrorBoundary>
-          {children}
+          <Suspense fallback={null}>
+            {children}
+          </Suspense>
           <ScrollToTop />
           <AdSenseScript />
           <Toaster position="top-right" theme="dark" richColors />

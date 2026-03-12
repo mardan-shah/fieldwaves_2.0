@@ -20,10 +20,10 @@ const SkewContainer: React.FC<SkewContainerProps> = ({
   noSkewMobile = false,
 }) => {
 
-  // Skew on all screens by default; cards can opt out on mobile
+  // Simple skew logic - reverting to original
   const skewStyles = noSkewMobile
     ? "relative transform md:-skew-x-12 transition-all duration-200 ease-out"
-    : "relative transform -skew-x-12 transition-all duration-200 ease-out";
+    : "relative transform skew-x-0 sm:-skew-x-6 md:-skew-x-12 transition-all duration-200 ease-out";
 
   // Variant styles
   const variants = {
@@ -36,7 +36,7 @@ const SkewContainer: React.FC<SkewContainerProps> = ({
 
   // Hover styles
   const hoverStyles = hoverEffect
-    ? " hover:border-primary  hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(var(--primary),0.4)] cursor-pointer"
+    ? " hover:border-primary hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(var(--primary),0.4)] cursor-pointer"
     : "";
 
   return (

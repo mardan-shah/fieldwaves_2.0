@@ -3,52 +3,15 @@ import SectionHeading from "@/components/ui/SectionHeading"
 import ServiceCard from "@/components/ServiceCard"
 import Button from "@/components/ui/SkewButton"
 import SkewContainer from "@/components/ui/SkewContainer"
-import { Cpu, Lock, Zap, Code, BarChart3, Wrench } from "lucide-react"
+import { getServices } from "@/app/actions/public"
 
 export const metadata: Metadata = {
   title: "Services | FieldWaves",
   description: "Full-stack architecture, security hardening, performance optimization, AI-powered development, and DevOps automation.",
 }
 
-export default function ServicesPage() {
-  const services = [
-    {
-      icon: Cpu,
-      title: "Full-Stack Architecture",
-      description: "Enterprise-grade systems built for scale, security, and performance.",
-      features: ["Microservices design", "API optimization", "Database sharding", "Load balancing"],
-    },
-    {
-      icon: Lock,
-      title: "Security Hardening",
-      description: "Comprehensive security audits and hardening from the ground up.",
-      features: ["Penetration testing", "Vulnerability assessment", "Compliance audit", "Security protocols"],
-    },
-    {
-      icon: Zap,
-      title: "Performance Optimization",
-      description: "Extract maximum efficiency from your infrastructure.",
-      features: ["Code profiling", "CDN integration", "Caching strategy", "Query optimization"],
-    },
-    {
-      icon: Code,
-      title: "AI-Powered Development",
-      description: "Accelerate development with AI-assisted code generation and review.",
-      features: ["Code generation", "Automated testing", "Performance analysis", "Best practices"],
-    },
-    {
-      icon: BarChart3,
-      title: "Analytics & Monitoring",
-      description: "Real-time insights into system performance and user behavior.",
-      features: ["Real-time dashboards", "Alert systems", "Trend analysis", "Custom metrics"],
-    },
-    {
-      icon: Wrench,
-      title: "DevOps & Automation",
-      description: "Streamlined deployment pipelines and infrastructure automation.",
-      features: ["CI/CD setup", "Container orchestration", "Infrastructure as code", "Disaster recovery"],
-    },
-  ]
+export default async function ServicesPage() {
+  const services = await getServices()
 
   return (
     <>
@@ -77,7 +40,7 @@ export default function ServicesPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
             {services.map((service, i) => (
-              <ServiceCard key={i} {...service} />
+              <ServiceCard key={service._id} index={i + 1} {...service} />
             ))}
           </div>
 

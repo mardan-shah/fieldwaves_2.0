@@ -91,7 +91,7 @@ export default function AdminLoginForm({ needsSetup }: AdminLoginFormProps) {
           <button type="submit" disabled={isSubmitting} className="w-full group">
             <SkewContainer
               variant="primary"
-              className="py-3 text-center flex items-center justify-center gap-2"
+              className="py-3 text-center flex items-center justify-center gap-2 skew-x-0"
               hoverEffect
             >
               <div className="flex items-center justify-center gap-2">

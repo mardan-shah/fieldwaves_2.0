@@ -161,10 +161,10 @@ export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewP
 
   const filteredCases = searchQuery
     ? caseStudies.filter(c =>
-        c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.techStack.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
+      c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.techStack.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
     : caseStudies
 
   return (
@@ -176,7 +176,7 @@ export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewP
           <h2 className="font-mono font-bold text-lg tracking-wider">CREATE_CASE_STUDY</h2>
         </div>
 
-        <SkewContainer variant="outline" className="p-8 bg-card">
+        <SkewContainer variant="outline" className="p-8 bg-card mx-6 md:mx-12 lg:mx-22">
           <form onSubmit={handleAddCase} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-4">
               <FormInput
@@ -280,13 +280,11 @@ export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewP
                 <button
                   type="button"
                   onClick={() => setNewCase(prev => ({ ...prev, published: !prev.published }))}
-                  className={`relative w-14 h-7 transition-colors duration-300 ${
-                    newCase.published ? "bg-primary" : "bg-border"
-                  }`}
+                  className={`relative w-14 h-7 transition-colors duration-300 ${newCase.published ? "bg-primary" : "bg-border"
+                    }`}
                 >
-                  <div className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white transition-transform duration-300 ${
-                    newCase.published ? "translate-x-7" : "translate-x-0"
-                  }`} />
+                  <div className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white transition-transform duration-300 ${newCase.published ? "translate-x-7" : "translate-x-0"
+                    }`} />
                 </button>
               </div>
             </div>
@@ -373,9 +371,8 @@ export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewP
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-bold text-sm truncate">{cs.title}</h3>
-                    <span className={`px-2 py-0.5 font-mono text-[10px] ${
-                      cs.published ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"
-                    }`}>
+                    <span className={`px-2 py-0.5 font-mono text-[10px] ${cs.published ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"
+                      }`}>
                       {cs.published ? "LIVE" : "DRAFT"}
                     </span>
                     {cs.featured && (
@@ -397,9 +394,8 @@ export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewP
                 <div className="flex gap-1 shrink-0">
                   <button
                     onClick={() => handleToggleFeatured(cs._id)}
-                    className={`p-2 transition-colors ${
-                      cs.featured ? "text-primary hover:text-white" : "text-muted hover:text-primary"
-                    }`}
+                    className={`p-2 transition-colors ${cs.featured ? "text-primary hover:text-white" : "text-muted hover:text-primary"
+                      }`}
                     title={cs.featured ? "Remove featured" : "Mark featured"}
                   >
                     <Star size={14} fill={cs.featured ? "currentColor" : "none"} />

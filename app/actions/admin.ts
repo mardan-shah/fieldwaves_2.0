@@ -1,8 +1,8 @@
 'use server';
 
 import { z } from 'zod';
-import { GlobalSettings, Project, TeamMember, Admin, CaseStudy, BlogPost, PageView } from '@/lib/models';
-import { revalidatePath } from 'next/cache';
+import { GlobalSettings, Project, TeamMember, Admin, CaseStudy, BlogPost, PageView, Service } from '@/lib/models';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import connectToDatabase from '@/lib/db';
 import { writeFile, mkdir } from 'node:fs/promises';
 import { join, basename } from 'node:path';
@@ -54,6 +54,15 @@ const TeamMemberSchema = z.object({
   backgroundColor: z.string().max(20, 'Color value too long').optional().nullable().transform(v => v ?? undefined),
   isOwner: z.string().optional().nullable().transform(v => v ?? undefined),
   order: z.coerce.number().min(0).max(9999).optional().nullable().transform(v => v ?? undefined),
+});
+
+const ServiceSchema = z.object({
+  title: z.string().min(2, 'Title must be at least 2 characters').max(200, 'Title too long'),
+  description: z.string().min(10, 'Description too long').max(2000, 'Description too long'),
+  iconName: z.string().max(100, 'Icon name too long'),
+  features: z.string().max(5000, 'Features too long'),
+  order: z.coerce.number().min(0).max(9999).optional().nullable().transform(v => v ?? undefined),
+  active: z.string().optional().nullable().transform(v => v ?? undefined),
 });
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]).{8,}$/;
@@ -356,14 +365,14 @@ export async function toggleProjectFeatured(id: string) {
   return { success: true, featured: project.featured };
 }
 
-export async function reorderItem(collection: 'project' | 'team' | 'case_study' | 'blog', id: string, direction: 'up' | 'down') {
+export async function reorderItem(collection: 'project' | 'team' | 'case_study' | 'blog' | 'service', id: string, direction: 'up' | 'down') {
   const session = await requireAuth();
   if (!session) return { error: 'Unauthorized' };
   if (!validateObjectId(id)) return { error: 'Invalid ID' };
 
   await connectToDatabase();
 
-  const ModelMap: Record<string, any> = { project: Project, team: TeamMember, case_study: CaseStudy, blog: BlogPost };
+  const ModelMap: Record<string, any> = { project: Project, team: TeamMember, case_study: CaseStudy, blog: BlogPost, service: Service };
   const Model = ModelMap[collection];
 
   const item = await Model.findById(id);
@@ -978,7 +987,10 @@ export async function getAllBlogPosts() {
 
 // --- Analytics Actions ---
 
+import { connection } from 'next/server';
+
 export async function trackPageView(path: string, contentType: 'case_study' | 'blog' | 'page', contentId: string = '') {
+  await connection();
   await connectToDatabase();
   const date = new Date().toISOString().split('T')[0];
 
@@ -1042,4 +1054,87 @@ export async function getAnalytics() {
     topCases: topCases.map(c => ({ title: c.title, slug: c.slug, views: (c as any).views || 0 })),
     topPosts: topPosts.map(p => ({ title: p.title, slug: p.slug, views: (p as any).views || 0 })),
   };
+}
+
+// --- Service Actions ---
+
+export async function getAdminServices() {
+  const session = await requireAuth();
+  if (!session) return [];
+
+  await connectToDatabase();
+  const services = await Service.find().sort({ order: 1 }).lean();
+  return services.map(s => ({
+    _id: s._id.toString(),
+    title: s.title,
+    description: s.description,
+    iconName: s.iconName,
+    features: s.features.join('\n'),
+    order: s.order,
+    active: s.active,
+  }));
+}
+
+export async function saveService(formData: FormData) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+
+  const rawData = {
+    title: formData.get('title'),
+    description: formData.get('description'),
+    iconName: formData.get('iconName'),
+    features: formData.get('features'),
+    order: formData.get('order'),
+    active: formData.get('active'),
+  };
+
+  const validatedFields = ServiceSchema.safeParse(rawData);
+  if (!validatedFields.success) {
+    return { error: validatedFields.error.flatten().fieldErrors };
+  }
+
+  const { title, description, iconName, features, order, active } = validatedFields.data;
+  const serviceId = formData.get('id') as string;
+
+  await connectToDatabase();
+
+  const serviceData = {
+    title,
+    description,
+    iconName,
+    features: features.split('\n').filter(f => f.trim() !== ''),
+    order: order || 0,
+    active: active === 'true',
+  };
+
+  try {
+    if (serviceId && validateObjectId(serviceId)) {
+      await Service.findByIdAndUpdate(serviceId, serviceData);
+    } else {
+      await Service.create(serviceData);
+    }
+
+    revalidatePath('/services');
+    revalidateTag('services', 'max');
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || 'Database error' };
+  }
+}
+
+export async function deleteService(id: string) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+
+  if (!validateObjectId(id)) return { error: 'Invalid ID' };
+
+  await connectToDatabase();
+  try {
+    await Service.findByIdAndDelete(id);
+    revalidatePath('/services');
+    revalidateTag('services', 'max');
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || 'Database error' };
+  }
 }

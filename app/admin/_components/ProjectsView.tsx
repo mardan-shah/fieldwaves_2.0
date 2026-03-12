@@ -141,10 +141,10 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
 
   const filteredProjects = searchQuery
     ? projects.filter(p =>
-        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.techStack.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (p.description || "").toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.techStack.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (p.description || "").toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : projects
 
   return (
@@ -156,7 +156,7 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
           <h2 className="font-mono font-bold text-lg tracking-wider">DEPLOY_PROJECT</h2>
         </div>
 
-        <SkewContainer variant="outline" className="p-8 bg-card">
+        <SkewContainer variant="outline" className="p-8 bg-card mx-6 md:mx-12 lg:mx-22">
           <form onSubmit={handleAddProject} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-4">
               <FormInput

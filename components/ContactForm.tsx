@@ -58,13 +58,13 @@ export default function ContactForm() {
         <SkewContainer variant="glass" className="p-8">
           <Mail className="text-primary mb-4" size={32} />
           <h3 className="font-display text-xl font-bold mb-2">Email</h3>
-          <p className="text-secondary font-mono text-sm">contact@fieldwaves.io</p>
+          <p className="text-secondary font-mono text-sm">contact@fieldwaves.com</p>
         </SkewContainer>
 
         <SkewContainer variant="glass" className="p-8">
           <MapPin className="text-primary mb-4" size={32} />
           <h3 className="font-display text-xl font-bold mb-2">Location</h3>
-          <p className="text-secondary font-mono text-sm">San Francisco, CA</p>
+          <p className="text-secondary font-mono text-sm">Lahore, Pakistan</p>
         </SkewContainer>
       </div>
 
@@ -132,18 +132,18 @@ export default function ContactForm() {
               >
                 <div className="flex items-center justify-center gap-2">
                   {submitted ? (
-                  <>
-                    <Check size={18} />
-                    <span className="font-bold tracking-widest">MESSAGE SENT</span>
-                  </>
-                ) : loading ? (
-                  <>
-                    <Loader2 className="animate-spin" size={18} />
-                    <span className="font-bold tracking-widest">SENDING...</span>
-                  </>
-                ) : (
-                  <span className="font-bold tracking-widest">SEND MESSAGE</span>
-                )}
+                    <>
+                      <Check size={18} />
+                      <span className="font-bold tracking-widest">MESSAGE SENT</span>
+                    </>
+                  ) : loading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={18} />
+                      <span className="font-bold tracking-widest">SENDING...</span>
+                    </>
+                  ) : (
+                    <span className="font-bold tracking-widest">SEND MESSAGE</span>
+                  )}
                 </div>
               </SkewContainer>
             </button>

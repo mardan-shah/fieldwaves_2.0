@@ -25,7 +25,7 @@ export default async function TeamPage() {
           }}
         />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-14 md:px-6 w-full">
+        <div className="relative z-10 max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6 w-full">
           <SectionHeading
             label="Our Team"
             title="OPERATIVES"
@@ -36,7 +36,7 @@ export default async function TeamPage() {
 
       {/* Team Grid */}
       <section className="py-24 bg-card">
-        <div className="max-w-7xl mx-auto px-14 md:px-6">
+        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6">
           <TeamGrid team={team} />
         </div>
       </section>

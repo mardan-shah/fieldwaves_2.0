@@ -25,14 +25,14 @@ export default async function ProjectsPage() {
           }}
         />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-14 md:px-6 w-full">
+        <div className="relative z-10 max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6 w-full">
           <SectionHeading label="Recent Work" title="DEPLOYMENTS" subtitle="Enterprise solutions in production" />
         </div>
       </section>
 
       {/* Projects Grid */}
       <section className="py-24 bg-card">
-        <div className="max-w-7xl mx-auto px-14 md:px-6">
+        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6">
           <ProjectGrid projects={projects} showSearch />
         </div>
       </section>

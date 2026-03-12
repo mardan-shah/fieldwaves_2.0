@@ -91,9 +91,9 @@ export default function TeamView({ initialTeam }: TeamViewProps) {
 
   const filteredTeam = searchQuery
     ? team.filter(m =>
-        m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.role.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.role.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : team
 
   return (
@@ -134,7 +134,7 @@ export default function TeamView({ initialTeam }: TeamViewProps) {
           <h2 className="font-mono font-bold text-lg tracking-wider">ADD_TEAM_MEMBER</h2>
         </div>
 
-        <SkewContainer variant="outline" className="p-8 bg-card">
+        <SkewContainer variant="outline" className="p-8 bg-card mx-6 md:mx-12 lg:mx-22">
           <TeamMemberFormEnhanced onSubmit={handleAddTeamMember} loading={submitting} />
         </SkewContainer>
       </section>

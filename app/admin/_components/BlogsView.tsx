@@ -143,10 +143,10 @@ export default function BlogsView({ initialBlogPosts }: BlogsViewProps) {
 
   const filteredPosts = searchQuery
     ? blogPosts.filter(p =>
-        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        p.keywords.some(k => k.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
+      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      p.keywords.some(k => k.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
     : blogPosts
 
   return (
@@ -158,7 +158,7 @@ export default function BlogsView({ initialBlogPosts }: BlogsViewProps) {
           <h2 className="font-mono font-bold text-lg tracking-wider">CREATE_BLOG_POST</h2>
         </div>
 
-        <SkewContainer variant="outline" className="p-8 bg-card">
+        <SkewContainer variant="outline" className="p-8 bg-card mx-6 md:mx-12 lg:mx-22">
           <form onSubmit={handleAddPost} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-4">
               <FormInput
@@ -229,13 +229,11 @@ export default function BlogsView({ initialBlogPosts }: BlogsViewProps) {
                 <button
                   type="button"
                   onClick={() => setNewPost(prev => ({ ...prev, published: !prev.published }))}
-                  className={`relative w-14 h-7 transition-colors duration-300 ${
-                    newPost.published ? "bg-primary" : "bg-border"
-                  }`}
+                  className={`relative w-14 h-7 transition-colors duration-300 ${newPost.published ? "bg-primary" : "bg-border"
+                    }`}
                 >
-                  <div className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white transition-transform duration-300 ${
-                    newPost.published ? "translate-x-7" : "translate-x-0"
-                  }`} />
+                  <div className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white transition-transform duration-300 ${newPost.published ? "translate-x-7" : "translate-x-0"
+                    }`} />
                 </button>
               </div>
             </div>
@@ -243,7 +241,7 @@ export default function BlogsView({ initialBlogPosts }: BlogsViewProps) {
             <button type="submit" disabled={submitting} className="w-full group">
               <SkewContainer
                 variant="primary"
-                className="py-3 text-center flex items-center justify-center gap-2"
+                className="py-3 text-center flex items-center justify-center gap-2 skew-x-0"
                 hoverEffect
               >
                 <div className="flex items-center justify-center gap-2">
@@ -318,9 +316,8 @@ export default function BlogsView({ initialBlogPosts }: BlogsViewProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-bold text-sm truncate">{post.title}</h3>
-                    <span className={`px-2 py-0.5 font-mono text-[10px] ${
-                      post.published ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"
-                    }`}>
+                    <span className={`px-2 py-0.5 font-mono text-[10px] ${post.published ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"
+                      }`}>
                       {post.published ? "LIVE" : "DRAFT"}
                     </span>
                     {post.featured && (
@@ -341,9 +338,8 @@ export default function BlogsView({ initialBlogPosts }: BlogsViewProps) {
                 <div className="flex gap-1 shrink-0">
                   <button
                     onClick={() => handleToggleFeatured(post._id)}
-                    className={`p-2 transition-colors ${
-                      post.featured ? "text-primary hover:text-white" : "text-muted hover:text-primary"
-                    }`}
+                    className={`p-2 transition-colors ${post.featured ? "text-primary hover:text-white" : "text-muted hover:text-primary"
+                      }`}
                     title={post.featured ? "Remove featured" : "Mark featured"}
                   >
                     <Star size={14} fill={post.featured ? "currentColor" : "none"} />

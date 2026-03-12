@@ -157,6 +157,25 @@ const AdminSchema = new Schema<IAdmin>({
   isOwner: { type: Boolean, default: true },
 });
 
+// --- Service Schema ---
+export interface IService extends Document {
+  title: string;
+  description: string;
+  iconName: string; // Lucide icon name string
+  features: string[];
+  order: number;
+  active: boolean;
+}
+
+const ServiceSchema = new Schema<IService>({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  iconName: { type: String, required: true, default: 'Cpu' },
+  features: [{ type: String }],
+  order: { type: Number, default: 0 },
+  active: { type: Boolean, default: true },
+});
+
 // Singleton Model exports (handling hot-reload in Next.js)
 export const GlobalSettings = (mongoose.models.GlobalSettings as Model<IGlobalSettings>) || mongoose.model<IGlobalSettings>('GlobalSettings', GlobalSettingsSchema);
 export const TeamMember = (mongoose.models.TeamMember as Model<ITeamMember>) || mongoose.model<ITeamMember>('TeamMember', TeamMemberSchema);
@@ -165,3 +184,4 @@ export const CaseStudy = (mongoose.models.CaseStudy as Model<ICaseStudy>) || mon
 export const BlogPost = (mongoose.models.BlogPost as Model<IBlogPost>) || mongoose.model<IBlogPost>('BlogPost', BlogPostSchema);
 export const PageView = (mongoose.models.PageView as Model<IPageView>) || mongoose.model<IPageView>('PageView', PageViewSchema);
 export const Admin = (mongoose.models.Admin as Model<IAdmin>) || mongoose.model<IAdmin>('Admin', AdminSchema);
+export const Service = (mongoose.models.Service as Model<IService>) || mongoose.model<IService>('Service', ServiceSchema);

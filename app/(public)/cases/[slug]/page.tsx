@@ -4,12 +4,19 @@ import SkewContainer from "@/components/ui/SkewContainer"
 import MarkdownRenderer from "@/components/ui/MarkdownRenderer"
 import TableOfContents from "@/components/ui/TableOfContents"
 import Button from "@/components/ui/SkewButton"
-import { getCaseStudyBySlug } from "@/app/actions/public"
+import { getCaseStudyBySlug, getCaseStudies } from "@/app/actions/public"
 import { trackPageView } from "@/app/actions/admin"
 import { ArrowLeft, Eye, Calendar } from "lucide-react"
 
 interface CaseStudyPageProps {
   params: Promise<{ slug: string }>
+}
+
+export async function generateStaticParams() {
+  const cases = await getCaseStudies()
+  return cases.map((c) => ({
+    slug: c.slug,
+  }))
 }
 
 export async function generateMetadata({ params }: CaseStudyPageProps) {

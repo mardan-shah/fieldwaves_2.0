@@ -17,26 +17,26 @@ const Footer = () => {
                 <span className="font-mono font-bold text-[10px] text-primary tracking-[0.2em]">FIELDWAVES</span>
               </div>
             </div>
-            <p className="font-mono text-xs text-secondary tracking-widest">ENGINEERING OVER VIBE</p>
+            <p className="font-mono text-xs text-secondary tracking-widest">ENGINEERED AESTHETICS</p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-mono text-xs text-primary tracking-widest font-bold mb-4">PRODUCT</h3>
+            <h3 className="font-mono text-xs text-primary tracking-widest font-bold mb-4 uppercase">CORE_MODULES</h3>
             <ul className="space-y-2 font-mono text-sm text-secondary">
               <li>
                 <Link href="/services" className="hover:text-primary transition-colors">
-                  Services
+                  01_Services
                 </Link>
               </li>
               <li>
                 <Link href="/cases" className="hover:text-primary transition-colors">
-                  Case Studies
+                  02_Case_Studies
                 </Link>
               </li>
               <li>
                 <Link href="/projects" className="hover:text-primary transition-colors">
-                  Deployments
+                  03_Deployments
                 </Link>
               </li>
             </ul>
@@ -44,21 +44,21 @@ const Footer = () => {
 
           {/* Resources */}
           <div>
-            <h3 className="font-mono text-xs text-primary tracking-widest font-bold mb-4">RESOURCES</h3>
+            <h3 className="font-mono text-xs text-primary tracking-widest font-bold mb-4 uppercase">INTEL_FEED</h3>
             <ul className="space-y-2 font-mono text-sm text-secondary">
               <li>
                 <Link href="/blog" className="hover:text-primary transition-colors">
-                  Blog
+                  04_Blog
                 </Link>
               </li>
               <li>
                 <Link href="/about" className="hover:text-primary transition-colors">
-                  About
+                  05_About
                 </Link>
               </li>
               <li>
                 <Link href="/privacy" className="hover:text-primary transition-colors">
-                  Privacy Policy
+                  06_Privacy
                 </Link>
               </li>
             </ul>
@@ -66,7 +66,7 @@ const Footer = () => {
 
           {/* Social */}
           <div>
-            <h3 className="font-mono text-xs text-primary tracking-widest font-bold mb-4">CONNECT</h3>
+            <h3 className="font-mono text-xs text-primary tracking-widest font-bold mb-4 uppercase">COMMAND_CENTER</h3>
             <div className="flex gap-3 -skew-x-12">
               <a
                 href="#"

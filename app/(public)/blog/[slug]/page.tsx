@@ -3,12 +3,19 @@ import Link from "next/link"
 import SkewContainer from "@/components/ui/SkewContainer"
 import MarkdownRenderer from "@/components/ui/MarkdownRenderer"
 import TableOfContents from "@/components/ui/TableOfContents"
-import { getBlogPostBySlug } from "@/app/actions/public"
+import { getBlogPostBySlug, getBlogPosts } from "@/app/actions/public"
 import { trackPageView } from "@/app/actions/admin"
 import { ArrowLeft, Calendar, User, Eye, Clock } from "lucide-react"
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>
+}
+
+export async function generateStaticParams() {
+  const posts = await getBlogPosts()
+  return posts.map((post) => ({
+    slug: post.slug,
+  }))
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps) {

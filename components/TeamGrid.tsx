@@ -34,9 +34,9 @@ export default function TeamGrid({ team }: TeamGridProps) {
                     className="w-full h-full object-cover scale-125"
                   />
                   {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-primary/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-6">
+                  <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-6 backdrop-blur-[2px]">
                     <div className="flex flex-col items-center gap-6">
-                      <p className="text-white font-mono text-xs tracking-widest">VIEW_PROFILE</p>
+                      <p className="text-white font-mono text-xs tracking-widest bg-background/80 px-3 py-1 -skew-x-12">VIEW_PROFILE</p>
                       <div className="flex gap-6">
                         {member.socialLinks?.github && (
                           <a

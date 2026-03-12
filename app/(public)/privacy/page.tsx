@@ -261,8 +261,8 @@ export default function PrivacyPolicyPage() {
               <div className="space-y-2">
                 <p className="font-mono text-sm">
                   <span className="text-primary">EMAIL:</span>{" "}
-                  <a href="mailto:contact@fieldwaves.io" className="text-white hover:text-primary transition-colors">
-                    contact@fieldwaves.io
+                  <a href="mailto:contact@fieldwaves.com" className="text-white hover:text-primary transition-colors">
+                    contact@fieldwaves.com
                   </a>
                 </p>
                 <p className="font-mono text-sm">

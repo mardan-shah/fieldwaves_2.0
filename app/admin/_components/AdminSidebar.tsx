@@ -9,6 +9,7 @@ import {
   Users,
   BookOpen,
   FileText,
+  LayoutGrid,
   BarChart3,
   Settings,
   Terminal,
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { href: "/admin/team", label: "TEAM", icon: Users },
   { href: "/admin/cases", label: "CASES", icon: BookOpen },
   { href: "/admin/blog", label: "BLOG", icon: FileText },
+  { href: "/admin/services", label: "SERVICES", icon: LayoutGrid },
   { href: "/admin/analytics", label: "ANALYTICS", icon: BarChart3 },
   { href: "/admin/settings", label: "SETTINGS", icon: Settings },
 ]

@@ -16,18 +16,34 @@ interface ProjectGridProps {
 export default function ProjectGrid({ projects, showSearch = false }: ProjectGridProps) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const { ref: gridRef, isInView } = useInView()
 
+  const allTags = useMemo(() => {
+    const tags = new Set<string>()
+    projects.forEach(p => p.techStack.forEach(t => tags.add(t)))
+    return Array.from(tags).sort()
+  }, [projects])
+
   const filtered = useMemo(() => {
-    if (!searchQuery) return projects
-    const q = searchQuery.toLowerCase()
-    return projects.filter(
-      p =>
-        p.title.toLowerCase().includes(q) ||
-        (p.description && p.description.toLowerCase().includes(q)) ||
-        p.techStack.some(t => t.toLowerCase().includes(q))
-    )
-  }, [projects, searchQuery])
+    let result = projects
+    
+    if (selectedTag) {
+      result = result.filter(p => p.techStack.includes(selectedTag))
+    }
+
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      result = result.filter(
+        p =>
+          p.title.toLowerCase().includes(q) ||
+          (p.description && p.description.toLowerCase().includes(q)) ||
+          p.techStack.some(t => t.toLowerCase().includes(q))
+      )
+    }
+    
+    return result
+  }, [projects, searchQuery, selectedTag])
 
   return (
     <>
@@ -36,6 +52,9 @@ export default function ProjectGrid({ projects, showSearch = false }: ProjectGri
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           placeholder="SEARCH_PROJECTS // title, tech stack..."
+          tags={allTags}
+          activeTag={selectedTag}
+          onTagChange={setSelectedTag}
           resultCount={filtered.length}
           totalCount={projects.length}
         />

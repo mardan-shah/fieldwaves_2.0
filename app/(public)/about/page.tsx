@@ -58,9 +58,9 @@ export default function AboutPage() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
           <SectionHeading
-            label="Who We Are"
-            title="Engineering as an Art Form"
-            subtitle="FieldWaves is more than a software agency. We're a collective of senior engineers who believe that great code is an investment in the future."
+            label="WHO_WE_ARE"
+            title="Engineered Aesthetics"
+            subtitle="FieldWaves is a collective of senior engineers who believe that high-end design and architectural rigor are not mutually exclusive."
             align="center"
             className="mb-0"
           />
@@ -72,38 +72,43 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="-skew-x-12">
-              <h2 className="font-display text-4xl font-bold mb-6">Our Story</h2>
-              <p className="text-secondary mb-4 leading-relaxed">
-                Founded by engineers who were tired of compromising on quality, FieldWaves started with a simple
-                mission: prove that you don't have to choose between speed and excellence.
-              </p>
-              <p className="text-secondary mb-4 leading-relaxed">
-                We've worked with FinTech companies and ambitious startups. In every project, we bring the same
-                level of rigor, security thinking, and performance obsession.
-              </p>
-              <p className="text-secondary leading-relaxed">
-                Your success is our success. We don't disappear after launch — we build sustainable systems that your team
-                can maintain and scale.
-              </p>
+              <div className="skew-x-12">
+                <h2 className="font-display text-4xl font-bold mb-6">Our Story</h2>
+                <p className="text-secondary mb-4 leading-relaxed">
+                  Founded by engineers who were tired of compromising on quality, FieldWaves started with a simple
+                  mission: prove that you don't have to choose between speed and excellence.
+                </p>
+                <p className="text-secondary mb-4 leading-relaxed">
+                  We've worked with FinTech companies and ambitious startups. In every project, we bring the same
+                  level of rigor, security thinking, and performance obsession.
+                </p>
+                <p className="text-secondary leading-relaxed">
+                  Your success is our success. We don't disappear after launch — we build sustainable systems that your team
+                  can maintain and scale.
+                </p>
+              </div>
             </div>
 
-            <SkewContainer variant="glass" className="p-8">
+            <SkewContainer variant="glass" className="p-8 relative overflow-hidden group">
+              <div className="absolute top-2 right-4 font-mono text-[8px] opacity-30 select-none">
+                CORP_ID_FW_2023_001
+              </div>
               <div className="space-y-6">
-                <div className="border-l-4 border-primary pl-6">
-                  <h3 className="font-bold text-lg mb-2">Founded</h3>
-                  <p className="text-secondary">2023 with a vision to revolutionize enterprise development</p>
+                <div className="border-l-4 border-primary pl-6 hover:bg-white/5 transition-colors py-1">
+                  <h3 className="font-mono text-xs font-bold mb-1 tracking-widest uppercase">ESTABLISHED</h3>
+                  <p className="text-secondary text-sm">2023_Q1 // MISSION: HIGH_FIDELITY_ENG</p>
                 </div>
-                <div className="border-l-4 border-primary pl-6">
-                  <h3 className="font-bold text-lg mb-2">Team</h3>
-                  <p className="text-secondary">5+ senior engineers with unparallel experience as software</p>
+                <div className="border-l-4 border-primary pl-6 hover:bg-white/5 transition-colors py-1">
+                  <h3 className="font-mono text-xs font-bold mb-1 tracking-widest uppercase">UNIT_STRENGTH</h3>
+                  <p className="text-secondary text-sm">SENIOR_ONLY // 05_OPERATIVES</p>
                 </div>
-                <div className="border-l-4 border-primary pl-6">
-                  <h3 className="font-bold text-lg mb-2">Projects</h3>
-                  <p className="text-secondary">10+ enterprise solutions in production</p>
+                <div className="border-l-4 border-primary pl-6 hover:bg-white/5 transition-colors py-1">
+                  <h3 className="font-mono text-xs font-bold mb-1 tracking-widest uppercase">OPERATIONS</h3>
+                  <p className="text-secondary text-sm">10+ ENTERPRISE_DEPLOYMENTS</p>
                 </div>
-                <div className="border-l-4 border-primary pl-6">
-                  <h3 className="font-bold text-lg mb-2">Commitment</h3>
-                  <p className="text-secondary">100% focus on your success and code quality</p>
+                <div className="border-l-4 border-primary pl-6 hover:bg-white/5 transition-colors py-1">
+                  <h3 className="font-mono text-xs font-bold mb-1 tracking-widest uppercase">KPI_TARGET</h3>
+                  <p className="text-secondary text-sm">ZERO_DEBT // ARCHITECTURAL_RIGOR</p>
                 </div>
               </div>
             </SkewContainer>
