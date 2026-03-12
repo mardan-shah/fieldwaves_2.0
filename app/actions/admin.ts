@@ -203,6 +203,45 @@ export async function toggleSoloMode() {
 
   revalidatePath('/');
   revalidatePath('/admin');
+  revalidateTag('settings', 'max');
+  return { success: true };
+}
+
+export async function toggleMaintenanceMode() {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+
+  await connectToDatabase();
+
+  const settings = await GlobalSettings.findOne();
+  if (!settings) {
+    await GlobalSettings.create({ maintenanceMode: true });
+  } else {
+    settings.maintenanceMode = !settings.maintenanceMode;
+    await settings.save();
+  }
+
+  revalidatePath('/', 'layout');
+  revalidatePath('/admin');
+  revalidateTag('settings', 'max');
+  return { success: true };
+}
+
+export async function updateMaintenanceMessage(message: string) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+
+  await connectToDatabase();
+
+  const settings = await GlobalSettings.findOne();
+  if (!settings) {
+    await GlobalSettings.create({ maintenanceMessage: message });
+  } else {
+    settings.maintenanceMessage = message;
+    await settings.save();
+  }
+
+  revalidateTag('settings', 'max');
   return { success: true };
 }
 
@@ -550,7 +589,19 @@ export async function getAllTeamMembers() {
 
   await connectToDatabase();
   const members = await TeamMember.find().sort({ order: 1, _id: -1 }).lean();
-  return members.map(m => ({ ...m, _id: m._id.toString() }));
+  return members.map(m => ({
+    _id: m._id.toString(),
+    name: m.name,
+    role: m.role,
+    bio: m.bio || '',
+    socialLinks: m.socialLinks instanceof Map
+      ? Object.fromEntries(m.socialLinks)
+      : (m.socialLinks || {}),
+    avatarUrl: m.avatarUrl || '/placeholder-user.jpg',
+    backgroundColor: m.backgroundColor || 'transparent',
+    isOwner: m.isOwner || false,
+    order: m.order || 0,
+  }));
 }
 
 export async function deleteTeamMember(id: string) {
@@ -753,7 +804,11 @@ export async function getAllCaseStudies() {
     overview: c.overview || '',
     description: c.description || '',
     coverImage: c.coverImage || '',
-    metricCards: c.metricCards || [],
+    metricCards: (c.metricCards || []).map((m: any) => ({
+      label: m.label || '',
+      value: m.value || '',
+      unit: m.unit || ''
+    })),
     techStack: c.techStack || [],
     published: c.published,
     featured: (c as any).featured || false,
@@ -797,6 +852,7 @@ export async function updateCasesDisplayCount(count: number) {
 
   revalidatePath('/cases');
   revalidatePath('/admin');
+  revalidateTag('settings', 'max');
   return { success: true };
 }
 

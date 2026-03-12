@@ -251,7 +251,7 @@ export async function getTeam(): Promise<{ _id: string; name: string; role: stri
   return result;
 }
 
-export async function getSettings(): Promise<{ soloMode: boolean; maintenanceMode: boolean; casesDisplayCount: number } | null> {
+export async function getSettings(): Promise<{ soloMode: boolean; maintenanceMode: boolean; maintenanceMessage: string; casesDisplayCount: number } | null> {
   "use cache"
   cacheLife('minutes');
   cacheTag('settings');
@@ -261,7 +261,12 @@ export async function getSettings(): Promise<{ soloMode: boolean; maintenanceMod
      await GlobalSettings.create(INITIAL_SETTINGS);
      settings = await GlobalSettings.findOne().lean();
   }
-  return settings ? { soloMode: settings.soloMode, maintenanceMode: settings.maintenanceMode, casesDisplayCount: (settings as any).casesDisplayCount ?? 3 } : null;
+  return settings ? { 
+    soloMode: settings.soloMode, 
+    maintenanceMode: settings.maintenanceMode, 
+    maintenanceMessage: settings.maintenanceMessage || "",
+    casesDisplayCount: (settings as any).casesDisplayCount ?? 3 
+  } : null;
 }
 
 export async function getServices() {

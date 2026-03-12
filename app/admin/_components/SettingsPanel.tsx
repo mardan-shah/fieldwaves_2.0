@@ -4,7 +4,7 @@ import { useState } from "react"
 import SkewContainer from "@/components/ui/SkewContainer"
 import type { GlobalSettings, TeamMember, Project, CaseStudy, BlogPost } from "@/types"
 import { Power, Crown, BarChart3, Shield, Star } from "lucide-react"
-import { updateCasesDisplayCount, toggleSoloMode } from "@/app/actions/admin"
+import { updateCasesDisplayCount, toggleSoloMode, toggleMaintenanceMode, updateMaintenanceMessage } from "@/app/actions/admin"
 import { getSettings } from "@/app/actions/public"
 import { toast } from "sonner"
 
@@ -57,6 +57,15 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
     if (s) setSettings(s)
   }
 
+  const onToggleMaintenanceMode = async () => {
+    const newState = !settings.maintenanceMode
+    setSettings({ ...settings, maintenanceMode: newState })
+    await toggleMaintenanceMode()
+    toast.success(`MAINTENANCE_MODE: ${newState ? "ENABLED" : "DISABLED"}`)
+    const s = await getSettings()
+    if (s) setSettings(s)
+  }
+
   const handleDisplayCountChange = async (value: string) => {
     setDisplayCount(value)
     const num = parseInt(value)
@@ -96,10 +105,25 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
             />
             <Toggle
               value={settings.maintenanceMode || false}
-              onChange={() => toast.error("Maintenance mode toggle coming soon")}
+              onChange={onToggleMaintenanceMode}
               label="MAINTENANCE MODE"
               description="Show a maintenance page to all visitors. Admin panel remains accessible."
             />
+            {settings.maintenanceMode && (
+              <div className="mt-4 p-4 bg-background/50 border border-border">
+                <label className="block font-mono text-[10px] text-secondary mb-2 tracking-widest uppercase">MAINTENANCE_MESSAGE</label>
+                <textarea
+                  value={settings.maintenanceMessage || ""}
+                  onChange={(e) => setSettings({ ...settings, maintenanceMessage: e.target.value })}
+                  onBlur={async () => {
+                    await updateMaintenanceMessage(settings.maintenanceMessage)
+                    toast.success("MAINTENANCE_MESSAGE_UPDATED")
+                  }}
+                  className="w-full bg-input border border-border focus:border-primary text-white p-3 text-sm font-sans outline-none min-h-[100px] resize-y"
+                  placeholder="Enter custom maintenance message..."
+                />
+              </div>
+            )}
           </SkewContainer>
         </section>
 

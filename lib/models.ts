@@ -4,12 +4,14 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IGlobalSettings extends Document {
   soloMode: boolean;
   maintenanceMode: boolean;
+  maintenanceMessage: string;
   casesDisplayCount: number;
 }
 
 const GlobalSettingsSchema = new Schema<IGlobalSettings>({
   soloMode: { type: Boolean, default: false },
   maintenanceMode: { type: Boolean, default: false },
+  maintenanceMessage: { type: String, default: "We're currently performing scheduled infrastructure upgrades to improve performance and security. Our systems will be back online shortly." },
   casesDisplayCount: { type: Number, default: 3 },
 });
 

@@ -36,7 +36,7 @@ const SkewContainer: React.FC<SkewContainerProps> = ({
 
   // Hover styles
   const hoverStyles = hoverEffect
-    ? " hover:border-primary hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(var(--primary),0.4)] cursor-pointer"
+    ? " hover:border-primary hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(var(--primary),0.15)] cursor-pointer"
     : "";
 
   return (

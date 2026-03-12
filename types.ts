@@ -74,6 +74,7 @@ export interface BlogPost {
 export interface GlobalSettings {
   soloMode: boolean
   maintenanceMode: boolean
+  maintenanceMessage: string
   casesDisplayCount: number
 }
 
