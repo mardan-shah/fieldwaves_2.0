@@ -141,12 +141,12 @@
 @layer utilities {
   /* Skew utilities — content flows with the skew, no counter-skew */
   .skew-container {
-    @apply relative transform -skew-x-12;
+    @apply relative transform ;
   }
 
   /* Cards/grids: square on mobile, skewed on desktop only */
   .skew-container-desktop {
-    @apply relative transform md:-skew-x-12;
+    @apply relative transform;
   }
 
   /* Animation utilities */

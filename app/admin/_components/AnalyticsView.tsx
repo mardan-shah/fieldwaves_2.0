@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import { BarChart3, TrendingUp, Eye, FileText, BookOpen, ExternalLink, Loader2 } from "lucide-react"
 import { getAnalytics } from "@/app/actions/admin"
 
@@ -63,25 +63,25 @@ export default function AnalyticsView() {
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-8">
-          <SkewContainer variant="glass" className="p-5 text-center border-t-2 border-t-primary">
+          <Container variant="glass" className="p-5 text-center border-t-2 border-t-primary">
             <Eye size={18} className="mx-auto text-primary mb-2" />
             <p className="font-display text-3xl font-bold">{data.totalViews}</p>
             <p className="font-mono text-[10px] text-muted mt-1">TOTAL VIEWS</p>
-          </SkewContainer>
-          <SkewContainer variant="glass" className="p-5 text-center border-t-2 border-t-primary">
+          </Container>
+          <Container variant="glass" className="p-5 text-center border-t-2 border-t-primary">
             <BookOpen size={18} className="mx-auto text-primary mb-2" />
             <p className="font-display text-3xl font-bold">
               {data.topCases.reduce((sum, c) => sum + c.views, 0)}
             </p>
             <p className="font-mono text-[10px] text-muted mt-1">CASE STUDY VIEWS</p>
-          </SkewContainer>
-          <SkewContainer variant="glass" className="p-5 text-center border-t-2 border-t-primary">
+          </Container>
+          <Container variant="glass" className="p-5 text-center border-t-2 border-t-primary">
             <FileText size={18} className="mx-auto text-primary mb-2" />
             <p className="font-display text-3xl font-bold">
               {data.topPosts.reduce((sum, p) => sum + p.views, 0)}
             </p>
             <p className="font-mono text-[10px] text-muted mt-1">BLOG VIEWS</p>
-          </SkewContainer>
+          </Container>
         </div>
       </section>
 
@@ -92,7 +92,7 @@ export default function AnalyticsView() {
           <h3 className="font-mono font-bold text-sm tracking-wider">DAILY_VIEWS</h3>
         </div>
 
-        <SkewContainer variant="glass" className="p-6">
+        <Container variant="glass" className="p-6">
           <div className="flex items-end gap-1 h-32">
             {last14Days.map((day) => {
               const height = maxViews > 0 ? (day.count / maxViews) * 100 : 0
@@ -113,7 +113,7 @@ export default function AnalyticsView() {
               )
             })}
           </div>
-        </SkewContainer>
+        </Container>
       </section>
 
       {/* Top Pages */}
@@ -172,7 +172,7 @@ export default function AnalyticsView() {
           rel="noopener noreferrer"
           className="block"
         >
-          <SkewContainer variant="ghost" hoverEffect className="p-4">
+          <Container variant="ghost" hoverEffect className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-mono text-xs text-primary mb-1">VERCEL ANALYTICS</p>
@@ -180,7 +180,7 @@ export default function AnalyticsView() {
               </div>
               <ExternalLink size={16} className="text-muted" />
             </div>
-          </SkewContainer>
+          </Container>
         </a>
       </section>
     </div>

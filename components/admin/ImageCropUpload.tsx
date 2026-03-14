@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from "react"
 import Cropper from "react-easy-crop"
 import type { Area } from "react-easy-crop"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import { Upload, Crop, Check, X, ZoomIn, ZoomOut, RotateCw } from "lucide-react"
 
 interface ImageCropUploadProps {
@@ -157,12 +157,12 @@ export default function ImageCropUpload({
               <X size={14} /> CANCEL
             </button>
             <button type="button" onClick={handleConfirmCrop} className="flex-1">
-              <SkewContainer variant="primary" className="py-2 text-center" hoverEffect>
+              <Container variant="primary" className="py-2 text-center" hoverEffect>
                 <div className="flex items-center justify-center gap-2">
                   <Check size={14} />
                   <span className="font-bold tracking-widest text-xs">APPLY CROP</span>
                 </div>
-              </SkewContainer>
+              </Container>
             </button>
           </div>
         </div>

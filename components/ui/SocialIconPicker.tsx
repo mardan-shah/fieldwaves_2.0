@@ -1,7 +1,7 @@
 "use client"
 
 import { Github, Linkedin, Twitter, Globe, Mail } from "lucide-react"
-import SkewContainer from "./SkewContainer"
+import Container from "./Container"
 
 export const SOCIAL_PLATFORMS = [
   {
@@ -55,13 +55,13 @@ export default function SocialIconPicker({ selected, onChange }: SocialIconPicke
             className="group"
             title={platform.label}
           >
-            <SkewContainer
+            <Container
               variant={isSelected ? "primary" : "ghost"}
               className="p-3 flex items-center justify-center"
               hoverEffect
             >
               <Icon size={20} />
-            </SkewContainer>
+            </Container>
           </button>
         )
       })}

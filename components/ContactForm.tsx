@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import FormInput from "@/components/ui/FormInput"
 import FormTextarea from "@/components/ui/FormTextarea"
 import { Mail, MapPin, Loader2, Check } from "lucide-react"
@@ -55,31 +55,31 @@ export default function ContactForm() {
   return (
     <>
       <div className="grid md:grid-cols-2 gap-8 mb-24">
-        <SkewContainer variant="glass" className="p-8">
+        <Container variant="glass" className="p-8">
           <Mail className="text-primary mb-4" size={32} />
           <h3 className="font-display text-xl font-bold mb-2">Email</h3>
           <p className="text-secondary font-mono text-sm">contact@fieldwaves.com</p>
-        </SkewContainer>
+        </Container>
 
-        <SkewContainer variant="glass" className="p-8">
+        <Container variant="glass" className="p-8">
           <MapPin className="text-primary mb-4" size={32} />
           <h3 className="font-display text-xl font-bold mb-2">Location</h3>
           <p className="text-secondary font-mono text-sm">Lahore, Pakistan</p>
-        </SkewContainer>
+        </Container>
       </div>
 
       <div className="grid md:grid-cols-2 gap-16">
         <div>
-          <SkewContainer variant="ghost" className="p-8">
+          <Container variant="ghost" className="p-8">
             <h2 className="font-display text-3xl font-bold mb-6">Get In Touch</h2>
             <p className="text-secondary mb-8 leading-relaxed">
               Whether you're looking to scale your infrastructure, improve security, or launch a new project, our team
               is ready to help. Fill out the form and we'll be in touch within 24 hours.
             </p>
-          </SkewContainer>
+          </Container>
         </div>
 
-        <SkewContainer variant="outline" className="p-8 bg-card">
+        <Container variant="outline" className="p-8 bg-card">
           <form onSubmit={handleSubmit} className="space-y-6">
             <FormInput
               type="text"
@@ -125,7 +125,7 @@ export default function ContactForm() {
               disabled={loading || submitted}
               className="w-full skew-x-12 group"
             >
-              <SkewContainer
+              <Container
                 variant="primary"
                 className="py-3 text-center"
                 hoverEffect
@@ -145,10 +145,10 @@ export default function ContactForm() {
                     <span className="font-bold tracking-widest">SEND MESSAGE</span>
                   )}
                 </div>
-              </SkewContainer>
+              </Container>
             </button>
           </form>
-        </SkewContainer>
+        </Container>
       </div>
     </>
   )

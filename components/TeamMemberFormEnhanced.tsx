@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
-import SkewContainer from "./ui/SkewContainer"
+import Container from "./ui/Container"
 import SocialIconPicker, { SOCIAL_PLATFORMS } from "./ui/SocialIconPicker"
 import FormInput from "./ui/FormInput"
 import MarkdownEditor from "./ui/MarkdownEditor"
@@ -240,7 +240,7 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
           />
 
           <button type="button" onClick={handleAddSocial} className="w-full group">
-            <SkewContainer
+            <Container
               variant="secondary"
               className="py-2 text-center flex items-center justify-center gap-2"
               hoverEffect
@@ -249,7 +249,7 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
                 <Plus size={16} />
                 <span className="font-bold text-sm">ADD SOCIAL</span>
               </div>
-            </SkewContainer>
+            </Container>
           </button>
 
           {/* Social Links List */}
@@ -280,7 +280,7 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
 
       {/* Submit Button */}
       <button type="submit" disabled={loading || submitted} className="w-full group">
-        <SkewContainer
+        <Container
           variant="primary"
           className="py-3 text-center flex items-center justify-center gap-2"
           hoverEffect
@@ -303,7 +303,7 @@ export default function TeamMemberFormEnhanced({ onSubmit, loading }: TeamMember
               </>
             )}
           </div>
-        </SkewContainer>
+        </Container>
       </button>
     </form>
   )

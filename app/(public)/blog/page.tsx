@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import SectionHeading from "@/components/ui/SectionHeading"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import { getBlogPosts, getFeaturedBlogPosts } from "@/app/actions/public"
 import { Star, ArrowRight, Calendar, Eye } from "lucide-react"
+import GridBackground from "@/components/ui/GridBackground"
 
 export const metadata: Metadata = {
   title: "Blog | FieldWaves",
@@ -24,14 +25,8 @@ export default async function BlogPage() {
     <>
       {/* Hero */}
       <section className="relative min-h-[40vh] flex items-center justify-center pt-32 pb-12">
-        <div
-          className="absolute inset-0 z-0 opacity-10 pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(var(--secondary) 1px, transparent 1px), linear-gradient(90deg, var(--secondary) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+              <GridBackground />
+        
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
           <SectionHeading
             label="Engineering Insights"
@@ -52,7 +47,7 @@ export default async function BlogPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featured.map(post => (
               <Link key={post._id} href={`/blog/${post.slug}`}>
-                <SkewContainer variant="glass" className="h-full p-0 group" noSkewMobile hoverEffect>
+                <Container variant="glass" className="h-full p-0 group" noSkewMobile hoverEffect>
                   <div className="flex flex-col h-full">
                     {post.coverImage && (
                       <div className="h-[200px] w-full bg-black overflow-hidden border-b-2 border-border group-hover:border-primary transition-colors">
@@ -65,11 +60,11 @@ export default async function BlogPage() {
                     )}
                     <div className="p-6 flex flex-col grow bg-background">
                       <div className="flex items-center gap-2 mb-3">
-                        <SkewContainer variant="primary" className="px-2 py-0.5">
+                        <Container variant="primary" className="px-2 py-0.5">
                           <span className="font-mono text-[10px] tracking-widest flex items-center gap-1">
                             <Star size={8} /> FEATURED
                           </span>
-                        </SkewContainer>
+                        </Container>
                       </div>
                       <h3 className="font-display text-xl font-bold mb-2 group-hover:text-primary transition-colors">
                         {post.title}
@@ -87,7 +82,7 @@ export default async function BlogPage() {
                       </div>
                     </div>
                   </div>
-                </SkewContainer>
+                </Container>
               </Link>
             ))}
           </div>
@@ -107,7 +102,7 @@ export default async function BlogPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {latest.map(post => (
               <Link key={post._id} href={`/blog/${post.slug}`}>
-                <SkewContainer variant="ghost" className="h-full p-0 group" noSkewMobile hoverEffect>
+                <Container variant="ghost" className="h-full p-0 group" noSkewMobile hoverEffect>
                   <div className="flex flex-col h-full">
                     {post.coverImage && (
                       <div className="h-[180px] w-full bg-black overflow-hidden border-b border-border group-hover:border-primary transition-colors">
@@ -144,7 +139,7 @@ export default async function BlogPage() {
                       </div>
                     </div>
                   </div>
-                </SkewContainer>
+                </Container>
               </Link>
             ))}
           </div>
@@ -163,12 +158,12 @@ export default async function BlogPage() {
       {allPosts.length > 0 && (
         <section className="max-w-7xl mx-auto px-6 pb-24 text-center">
           <Link href="/blog/all">
-            <SkewContainer variant="outline" className="px-8 py-3 inline-block" hoverEffect>
+            <Container variant="outline" className="px-8 py-3 inline-block" hoverEffect>
               <span className="flex items-center gap-2 font-mono font-bold tracking-widest text-sm">
                 VIEW ALL POSTS
                 <ArrowRight size={14} />
               </span>
-            </SkewContainer>
+            </Container>
           </Link>
         </section>
       )}

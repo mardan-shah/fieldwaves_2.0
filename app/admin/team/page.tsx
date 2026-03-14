@@ -1,5 +1,5 @@
 import { getAllTeamMembers } from "@/app/actions/admin"
-import type { TeamMember } from "@/types"
+import type { iTeamMember } from "@/types"
 import TeamView from "../_components/TeamView"
 
 export default async function AdminTeamPage() {
@@ -11,7 +11,7 @@ export default async function AdminTeamPage() {
         <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wider">TEAM</h1>
         <p className="font-mono text-xs text-muted tracking-widest mt-2">PERSONNEL // MANAGE TEAM MEMBERS</p>
       </div>
-      <TeamView initialTeam={team as TeamMember[]} />
+      <TeamView initialTeam={team as iTeamMember[]} />
     </div>
   )
 }

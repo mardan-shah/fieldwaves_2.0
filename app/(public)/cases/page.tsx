@@ -6,6 +6,7 @@ import CaseStudyCard from "@/components/CaseStudyCard"
 import CaseStudyGrid from "@/components/CaseStudyGrid"
 import { getCaseStudies, getFeaturedCaseStudies } from "@/app/actions/public"
 import { Star } from "lucide-react"
+import GridBackground from "@/components/ui/GridBackground"
 
 export const metadata: Metadata = {
   title: "Case Studies | FieldWaves",
@@ -22,14 +23,8 @@ export default async function CaseStudiesPage() {
     <>
       {/* Hero */}
       <section className="relative min-h-[60vh] flex items-center justify-center pt-32 pb-20">
-        <div
-          className="absolute inset-0 z-0 opacity-10 pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(var(--secondary) 1px, transparent 1px), linear-gradient(90deg, var(--secondary) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+              <GridBackground />
+        
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
           <SectionHeading
             label="Proven Track Record"

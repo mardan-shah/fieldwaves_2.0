@@ -1,30 +1,59 @@
-import type React from "react"
+import React from "react"
+import { cn } from "@/lib/utils"
 
 interface LoadingSpinnerProps {
   size?: "sm" | "md" | "lg"
+  variant?: "primary" | "secondary" | "white"
+  fullPage?: boolean
+  label?: string
   className?: string
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ size = "md", className = "" }) => {
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
+  size = "md", 
+  variant = "primary",
+  fullPage = false,
+  label,
+  className = "" 
+}) => {
   const sizes = {
-    sm: "w-4 h-4 border-2",
-    md: "w-8 h-8 border-3",
-    lg: "w-12 h-12 border-4",
+    sm: "size-4 border-2",
+    md: "size-8 border-[3px]",
+    lg: "size-12 border-4",
   }
 
-  return (
-    <div className={`inline-block ${sizes[size]} ${className}`}>
+  const variants = {
+    primary: "border-primary",
+    secondary: "border-secondary",
+    white: "border-white",
+  }
+
+  const spinner = (
+    <div className={cn("flex flex-col items-center justify-center gap-3", className)}>
       <div
-        className={`w-full h-full border-primary border-t-transparent border-solid rounded-full animate-spin`}
-        style={{
-          borderTopColor: "transparent",
-          borderRightColor: "var(--primary)",
-          borderBottomColor: "transparent",
-          borderLeftColor: "var(--primary)",
-        }}
+        className={cn(
+          "animate-spin rounded-full border-solid border-t-transparent border-r-transparent",
+          sizes[size],
+          variants[variant]
+        )}
       />
+      {label && (
+        <span className="text-sm font-bold tracking-widest uppercase animate-pulse">
+          {label}
+        </span>
+      )}
     </div>
   )
+
+  if (fullPage) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+        {spinner}
+      </div>
+    )
+  }
+
+  return spinner
 }
 
 export default LoadingSpinner

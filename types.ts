@@ -1,4 +1,4 @@
-export interface SocialLinks {
+export interface iSocialLinks {
   twitter?: string
   github?: string
   linkedin?: string
@@ -6,19 +6,19 @@ export interface SocialLinks {
   email?: string
 }
 
-export interface TeamMember {
+export interface iTeamMember {
   _id: string
   name: string
   role: string
   bio: string
-  socialLinks: SocialLinks
+  socialLinks: iSocialLinks
   avatarUrl: string
   backgroundColor: string
   isOwner: boolean
   order: number
 }
 
-export interface Project {
+export interface iProject {
   _id: string
   title: string
   description: string
@@ -27,15 +27,17 @@ export interface Project {
   techStack: string[]
   order: number
   featured: boolean
+  githubUrl?: string
 }
 
-export interface MetricCard {
+
+export interface iMetricCard {
   label: string
   value: string
   unit: string
 }
 
-export interface CaseStudy {
+export interface iCaseStudy {
   _id: string
   title: string
   slug: string
@@ -43,7 +45,7 @@ export interface CaseStudy {
   overview: string
   description: string
   coverImage: string
-  metricCards: MetricCard[]
+  metricCards: iMetricCard[]
   techStack: string[]
   published: boolean
   featured: boolean
@@ -53,7 +55,7 @@ export interface CaseStudy {
   updatedAt: string
 }
 
-export interface BlogPost {
+export interface iBlogPost {
   _id: string
   title: string
   slug: string
@@ -71,12 +73,23 @@ export interface BlogPost {
   updatedAt: string
 }
 
-export interface GlobalSettings {
+export interface iGlobalSettings {
   soloMode: boolean
   maintenanceMode: boolean
   maintenanceMessage: string
   casesDisplayCount: number
 }
 
-export type Variant = "primary" | "secondary" | "outline" | "ghost"
-export type Size = "sm" | "md" | "lg"
+export interface iService {
+  _id: string;
+  active: boolean;
+  description: string;
+  iconName: string;
+  order: number;
+  title: string;
+  features: string[];
+}
+
+
+export type iVariant = "primary" | "secondary" | "outline" | "ghost"
+export type iSize = "sm" | "md" | "lg"

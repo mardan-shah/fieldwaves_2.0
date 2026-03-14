@@ -14,15 +14,16 @@ export default async function PublicLayout({
   const headerList = await headers()
   const pathname = headerList.get("x-pathname") || ""
   const isMaintenancePage = pathname === "/maintenance"
+  const showNavbarFooter = !isMaintenancePage && !settings?.maintenanceMode
 
   return (
     <div className="min-h-screen bg-background text-white overflow-x-hidden selection:bg-primary selection:text-white">
       <MaintenanceGuard enabled={!!settings?.maintenanceMode} />
-      {!isMaintenancePage && <Navbar />}
+      {showNavbarFooter && <Navbar />}
       <Suspense fallback={null}>
         {children}
       </Suspense>
-      {!isMaintenancePage && <Footer />}
+      {showNavbarFooter && <Footer />}
     </div>
   )
 }

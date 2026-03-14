@@ -1,20 +1,20 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import ProjectDetailModal from "@/components/ProjectDetailModal"
 import SearchFilterBar from "@/components/SearchFilterBar"
-import type { Project } from "@/types"
+import type { iProject } from "@/types"
 import { ArrowUpRight } from "lucide-react"
 import { useInView } from "@/hooks/use-in-view"
 
 interface ProjectGridProps {
-  projects: Project[]
+  projects: iProject[]
   showSearch?: boolean
 }
 
 export default function ProjectGrid({ projects, showSearch = false }: ProjectGridProps) {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [selectedProject, setSelectedProject] = useState<iProject | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const { ref: gridRef, isInView } = useInView()
@@ -70,7 +70,7 @@ export default function ProjectGrid({ projects, showSearch = false }: ProjectGri
         <div ref={gridRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filtered.map((project, i) => (
             <div key={project._id} className={isInView ? "animate-fade-in-up" : "opacity-0"} style={{ animationDelay: `${i * 0.05}s` }}>
-            <SkewContainer
+            <Container
               variant="ghost"
               className="h-full group cursor-pointer"
               noSkewMobile
@@ -86,9 +86,9 @@ export default function ProjectGrid({ projects, showSearch = false }: ProjectGri
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-200 scale-125 group-hover:scale-110"
                   />
                   <div className="absolute top-2 right-2">
-                    <SkewContainer variant="primary" className="p-1 px-2">
+                    <Container variant="primary" className="p-1 px-2">
                       <ArrowUpRight size={16} />
-                    </SkewContainer>
+                    </Container>
                   </div>
                 </div>
 
@@ -107,7 +107,7 @@ export default function ProjectGrid({ projects, showSearch = false }: ProjectGri
                   </div>
                 </div>
               </div>
-            </SkewContainer>
+            </Container>
             </div>
           ))}
         </div>

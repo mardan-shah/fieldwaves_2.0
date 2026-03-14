@@ -43,6 +43,7 @@ export interface IProject extends Document {
   title: string;
   description: string;
   liveUrl: string;
+  githubUrl?: string;
   screenshotUrl: string;
   techStack: string[];
   order: number;
@@ -53,6 +54,7 @@ const ProjectSchema = new Schema<IProject>({
   title: { type: String, required: true },
   description: { type: String, default: '' },
   liveUrl: { type: String, required: true },
+  githubUrl: { type: String },
   screenshotUrl: { type: String },
   techStack: [{ type: String }],
   order: { type: Number, default: 0 },

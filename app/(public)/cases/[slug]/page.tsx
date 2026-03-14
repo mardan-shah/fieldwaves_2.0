@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import MarkdownRenderer from "@/components/ui/MarkdownRenderer"
 import TableOfContents from "@/components/ui/TableOfContents"
 import Button from "@/components/ui/SkewButton"
@@ -60,18 +60,18 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
       <section className={`max-w-7xl mx-auto px-6 ${caseStudy.coverImage ? "-mt-40 relative z-10" : "pt-32"}`}>
         {/* Back link */}
         <Link href="/cases" className="inline-block mb-8">
-          <SkewContainer variant="ghost" className="px-4 py-2">
+          <Container variant="ghost" className="px-4 py-2">
             <span className="flex items-center gap-2 font-mono text-xs text-muted hover:text-white transition-colors">
               <ArrowLeft size={14} />
               BACK_TO_CASES
             </span>
-          </SkewContainer>
+          </Container>
         </Link>
 
         {caseStudy.subtitle && (
-          <SkewContainer variant="primary" className="px-4 py-1 inline-block mb-4">
+          <Container variant="primary" className="px-4 py-1 inline-block mb-4">
             <span className="font-mono text-xs tracking-widest uppercase">{caseStudy.subtitle}</span>
-          </SkewContainer>
+          </Container>
         )}
 
         <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold uppercase mb-6 leading-tight">
@@ -84,18 +84,18 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
 
         {/* Meta */}
         <div className="flex items-center gap-3 mb-10">
-          <SkewContainer variant="glass" className="px-4 py-2">
+          <Container variant="glass" className="px-4 py-2">
             <span className="flex items-center gap-2 font-mono text-xs">
               <Eye size={12} className="text-primary" />
               {caseStudy.views ?? 0} VIEWS
             </span>
-          </SkewContainer>
-          <SkewContainer variant="glass" className="px-4 py-2">
+          </Container>
+          <Container variant="glass" className="px-4 py-2">
             <span className="flex items-center gap-2 font-mono text-xs">
               <Calendar size={12} className="text-primary" />
               {formattedDate}
             </span>
-          </SkewContainer>
+          </Container>
         </div>
       </section>
 
@@ -109,11 +109,11 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
             }}
           >
             {caseStudy.metricCards.map((metric, idx) => (
-              <SkewContainer key={idx} variant="glass" className="p-6 border-t-2 border-t-primary">
+              <Container key={idx} variant="glass" className="p-6 border-t-2 border-t-primary">
                 <p className="font-mono text-xs text-primary mb-2 tracking-widest uppercase">{metric.label}</p>
                 <p className="font-display text-4xl font-bold mb-1">{metric.value}</p>
                 <p className="text-sm text-secondary">{metric.unit}</p>
-              </SkewContainer>
+              </Container>
             ))}
           </div>
         </section>
@@ -134,9 +134,9 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
                   <p className="font-mono text-xs text-primary tracking-widest mb-3">TECH_STACK</p>
                   <div className="flex flex-wrap gap-2">
                     {caseStudy.techStack.map((tech) => (
-                      <SkewContainer key={tech} variant="outline" className="px-3 py-1">
+                      <Container key={tech} variant="outline" className="px-3 py-1">
                         <span className="font-mono text-xs">{tech}</span>
-                      </SkewContainer>
+                      </Container>
                     ))}
                   </div>
                 </div>
@@ -156,9 +156,9 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
           <p className="font-mono text-xs text-primary tracking-widest mb-4">TECHNOLOGIES USED</p>
           <div className="flex flex-wrap gap-2">
             {caseStudy.techStack.map((tech) => (
-              <SkewContainer key={tech} variant="outline" className="px-4 py-2">
+              <Container key={tech} variant="outline" className="px-4 py-2">
                 <span className="font-mono text-sm">{tech}</span>
-              </SkewContainer>
+              </Container>
             ))}
           </div>
         </section>
@@ -174,9 +174,9 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
               <Button>GET IN TOUCH</Button>
             </Link>
             <Link href="/cases" className="inline-block">
-              <SkewContainer variant="ghost" hoverEffect className="px-6 py-3">
+              <Container variant="ghost" hoverEffect className="px-6 py-3">
                 <span className="font-mono font-bold tracking-widest text-sm">MORE CASES</span>
-              </SkewContainer>
+              </Container>
             </Link>
           </div>
         </div>

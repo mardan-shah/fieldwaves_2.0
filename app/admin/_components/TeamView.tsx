@@ -1,27 +1,27 @@
 "use client"
 
 import { useState } from "react"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import TeamList from "@/components/TeamList"
 import TeamMemberFormEnhanced from "@/components/TeamMemberFormEnhanced"
 import EditTeamMemberModal from "@/components/admin/EditTeamMemberModal"
 import ConfirmDialog from "@/components/admin/ConfirmDialog"
-import type { TeamMember } from "@/types"
+import type { iTeamMember } from "@/types"
 import { Users, Eye, Search } from "lucide-react"
 import { toast } from "sonner"
 import { addTeamMember, updateTeamMember, deleteTeamMember, getAllTeamMembers, reorderItem } from "@/app/actions/admin"
 
 interface TeamViewProps {
-  initialTeam: TeamMember[]
+  initialTeam: iTeamMember[]
 }
 
 export default function TeamView({ initialTeam }: TeamViewProps) {
-  const [team, setTeam] = useState<TeamMember[]>(initialTeam)
+  const [team, setTeam] = useState<iTeamMember[]>(initialTeam)
   const [submitting, setSubmitting] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
   // Edit modal state
-  const [editMember, setEditMember] = useState<TeamMember | null>(null)
+  const [editMember, setEditMember] = useState<iTeamMember | null>(null)
   const [editModalOpen, setEditModalOpen] = useState(false)
 
   // Delete confirm state
@@ -30,7 +30,7 @@ export default function TeamView({ initialTeam }: TeamViewProps) {
 
   const refreshTeam = async () => {
     const updated = await getAllTeamMembers()
-    setTeam(updated as TeamMember[])
+    setTeam(updated as iTeamMember[])
   }
 
   const handleAddTeamMember = async (formData: FormData) => {
@@ -47,7 +47,7 @@ export default function TeamView({ initialTeam }: TeamViewProps) {
     }
   }
 
-  const handleEditMember = (member: TeamMember) => {
+  const handleEditMember = (member: iTeamMember) => {
     setEditMember(member)
     setEditModalOpen(true)
   }
@@ -134,9 +134,9 @@ export default function TeamView({ initialTeam }: TeamViewProps) {
           <h2 className="font-mono font-bold text-lg tracking-wider">ADD_TEAM_MEMBER</h2>
         </div>
 
-        <SkewContainer variant="outline" className="p-8 bg-card mx-6 md:mx-12 lg:mx-22">
+        <Container variant="outline" className="p-8 bg-card mx-6 md:mx-12 lg:mx-22">
           <TeamMemberFormEnhanced onSubmit={handleAddTeamMember} loading={submitting} />
-        </SkewContainer>
+        </Container>
       </section>
 
       {/* Edit Modal */}

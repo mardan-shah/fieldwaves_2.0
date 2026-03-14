@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
-import SkewContainer from "./ui/SkewContainer"
+import Container from "./ui/Container"
 import { Plus, Loader2, Check } from "lucide-react"
 
 interface TeamMemberFormProps {
@@ -72,7 +72,7 @@ const TeamMemberForm: React.FC<TeamMemberFormProps> = ({ onSubmit, loading }) =>
       </div>
 
       <button type="submit" disabled={loading || submitted} className="w-full group">
-        <SkewContainer
+        <Container
           variant="primary"
           className="py-3 text-center flex items-center justify-center gap-2"
           hoverEffect
@@ -93,7 +93,7 @@ const TeamMemberForm: React.FC<TeamMemberFormProps> = ({ onSubmit, loading }) =>
               <span className="font-bold tracking-widest">ADD_MEMBER</span>
             </>
           )}
-        </SkewContainer>
+        </Container>
       </button>
     </form>
   )

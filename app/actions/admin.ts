@@ -41,6 +41,7 @@ function checkRateLimit(key: string): { allowed: boolean; retryAfterMs?: number 
 const ProjectSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters').max(200, 'Title too long'),
   url: z.string().url('Must be a valid URL').max(2000, 'URL too long'),
+  githubUrl: z.string().max(2000, 'URL too long').optional().nullable().transform(v => (v && v.trim() !== '') ? v.trim() : undefined),
   description: z.string().max(2000, 'Description too long').optional().nullable().transform(v => v ?? undefined),
   techStack: z.string().max(500, 'Tech stack too long').optional().nullable().transform(v => v ?? undefined),
   order: z.coerce.number().min(0).max(9999).optional().nullable().transform(v => v ?? undefined),
@@ -286,6 +287,7 @@ export async function addProject(formData: FormData) {
   const validatedFields = ProjectSchema.safeParse({
     title: formData.get('title'),
     url: formData.get('url'),
+    githubUrl: (formData.get('githubUrl') as string) || '',
     description: formData.get('description'),
     techStack: formData.get('techStack'),
     order: formData.get('order'),
@@ -295,7 +297,7 @@ export async function addProject(formData: FormData) {
     return { error: 'Invalid fields', details: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { title, url, description, techStack, order } = validatedFields.data;
+  const { title, url, githubUrl, description, techStack, order } = validatedFields.data;
 
   // Handle custom screenshot upload
   const screenshotFile = formData.get('screenshot') as File;
@@ -316,6 +318,7 @@ export async function addProject(formData: FormData) {
     title,
     description: description || '',
     liveUrl: url,
+    githubUrl: githubUrl || '',
     screenshotUrl,
     techStack: techStackArray,
     order: order ?? 0,
@@ -323,6 +326,7 @@ export async function addProject(formData: FormData) {
 
   revalidatePath('/');
   revalidatePath('/admin');
+  revalidateTag('projects', 'max');
   return { success: true };
 }
 
@@ -336,6 +340,7 @@ export async function updateProject(id: string, formData: FormData) {
   const validatedFields = ProjectSchema.safeParse({
     title: formData.get('title'),
     url: formData.get('url'),
+    githubUrl: (formData.get('githubUrl') as string) || '',
     description: formData.get('description'),
     techStack: formData.get('techStack'),
     order: formData.get('order'),
@@ -345,7 +350,7 @@ export async function updateProject(id: string, formData: FormData) {
     return { error: 'Invalid fields', details: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { title, url, description, techStack, order } = validatedFields.data;
+  const { title, url, githubUrl, description, techStack, order } = validatedFields.data;
 
   const project = await Project.findById(id);
   if (!project) return { error: 'Project not found' };
@@ -365,6 +370,7 @@ export async function updateProject(id: string, formData: FormData) {
   project.title = title;
   project.description = description || '';
   project.liveUrl = url;
+  project.githubUrl = githubUrl || '';
   project.screenshotUrl = screenshotUrl;
   project.techStack = techStackArray;
   project.order = order ?? project.order;
@@ -372,6 +378,7 @@ export async function updateProject(id: string, formData: FormData) {
 
   revalidatePath('/');
   revalidatePath('/admin');
+  revalidateTag('projects', 'max');
   return { success: true };
 }
 
@@ -384,6 +391,7 @@ export async function deleteProject(id: string) {
   await Project.findByIdAndDelete(id);
   revalidatePath('/');
   revalidatePath('/admin');
+  revalidateTag('projects', 'max');
   return { success: true };
 }
 
@@ -401,6 +409,7 @@ export async function toggleProjectFeatured(id: string) {
 
   revalidatePath('/');
   revalidatePath('/admin');
+  revalidateTag('projects', 'max');
   return { success: true, featured: project.featured };
 }
 
@@ -433,6 +442,14 @@ export async function reorderItem(collection: 'project' | 'team' | 'case_study' 
 
   revalidatePath('/');
   revalidatePath('/admin');
+  
+  // Instant updates via tags
+  if (collection === 'project') revalidateTag('projects', 'max');
+  if (collection === 'team') revalidateTag('team', 'max');
+  if (collection === 'case_study') revalidateTag('cases', 'max');
+  if (collection === 'blog') revalidateTag('blog', 'max');
+  if (collection === 'service') revalidateTag('services', 'max');
+
   return { success: true };
 }
 
@@ -500,6 +517,7 @@ export async function addTeamMember(formData: FormData) {
 
   revalidatePath('/');
   revalidatePath('/admin');
+  revalidateTag('team', 'max');
   return { success: true };
 }
 
@@ -563,6 +581,7 @@ export async function updateTeamMember(id: string, formData: FormData) {
 
   revalidatePath('/');
   revalidatePath('/admin');
+  revalidateTag('team', 'max');
   return { success: true };
 }
 
@@ -580,6 +599,7 @@ export async function toggleTeamMemberOwner(id: string) {
 
   revalidatePath('/');
   revalidatePath('/admin');
+  revalidateTag('team', 'max');
   return { success: true };
 }
 
@@ -613,6 +633,7 @@ export async function deleteTeamMember(id: string) {
   await TeamMember.findByIdAndDelete(id);
   revalidatePath('/');
   revalidatePath('/admin');
+  revalidateTag('team', 'max');
   return { success: true };
 }
 
@@ -708,6 +729,7 @@ export async function addCaseStudy(formData: FormData) {
 
   revalidatePath('/cases');
   revalidatePath('/admin');
+  revalidateTag('cases', 'max');
   return { success: true };
 }
 
@@ -775,6 +797,7 @@ export async function updateCaseStudy(id: string, formData: FormData) {
   revalidatePath('/cases');
   revalidatePath(`/cases/${caseStudy.slug}`);
   revalidatePath('/admin');
+  revalidateTag('cases', 'max');
   return { success: true };
 }
 
@@ -787,6 +810,7 @@ export async function deleteCaseStudy(id: string) {
   await CaseStudy.findByIdAndDelete(id);
   revalidatePath('/cases');
   revalidatePath('/admin');
+  revalidateTag('cases', 'max');
   return { success: true };
 }
 
@@ -832,6 +856,7 @@ export async function toggleCaseStudyFeatured(id: string) {
 
   revalidatePath('/cases');
   revalidatePath('/admin');
+  revalidateTag('cases', 'max');
   return { success: true, featured: cs.featured };
 }
 
@@ -932,6 +957,7 @@ export async function addBlogPost(formData: FormData) {
 
   revalidatePath('/blog');
   revalidatePath('/admin');
+  revalidateTag('blog', 'max');
   return { success: true };
 }
 
@@ -984,6 +1010,7 @@ export async function updateBlogPost(id: string, formData: FormData) {
   revalidatePath('/blog');
   revalidatePath(`/blog/${post.slug}`);
   revalidatePath('/admin');
+  revalidateTag('blog', 'max');
   return { success: true };
 }
 
@@ -1001,6 +1028,7 @@ export async function toggleBlogPostFeatured(id: string) {
 
   revalidatePath('/blog');
   revalidatePath('/admin');
+  revalidateTag('blog', 'max');
   return { success: true, featured: post.featured };
 }
 
@@ -1013,6 +1041,7 @@ export async function deleteBlogPost(id: string) {
   await BlogPost.findByIdAndDelete(id);
   revalidatePath('/blog');
   revalidatePath('/admin');
+  revalidateTag('blog', 'max');
   return { success: true };
 }
 

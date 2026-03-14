@@ -1,5 +1,5 @@
 import type React from "react"
-import SkewContainer from "./ui/SkewContainer"
+import Container from "./ui/Container"
 import type { LucideIcon as LucideIconType } from "lucide-react"
 import LucideIcon from "./ui/LucideIcon"
 
@@ -14,7 +14,7 @@ interface ServiceCardProps {
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ icon: Icon, iconName, title, description, features, index = 1 }) => {
   return (
-    <SkewContainer variant="glass" className="p-8 h-full group hover:bg-background/60 transition-all border-t-2 border-t-transparent hover:border-t-primary">
+    <Container variant="glass" className="p-8 h-full group hover:bg-background/60 transition-all border-t-2 border-t-transparent hover:border-t-primary">
       <div className="flex justify-between items-start mb-6">
         {iconName ? (
            <LucideIcon name={iconName} className="text-primary group-hover:scale-110 transition-transform" size={40} strokeWidth={1.5} />
@@ -40,7 +40,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ icon: Icon, iconName, title, 
           ))}
         </div>
       </div>
-    </SkewContainer>
+    </Container>
   )
 }
 

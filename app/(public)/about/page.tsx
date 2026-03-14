@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import SectionHeading from "@/components/ui/SectionHeading"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import Button from "@/components/ui/SkewButton"
 import { Code2, Users, Zap, Shield, TrendingUp, Award } from "lucide-react"
+import GridBackground from "@/components/ui/GridBackground"
 
 export const metadata: Metadata = {
   title: "About | FieldWaves",
@@ -47,14 +48,8 @@ export default function AboutPage() {
     <>
       {/* Hero Section */}
       <section className="relative min-h-[60vh] flex items-center justify-center pt-32 pb-20">
-        <div
-          className="absolute inset-0 z-0 opacity-10 pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(var(--secondary) 1px, transparent 1px), linear-gradient(90deg, var(--secondary) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+        <GridBackground />
+       
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
           <SectionHeading
@@ -89,7 +84,7 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <SkewContainer variant="glass" className="p-8 relative overflow-hidden group">
+            <Container variant="glass" className="p-8 relative overflow-hidden group">
               <div className="absolute top-2 right-4 font-mono text-[8px] opacity-30 select-none">
                 CORP_ID_FW_2023_001
               </div>
@@ -111,7 +106,7 @@ export default function AboutPage() {
                   <p className="text-secondary text-sm">ZERO_DEBT // ARCHITECTURAL_RIGOR</p>
                 </div>
               </div>
-            </SkewContainer>
+            </Container>
           </div>
         </div>
       </section>
@@ -131,13 +126,13 @@ export default function AboutPage() {
             {values.map((value, i) => {
               const Icon = value.icon
               return (
-                <SkewContainer key={i} variant="ghost" className="p-8 group" hoverEffect>
+                <Container key={i} variant="ghost" className="p-8 group" hoverEffect>
                   <div>
                     <Icon className="text-primary mb-6 group-hover:scale-110 transition-transform" size={40} />
                     <h3 className="font-display text-xl font-bold mb-3">{value.title}</h3>
                     <p className="text-secondary">{value.description}</p>
                   </div>
-                </SkewContainer>
+                </Container>
               )
             })}
           </div>

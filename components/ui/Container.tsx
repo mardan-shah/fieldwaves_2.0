@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface SkewContainerProps {
+interface ContainerProps {
   children: React.ReactNode;
   className?: string;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'glass';
@@ -10,7 +10,7 @@ interface SkewContainerProps {
   noSkewMobile?: boolean; // Cards/grids: square on mobile, skewed on desktop
 }
 
-const SkewContainer: React.FC<SkewContainerProps> = ({
+const Container: React.FC<ContainerProps> = ({
   children,
   className = '',
   variant = 'outline',
@@ -22,8 +22,8 @@ const SkewContainer: React.FC<SkewContainerProps> = ({
 
   // Simple skew logic - reverting to original
   const skewStyles = noSkewMobile
-    ? "relative transform md:-skew-x-12 transition-all duration-200 ease-out"
-    : "relative transform skew-x-0 sm:-skew-x-6 md:-skew-x-12 transition-all duration-200 ease-out";
+    ? "relative transform transition-all duration-200 ease-out"
+    : "relative transform transition-all duration-200 ease-out";
 
   // Variant styles
   const variants = {
@@ -49,4 +49,4 @@ const SkewContainer: React.FC<SkewContainerProps> = ({
   );
 };
 
-export default SkewContainer;
+export default Container;

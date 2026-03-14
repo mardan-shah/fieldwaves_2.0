@@ -2,14 +2,14 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import SearchFilterBar from "@/components/SearchFilterBar"
-import type { BlogPost } from "@/types"
+import type { iBlogPost } from "@/types"
 import { Calendar, Eye } from "lucide-react"
 import { useInView } from "@/hooks/use-in-view"
 
 interface BlogGridProps {
-  posts: BlogPost[]
+  posts: iBlogPost[]
   showSearch?: boolean
 }
 
@@ -65,7 +65,7 @@ export default function BlogGrid({ posts, showSearch = true }: BlogGridProps) {
 
               return (
                 <Link key={post._id} href={`/blog/${post.slug}`} className={`group ${isInView ? "animate-fade-in-up" : "opacity-0"}`} style={{ animationDelay: `${i * 0.05}s` }}>
-                  <SkewContainer variant="ghost" hoverEffect noSkewMobile className="overflow-hidden h-full">
+                  <Container variant="ghost" hoverEffect noSkewMobile className="overflow-hidden h-full">
                     <div className="flex flex-col h-full">
                       {post.coverImage && (
                         <div className="h-48 overflow-hidden">
@@ -109,7 +109,7 @@ export default function BlogGrid({ posts, showSearch = true }: BlogGridProps) {
                         </div>
                       </div>
                     </div>
-                  </SkewContainer>
+                  </Container>
                 </Link>
               )
             })}

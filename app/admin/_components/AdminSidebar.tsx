@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import {
   LayoutDashboard,
   FolderKanban,
@@ -85,17 +85,17 @@ export default function AdminSidebar() {
       {/* Footer */}
       <div className="p-4 border-t border-border space-y-3">
         <Link href="/" onClick={() => setMobileOpen(false)}>
-          <SkewContainer variant="ghost" className="px-4 py-2 w-full" hoverEffect>
+          <Container variant="ghost" className="px-4 py-2 w-full" hoverEffect>
             <span className="font-mono text-[10px] tracking-widest text-muted">VIEW_SITE</span>
-          </SkewContainer>
+          </Container>
         </Link>
-        <button onClick={handleLogout} className="w-full">
-          <SkewContainer variant="ghost" className="px-4 py-2 w-full" hoverEffect>
+        <button onClick={handleLogout} className="w-full mt-2">
+          <Container variant="ghost" className="px-4 py-2 w-full" hoverEffect>
             <span className="flex items-center gap-2 font-mono text-[10px] tracking-widest text-muted">
               <LogOut size={12} />
               LOGOUT
             </span>
-          </SkewContainer>
+          </Container>
         </button>
       </div>
     </div>

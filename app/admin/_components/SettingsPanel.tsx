@@ -1,19 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import SkewContainer from "@/components/ui/SkewContainer"
-import type { GlobalSettings, TeamMember, Project, CaseStudy, BlogPost } from "@/types"
+import Container from "@/components/ui/Container"
+import type { iGlobalSettings, iTeamMember, iProject, iCaseStudy, iBlogPost } from "@/types"
 import { Power, Crown, BarChart3, Shield, Star } from "lucide-react"
 import { updateCasesDisplayCount, toggleSoloMode, toggleMaintenanceMode, updateMaintenanceMessage } from "@/app/actions/admin"
 import { getSettings } from "@/app/actions/public"
 import { toast } from "sonner"
 
 interface SettingsPanelProps {
-  initialSettings: GlobalSettings
-  initialProjects: Project[]
-  initialTeam: TeamMember[]
-  initialCaseStudies: CaseStudy[]
-  initialBlogPosts: BlogPost[]
+  initialSettings: iGlobalSettings
+  initialProjects: iProject[]
+  initialTeam: iTeamMember[]
+  initialCaseStudies: iCaseStudy[]
+  initialBlogPosts: iBlogPost[]
 }
 
 function Toggle({ value, onChange, label, description }: { value: boolean; onChange: () => void; label: string; description: string }) {
@@ -40,7 +40,7 @@ function Toggle({ value, onChange, label, description }: { value: boolean; onCha
 }
 
 export default function SettingsPanel({ initialSettings, initialProjects, initialTeam, initialCaseStudies, initialBlogPosts }: SettingsPanelProps) {
-  const [settings, setSettings] = useState<GlobalSettings>(initialSettings)
+  const [settings, setSettings] = useState<iGlobalSettings>(initialSettings)
   const projects = initialProjects
   const team = initialTeam
   const caseStudies = initialCaseStudies
@@ -96,7 +96,7 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
             <h2 className="font-mono font-bold text-lg tracking-wider">DISPLAY_CONFIG</h2>
           </div>
 
-          <SkewContainer variant="glass" className="p-6 border-t-2 border-t-primary">
+          <Container variant="glass" className="p-6 border-t-2 border-t-primary">
             <Toggle
               value={settings.soloMode}
               onChange={onToggleSoloMode}
@@ -124,7 +124,7 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
                 />
               </div>
             )}
-          </SkewContainer>
+          </Container>
         </section>
 
         {/* Content Display */}
@@ -134,7 +134,7 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
             <h2 className="font-mono font-bold text-lg tracking-wider">CONTENT_DISPLAY</h2>
           </div>
 
-          <SkewContainer variant="glass" className="p-6 border-t-2 border-t-primary">
+          <Container variant="glass" className="p-6 border-t-2 border-t-primary">
             <div className="space-y-4">
               <div>
                 <label className="block font-mono text-xs text-secondary mb-2 tracking-widest">CASES_PER_PAGE</label>
@@ -149,7 +149,7 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
                 />
               </div>
             </div>
-          </SkewContainer>
+          </Container>
         </section>
 
         {/* Security Info */}
@@ -159,7 +159,7 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
             <h2 className="font-mono font-bold text-lg tracking-wider">SECURITY</h2>
           </div>
 
-          <SkewContainer variant="glass" className="p-6 border-t-2 border-t-primary">
+          <Container variant="glass" className="p-6 border-t-2 border-t-primary">
             <div className="space-y-4">
               <div className="flex items-center justify-between py-2 border-b border-border">
                 <span className="font-mono text-xs text-secondary">AUTH_METHOD</span>
@@ -178,7 +178,7 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
                 <span className="font-mono text-xs text-white">24 HOURS</span>
               </div>
             </div>
-          </SkewContainer>
+          </Container>
         </section>
       </div>
 
@@ -188,28 +188,28 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
         <section>
           <h2 className="font-mono font-bold text-lg tracking-wider mb-6">SYSTEM_STATS</h2>
           <div className="grid grid-cols-2 gap-3">
-            <SkewContainer variant="glass" className="p-4 text-center">
+            <Container variant="glass" className="p-4 text-center">
               <p className="font-mono text-[10px] text-secondary tracking-widest mb-1">PROJECTS</p>
               <p className="font-display text-2xl font-bold">{projects.length}</p>
-            </SkewContainer>
-            <SkewContainer variant="glass" className="p-4 text-center">
+            </Container>
+            <Container variant="glass" className="p-4 text-center">
               <p className="font-mono text-[10px] text-secondary tracking-widest mb-1">TEAM</p>
               <p className="font-display text-2xl font-bold">{team.length}</p>
-            </SkewContainer>
-            <SkewContainer variant="glass" className="p-4 text-center">
+            </Container>
+            <Container variant="glass" className="p-4 text-center">
               <p className="font-mono text-[10px] text-secondary tracking-widest mb-1">CASES</p>
               <p className="font-display text-2xl font-bold">{caseStudies.length}</p>
               <p className="font-mono text-[10px] text-muted">
                 {caseStudies.filter(c => c.published).length} live / {caseStudies.filter(c => !c.published).length} draft
               </p>
-            </SkewContainer>
-            <SkewContainer variant="glass" className="p-4 text-center">
+            </Container>
+            <Container variant="glass" className="p-4 text-center">
               <p className="font-mono text-[10px] text-secondary tracking-widest mb-1">BLOG</p>
               <p className="font-display text-2xl font-bold">{blogPosts.length}</p>
               <p className="font-mono text-[10px] text-muted">
                 {blogPosts.filter(p => p.published).length} live / {blogPosts.filter(p => !p.published).length} draft
               </p>
-            </SkewContainer>
+            </Container>
           </div>
         </section>
 
@@ -220,7 +220,7 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
             <h2 className="font-mono font-bold text-lg tracking-wider">FEATURED_CONTENT</h2>
           </div>
 
-          <SkewContainer variant="glass" className="p-6 border-t-2 border-t-primary">
+          <Container variant="glass" className="p-6 border-t-2 border-t-primary">
             <div className="space-y-3">
               <div className="flex items-center justify-between py-2 border-b border-border">
                 <span className="font-mono text-xs text-secondary">FEATURED PROJECTS</span>
@@ -244,14 +244,14 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
             <p className="text-[10px] text-muted mt-4 font-mono">
               Featured content appears in &quot;Top Picks&quot; sections on landing pages. Toggle featured status from each section&apos;s list view.
             </p>
-          </SkewContainer>
+          </Container>
         </section>
 
         {/* Owner Info */}
         {owner && (
           <section>
             <h2 className="font-mono font-bold text-lg tracking-wider mb-6">OWNER</h2>
-            <SkewContainer variant="glass" className="p-6 border-t-2 border-t-primary">
+            <Container variant="glass" className="p-6 border-t-2 border-t-primary">
               <div className="flex items-center gap-4">
                 {owner.avatarUrl && (
                   <div className="w-14 h-14 border border-border overflow-hidden shrink-0">
@@ -266,18 +266,18 @@ export default function SettingsPanel({ initialSettings, initialProjects, initia
                   <p className="font-mono text-xs text-primary">{owner.role}</p>
                 </div>
               </div>
-            </SkewContainer>
+            </Container>
           </section>
         )}
 
         {/* Mode Status */}
         <section>
-          <SkewContainer variant="glass" className="p-4 text-center">
+          <Container variant="glass" className="p-4 text-center">
             <p className="font-mono text-[10px] text-secondary tracking-widest mb-1">ACTIVE_MODE</p>
             <p className="font-mono text-lg font-bold text-primary">
               {settings.soloMode ? "SOLO" : "PUBLIC"}
             </p>
-          </SkewContainer>
+          </Container>
         </section>
       </div>
     </div>

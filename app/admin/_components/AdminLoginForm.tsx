@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import FormInput from "@/components/ui/FormInput"
 import { createAdmin, verifyAdmin } from "@/app/actions/admin"
 import { Terminal, Lock, Loader2 } from "lucide-react"
@@ -46,7 +46,7 @@ export default function AdminLoginForm({ needsSetup }: AdminLoginFormProps) {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <SkewContainer variant="outline" className="w-full max-w-md p-10 bg-card">
+      <Container variant="outline" className="w-full max-w-md p-10 bg-card">
         <div className="mb-8 text-center">
           <Terminal size={48} className="mx-auto text-primary mb-4" />
           <h1 className="font-display text-3xl font-bold">
@@ -63,7 +63,7 @@ export default function AdminLoginForm({ needsSetup }: AdminLoginFormProps) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             label="ADMIN_EMAIL"
-            placeholder="admin@fieldwaves.io"
+            placeholder="admin@admin.com"
             required
           />
 
@@ -89,7 +89,7 @@ export default function AdminLoginForm({ needsSetup }: AdminLoginFormProps) {
           )}
 
           <button type="submit" disabled={isSubmitting} className="w-full group">
-            <SkewContainer
+            <Container
               variant="primary"
               className="py-3 text-center flex items-center justify-center gap-2 skew-x-0"
               hoverEffect
@@ -104,10 +104,10 @@ export default function AdminLoginForm({ needsSetup }: AdminLoginFormProps) {
                   {needsSetup ? "INITIALIZE_SYSTEM" : "AUTHENTICATE"}
                 </span>
               </div>
-            </SkewContainer>
+            </Container>
           </button>
         </form>
-      </SkewContainer>
+      </Container>
     </div>
   )
 }

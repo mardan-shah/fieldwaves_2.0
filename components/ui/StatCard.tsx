@@ -1,5 +1,5 @@
 import type React from "react"
-import SkewContainer from "./SkewContainer"
+import Container from "./Container"
 
 interface StatCardProps {
   label: string
@@ -11,7 +11,7 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ label, value, unit, description, index = 1 }) => {
   return (
-    <SkewContainer variant="glass" className="p-8 h-full relative overflow-hidden group">
+    <Container variant="glass" className="p-8 h-full relative overflow-hidden group">
       <div className="absolute top-2 right-4 font-mono text-[8px] opacity-30 select-none">
         MTR_REF_{label.slice(0, 3).toUpperCase()}_00{index}
       </div>
@@ -26,7 +26,7 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, unit, description, in
         </div>
         {description && <p className="text-xs text-secondary leading-relaxed uppercase tracking-wide opacity-80">{description}</p>}
       </div>
-    </SkewContainer>
+    </Container>
   )
 }
 

@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { Github, Linkedin, Twitter, Mail } from "lucide-react"
-import SkewContainer from "./ui/SkewContainer"
-
+import Logo from "./Logo"
 const Footer = () => {
   return (
     <footer className="bg-surface border-t-2 border-primary mt-24">
@@ -9,15 +8,8 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div>
-            <div className="-skew-x-12 flex items-stretch mb-6 inline-flex">
-              <div className="bg-primary px-2.5 py-1.5 flex items-center">
-                <span className="font-display font-black text-lg text-background tracking-tight">FW</span>
-              </div>
-              <div className="border-2 border-primary border-l-0 px-2.5 py-1.5 flex items-center">
-                <span className="font-mono font-bold text-[10px] text-primary tracking-[0.2em]">FIELDWAVES</span>
-              </div>
-            </div>
-            <p className="font-mono text-xs text-secondary tracking-widest">ENGINEERED AESTHETICS</p>
+            <Logo />
+            <p className="font-mono text-xs text-secondary tracking-widest mt-4">ENGINEERED AESTHETICS</p>
           </div>
 
           {/* Quick Links */}
@@ -67,7 +59,7 @@ const Footer = () => {
           {/* Social */}
           <div>
             <h3 className="font-mono text-xs text-primary tracking-widest font-bold mb-4 uppercase">COMMAND_CENTER</h3>
-            <div className="flex gap-3 -skew-x-12">
+            <div className="flex gap-3 ">
               <a
                 href="#"
                 className="p-2 border border-border hover:border-primary hover:text-primary transition-colors"

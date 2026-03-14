@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/dialog"
 import FormInput from "@/components/ui/FormInput"
 import MarkdownEditor from "@/components/ui/MarkdownEditor"
-import SkewContainer from "@/components/ui/SkewContainer"
-import type { BlogPost } from "@/types"
+import Container from "@/components/ui/Container"
+import type { iBlogPost } from "@/types"
 import ImageCropUpload from "@/components/admin/ImageCropUpload"
 import { Loader2, Save } from "lucide-react"
 
 interface EditBlogModalProps {
-  post: BlogPost | null
+  post: iBlogPost | null
   open: boolean
   onOpenChange: (open: boolean) => void
   onSave: (id: string, formData: FormData) => Promise<void>
@@ -40,16 +40,17 @@ export default function EditBlogModal({ post, open, onOpenChange, onSave }: Edit
   const [coverPreview, setCoverPreview] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen && post) {
+  // Initialize form when post or open state changes
+  useEffect(() => {
+    if (open && post) {
       setForm({
-        title: post.title,
+        title: post.title || "",
         excerpt: post.excerpt || "",
         content: post.content || "",
-        tags: post.tags.join(", "),
+        tags: post.tags?.join(", ") || "",
         author: post.author || "",
-        keywords: post.keywords.join(", "),
-        published: post.published,
+        keywords: post.keywords?.join(", ") || "",
+        published: post.published || false,
         order: String(post.order || 0),
       })
       setCoverFile(null)
@@ -57,8 +58,7 @@ export default function EditBlogModal({ post, open, onOpenChange, onSave }: Edit
       setErrors({})
       setActiveTab("DETAILS")
     }
-    onOpenChange(isOpen)
-  }
+  }, [open, post])
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -90,25 +90,10 @@ export default function EditBlogModal({ post, open, onOpenChange, onSave }: Edit
     }
   }
 
-  // Initialize on open
-  if (open && post && form.title === "" && form.content === "") {
-    setForm({
-      title: post.title,
-      excerpt: post.excerpt || "",
-      content: post.content || "",
-      tags: post.tags.join(", "),
-      author: post.author || "",
-      keywords: post.keywords.join(", "),
-      published: post.published,
-      order: String(post.order || 0),
-    })
-    setCoverPreview(post.coverImage || null)
-  }
-
   const tabs: Tab[] = ["DETAILS", "CONTENT", "SEO"]
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card border border-border rounded-none max-w-2xl max-h-[90vh] overflow-y-auto" showCloseButton={false}>
         <DialogHeader>
           <DialogTitle className="font-display text-xl font-bold text-primary tracking-wider uppercase">
@@ -248,12 +233,12 @@ export default function EditBlogModal({ post, open, onOpenChange, onSave }: Edit
               CANCEL
             </button>
             <button type="submit" disabled={loading} className="flex-1 group">
-              <SkewContainer variant="primary" className="py-3 text-center flex items-center justify-center gap-2" hoverEffect>
+              <Container variant="primary" className="py-3 text-center flex items-center justify-center gap-2" hoverEffect>
                 <div className="flex items-center justify-center gap-2">
                   {loading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                   <span className="font-bold tracking-widest text-xs">SAVE</span>
                 </div>
-              </SkewContainer>
+              </Container>
             </button>
           </div>
         </form>

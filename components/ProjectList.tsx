@@ -1,14 +1,14 @@
 "use client"
 
 import type React from "react"
-import type { Project } from "@/types"
-import SkewContainer from "./ui/SkewContainer"
+import type { iProject } from "@/types"
+import Container from "./ui/Container"
 import { Trash2, ExternalLink, Pencil, ChevronUp, ChevronDown, Star } from "lucide-react"
 
 interface ProjectListProps {
-  projects: Project[]
+  projects: iProject[]
   onDelete?: (id: string) => void
-  onEdit?: (project: Project) => void
+  onEdit?: (project: iProject) => void
   onReorder?: (id: string, direction: "up" | "down") => void
   onToggleFeatured?: (id: string) => void
   loading?: boolean
@@ -31,7 +31,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects, onDelete, onEdit, o
   return (
     <div className="space-y-3">
       {projects.map((project, i) => (
-        <SkewContainer key={project._id} variant="ghost" className="p-4">
+        <Container key={project._id} variant="ghost" className="p-4">
           <div className="flex items-center gap-4">
             {/* Reorder */}
             {onReorder && (
@@ -78,7 +78,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects, onDelete, onEdit, o
               {project.description && (
                 <p className="text-xs text-secondary mb-1 line-clamp-1">{project.description}</p>
               )}
-              <div className="flex gap-3 items-center text-sm">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 items-center text-sm">
                 <a
                   href={project.liveUrl}
                   target="_blank"
@@ -88,6 +88,17 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects, onDelete, onEdit, o
                   {project.liveUrl}
                   <ExternalLink size={12} />
                 </a>
+                {project.githubUrl && (
+                  <a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-secondary hover:underline flex items-center gap-1 text-xs truncate"
+                  >
+                    GITHUB_REPO
+                    <ExternalLink size={12} />
+                  </a>
+                )}
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {project.techStack.map((tech) => (
@@ -132,7 +143,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects, onDelete, onEdit, o
               )}
             </div>
           </div>
-        </SkewContainer>
+        </Container>
       ))}
     </div>
   )

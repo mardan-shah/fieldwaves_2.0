@@ -1,227 +1,31 @@
 import type { Metadata } from "next"
-import SkewContainer from "@/components/ui/SkewContainer"
-import Button from "@/components/ui/SkewButton"
-import StatCard from "@/components/ui/StatCard"
-import SectionHeading from "@/components/ui/SectionHeading"
-import ProjectGrid from "@/components/ProjectGrid"
-import ServiceCard from "@/components/ServiceCard"
-import { getProjects, getServices } from "@/app/actions/public"
-import { Lightbulb, Cpu, Lock, Zap, Code, ShieldCheck, Clock, Users, Target } from "lucide-react"
+
+import { Suspense } from "react"
+import HomeHero from "./components/HomeHero"
+import LoadingSpinner from "@/components/ui/LoadingSpinner"
+import Stats from "./components/Stats"
+import FeaturedProjects from "./components/FeaturedProjects"
+import ServicesSection from "./components/ServicesSection"
+import WhyUs from "./components/WhyUs"
+import CallToActionSection from "@/components/CallToActionSection"
 
 export const metadata: Metadata = {
   title: "FieldWaves | Engineering Over Vibe",
   description: "Enterprise-grade full-stack development with AI-accelerated senior-level security and architectural rigor.",
 }
 
-const services = [
-  {
-    icon: Cpu,
-    title: "Bespoke Digital Platforms",
-    description: "Architectural excellence meets unique design. We build high-fidelity systems that scale with your ambitions.",
-    features: ["Custom UI/UX implementation", "Performance-first architecture", "Cloud-native infrastructure", "Real-time data streaming"],
-  },
-  {
-    icon: ShieldCheck,
-    title: "Enterprise Hardening",
-    description: "Military-grade security and reliability for your most critical digital assets.",
-    features: ["Offensive security audits", "Compliance-ready systems", "End-to-end encryption", "Zero-trust architecture"],
-  },
-  {
-    icon: Zap,
-    title: "Rapid Deployment",
-    description: "We use AI to accelerate the build without compromising on senior-level engineering standards.",
-    features: ["Accelerated prototyping", "CI/CD automation", "Automated testing", "Cloud-edge optimization"],
-  },
-  {
-    icon: Code,
-    title: "System Refactoring",
-    description: "Modernize legacy systems into high-performance, maintenance-free infrastructure.",
-    features: ["Database optimization", "API modernization", "Microservices migration", "Security audits"],
-  },
-]
-
-const whyUs = [
-  {
-    icon: ShieldCheck,
-    title: "Security-First",
-    description: "Every line of code is written with security in mind. No shortcuts, no exceptions.",
-  },
-  {
-    icon: Clock,
-    title: "Rapid Delivery",
-    description: "AI-accelerated workflows mean enterprise quality at startup speed.",
-  },
-  {
-    icon: Users,
-    title: "Senior-Only Team",
-    description: "No juniors, no handoffs. Every project gets direct access to senior engineers.",
-  },
-  {
-    icon: Target,
-    title: "Results-Driven",
-    description: "We measure success in uptime, performance metrics, and business impact — not hours billed.",
-  },
-]
 
 export default async function Home() {
-  const projects = await getProjects()
-  const services = await getServices()
+
 
   return (
-    <>
-      {/* --- HERO SECTION --- */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 pb-20">
-        <div
-          className="absolute inset-0 z-0 opacity-10 pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(var(--secondary) 1px, transparent 1px), linear-gradient(90deg, var(--secondary) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
-
-        <div className="relative z-10 max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6 w-full">
-          <div className="flex flex-col items-start gap-4">
-            <SkewContainer variant="secondary" className="px-3 py-1 mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 bg-primary animate-pulse rounded-full" />
-              <span className="font-mono text-[10px] font-bold tracking-widest uppercase">SYSTM_READY // BUILD_V2.5.0</span>
-            </SkewContainer>
-
-            <h1 className="font-display text-6xl md:text-8xl font-bold leading-[0.9] tracking-tighter uppercase mb-6 max-w-5xl">
-              Engineered <br />
-              <span className="text-transparent" style={{ WebkitTextStroke: "2px var(--primary)" }}>
-                Aesthetics
-              </span>{" "}
-              <br />
-              Infrastructure
-            </h1>
-
-            <div className="max-w-2xl bg-background/80 backdrop-blur-sm border-l-4 border-primary pl-6 py-4 -skew-x-12">
-              <div className="skew-x-12">
-                <p className="text-xl md:text-2xl text-secondary font-light leading-relaxed">
-                  We build <span className="text-white font-bold">unique digital identities</span> with
-                  <span className="text-white font-bold"> enterprise-grade rigor</span>. High-performance
-                  infrastructure for ambitious startups and global industry leaders.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-12 flex gap-6 flex-wrap">
-              <Button href="/projects">EXPLORE WORK</Button>
-              <Button variant="outline" href="/services">
-                LEARN MORE
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* --- STATS SECTION --- */}
-      <section className="py-24 bg-card">
-        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6">
-          <div className="grid md:grid-cols-4 gap-6">
-            <StatCard
-              index={1}
-              label="Projects Delivered"
-              value={`${projects.length}+`}
-              description="Enterprise-scale solutions"
-            />
-            <StatCard index={2} label="Uptime" value="99.99%" description="Average reliability" />
-            <StatCard index={3} label="Performance" value="89%" description="Average improvement" />
-            <StatCard
-              index={4}
-              label="Services"
-              value="6+"
-              description="Core capabilities"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* --- FEATURED PROJECTS PREVIEW --- */}
-      <section className="py-24 bg-card">
-        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6">
-          <SectionHeading
-            label="Recent Work"
-            title="Featured Deployments"
-            subtitle="A selection of our latest enterprise solutions"
-            align="right"
-            className="mb-16"
-          />
-
-          <div className="mb-12">
-            <ProjectGrid projects={projects.slice(0, 3)} />
-          </div>
-
-          <div className="text-center">
-            <Button href="/projects">VIEW ALL PROJECTS</Button>
-          </div>
-        </div>
-      </section>
-
-      {/* --- SERVICES PREVIEW --- */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6 relative z-10">
-          <SectionHeading
-            label="Our Arsenal"
-            title="What We Do"
-            subtitle="Enterprise-grade capabilities that scale with your ambitions"
-            align="center"
-            className="mb-16"
-          />
-
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {services.slice(0, 4).map((service, i) => (
-              <ServiceCard key={service._id} index={i + 1} {...service} />
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Button href="/services">VIEW ALL SERVICES</Button>
-          </div>
-        </div>
-      </section>
-
-      {/* --- WHY US --- */}
-      <section className="py-24 bg-card">
-        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-14 md:px-6">
-          <SectionHeading
-            label="The Difference"
-            title="Why FieldWaves"
-            subtitle="We don't just write code — we engineer systems that last"
-            align="center"
-            className="mb-16"
-          />
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-14 gap-y-8">
-            {whyUs.map((item, i) => {
-              const Icon = item.icon
-              return (
-                <SkewContainer key={i} variant="ghost" className="p-8 group" hoverEffect>
-                  <div>
-                    <Icon className="text-primary mb-6 group-hover:scale-110 transition-transform" size={36} />
-                    <h3 className="font-display text-lg font-bold mb-3 uppercase">{item.title}</h3>
-                    <p className="text-secondary text-sm leading-relaxed">{item.description}</p>
-                  </div>
-                </SkewContainer>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* --- CTA SECTION --- */}
-      <section className="py-24 bg-card">
-        <div className="max-w-4xl mx-auto px-14 md:px-6 text-center">
-          <Lightbulb className="mx-auto text-primary mb-8" size={48} />
-          <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 uppercase">Ready to Transform?</h2>
-          <p className="text-lg text-secondary mb-8 max-w-2xl mx-auto">
-            Let's engineer your next breakthrough. Whether it's scaling infrastructure, enhancing security, or launching
-            a new product, we're ready to help.
-          </p>
-          <Button href="/contact">INITIATE PROJECT</Button>
-        </div>
-      </section>
-    </>
+    <Suspense fallback={<LoadingSpinner fullPage label="Loading..." size="lg" />}>
+      <HomeHero />
+      <Stats />
+      <FeaturedProjects />
+      <ServicesSection />
+      <WhyUs />
+      <CallToActionSection />
+    </Suspense>
   )
 }

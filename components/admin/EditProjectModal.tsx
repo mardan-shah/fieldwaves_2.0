@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/dialog"
 import FormInput from "@/components/ui/FormInput"
 import MarkdownEditor from "@/components/ui/MarkdownEditor"
-import SkewContainer from "@/components/ui/SkewContainer"
-import type { Project } from "@/types"
+import Container from "@/components/ui/Container"
+import type { iProject } from "@/types"
 import ImageCropUpload from "@/components/admin/ImageCropUpload"
 import { Loader2, Save } from "lucide-react"
 
 interface EditProjectModalProps {
-  project: Project | null
+  project: iProject | null
   open: boolean
   onOpenChange: (open: boolean) => void
   onSave: (id: string, formData: FormData) => Promise<void>
@@ -26,6 +26,7 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
   const [form, setForm] = useState({
     title: "",
     url: "",
+    githubUrl: "",
     description: "",
     techStack: "",
     order: "0",
@@ -34,26 +35,31 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
   const [initialPreview, setInitialPreview] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen && project) {
+  // Initialize form when project or open state changes
+  useEffect(() => {
+    if (open && project) {
       setForm({
-        title: project.title,
-        url: project.liveUrl,
+        title: project.title || "",
+        url: project.liveUrl || "",
+        githubUrl: project.githubUrl || "",
         description: project.description || "",
-        techStack: project.techStack.join(", "),
+        techStack: project.techStack?.join(", ") || "",
         order: String(project.order || 0),
       })
       setScreenshotFile(null)
       setInitialPreview(project.screenshotUrl || null)
       setErrors({})
     }
-    onOpenChange(isOpen)
-  }
+  }, [open, project])
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
     if (form.title.length < 2) newErrors.title = "Title must be at least 2 characters"
-    try { new URL(form.url) } catch { newErrors.url = "Must be a valid URL" }
+    try {
+      new URL(form.url)
+    } catch {
+      newErrors.url = "Must be a valid URL"
+    }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -67,6 +73,7 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
       const formData = new FormData()
       formData.append("title", form.title)
       formData.append("url", form.url)
+      formData.append("githubUrl", form.githubUrl)
       formData.append("description", form.description)
       formData.append("techStack", form.techStack)
       formData.append("order", form.order)
@@ -80,20 +87,8 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
     }
   }
 
-  // Initialize form when dialog opens
-  if (open && project && form.title === "" && form.url === "") {
-    setForm({
-      title: project.title,
-      url: project.liveUrl,
-      description: project.description || "",
-      techStack: project.techStack.join(", "),
-      order: String(project.order || 0),
-    })
-    setInitialPreview(project.screenshotUrl || null)
-  }
-
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card border border-border rounded-none max-w-lg max-h-[90vh] overflow-y-auto" showCloseButton={false}>
         <DialogHeader>
           <DialogTitle className="font-display text-xl font-bold text-primary tracking-wider uppercase">
@@ -126,6 +121,13 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
             placeholder="https://..."
             required
             error={errors.url}
+          />
+          <FormInput
+            type="url"
+            value={form.githubUrl}
+            onChange={(e) => setForm(prev => ({ ...prev, githubUrl: e.target.value }))}
+            label="GITHUB_URL"
+            placeholder="https://..."
           />
 
           <MarkdownEditor
@@ -160,12 +162,12 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
               CANCEL
             </button>
             <button type="submit" disabled={loading} className="flex-1 group">
-              <SkewContainer variant="primary" className="py-3 text-center flex items-center justify-center gap-2" hoverEffect>
+              <Container variant="primary" className="py-3 text-center flex items-center justify-center gap-2" hoverEffect>
                 <div className="flex items-center justify-center gap-2">
                   {loading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                   <span className="font-bold tracking-widest text-xs">SAVE</span>
                 </div>
-              </SkewContainer>
+              </Container>
             </button>
           </div>
         </form>

@@ -31,7 +31,7 @@ function createComponents(withIds: boolean): Components {
       const id = withIds ? textToId(children) : undefined
       return (
         <h2 id={id} className="font-display text-2xl font-bold uppercase text-white mb-3 mt-10 first:mt-0 scroll-mt-24 flex items-center gap-3">
-          <span className="inline-block w-3 h-3 bg-primary -skew-x-12 shrink-0" />
+          <span className="inline-block w-3 h-3 bg-primary  shrink-0" />
           <span>{children}</span>
         </h2>
       )
@@ -95,9 +95,9 @@ function createComponents(withIds: boolean): Components {
           <div className="flex items-center justify-between px-4 py-2 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-widest uppercase">{lang}</span>
             <div className="flex gap-1.5">
-              <div className="w-2 h-2 bg-border -skew-x-12" />
-              <div className="w-2 h-2 bg-border -skew-x-12" />
-              <div className="w-2 h-2 bg-primary -skew-x-12" />
+              <div className="w-2 h-2 bg-border  shrink-0" />
+              <div className="w-2 h-2 bg-border  shrink-0" />
+              <div className="w-2 h-2 bg-primary  shrink-0" />
             </div>
           </div>
           <pre className="bg-input p-4 overflow-x-auto font-mono text-sm text-secondary">
@@ -114,7 +114,7 @@ function createComponents(withIds: boolean): Components {
     ),
     li: ({ children }) => (
       <li className="text-base text-secondary leading-relaxed flex items-start gap-3">
-        <span className="inline-block w-1.5 h-1.5 bg-primary -skew-x-12 mt-2.5 shrink-0" />
+        <span className="inline-block w-1.5 h-1.5 bg-primary  mt-2.5 shrink-0" />
         <div className="flex-1">{children}</div>
       </li>
     ),
@@ -126,7 +126,7 @@ function createComponents(withIds: boolean): Components {
     hr: () => (
       <div className="my-8 flex items-center gap-4">
         <div className="flex-1 h-px bg-border" />
-        <div className="w-4 h-4 bg-primary -skew-x-12" />
+        <div className="w-4 h-4 bg-primary  shrink-0" />
         <div className="flex-1 h-px bg-border" />
       </div>
     ),

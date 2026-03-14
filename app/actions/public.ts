@@ -184,7 +184,7 @@ export async function submitContactForm(formData: FormData) {
   }
 }
 
-export async function getProjects(): Promise<{ _id: string; title: string; description: string; liveUrl: string; screenshotUrl: string; techStack: string[]; order: number; featured: boolean }[]> {
+export async function getProjects(): Promise<{ _id: string; title: string; description: string; liveUrl: string; githubUrl: string; screenshotUrl: string; techStack: string[]; order: number; featured: boolean }[]> {
   "use cache"
   cacheLife('hours');
   cacheTag('projects');
@@ -202,6 +202,7 @@ export async function getProjects(): Promise<{ _id: string; title: string; descr
     title: p.title,
     description: (p as any).description || '',
     liveUrl: p.liveUrl,
+    githubUrl: (p as any).githubUrl || '',
     screenshotUrl: p.screenshotUrl,
     techStack: p.techStack,
     order: (p as any).order || 0,

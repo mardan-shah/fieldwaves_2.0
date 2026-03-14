@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import FormInput from "@/components/ui/FormInput"
 import EditServiceModal from "@/components/admin/EditServiceModal"
 import ConfirmDialog from "@/components/admin/ConfirmDialog"
@@ -117,7 +117,7 @@ export default function ServicesView({ initialServices }: ServicesViewProps) {
           <h2 className="font-mono font-bold text-lg tracking-wider">ADD_NEW_SERVICE</h2>
         </div>
 
-        <SkewContainer variant="outline" className="  p-8 bg-card mx-6 md:mx-12 lg:mx-22">
+        <Container variant="outline" className="  p-8 bg-card mx-6 md:mx-12 lg:mx-22">
           <form onSubmit={handleAddService} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-4">
               <FormInput
@@ -179,7 +179,7 @@ export default function ServicesView({ initialServices }: ServicesViewProps) {
             </div>
 
             <button type="submit" disabled={submitting} className="w-full group">
-              <SkewContainer
+              <Container
                 variant="primary"
                 className="py-3 text-center flex items-center justify-center gap-2 skew-x-0"
                 hoverEffect
@@ -188,10 +188,10 @@ export default function ServicesView({ initialServices }: ServicesViewProps) {
                   {submitting ? <Loader2 className="animate-spin" /> : <Save size={18} />}
                   <span className="font-bold tracking-widest">SAVE_SERVICE</span>
                 </div>
-              </SkewContainer>
+              </Container>
             </button>
           </form>
-        </SkewContainer>
+        </Container>
       </section>
 
       {/* Service List */}

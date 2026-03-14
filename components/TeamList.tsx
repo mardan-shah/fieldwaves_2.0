@@ -1,12 +1,12 @@
 "use client"
 
 import { Trash2, Pencil, Crown, ChevronUp, ChevronDown } from "lucide-react"
-import type { TeamMember } from "@/types"
+import type { iTeamMember } from "@/types"
 
 interface TeamListProps {
-  team: TeamMember[]
+  team: iTeamMember[]
   onDelete: (id: string) => void
-  onEdit?: (member: TeamMember) => void
+  onEdit?: (member: iTeamMember) => void
   onReorder?: (id: string, direction: "up" | "down") => void
 }
 

@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import SectionHeading from "@/components/ui/SectionHeading"
 import Button from "@/components/ui/SkewButton"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import { GitBranch, Lock, Zap, Lightbulb, Code2, Award } from "lucide-react"
+import GridBackground from "@/components/ui/GridBackground"
 
 export const metadata: Metadata = {
   title: "Philosophy | FieldWaves",
@@ -14,14 +15,8 @@ export default function PhilosophyPage() {
     <>
       {/* Hero */}
       <section className="relative min-h-[60vh] flex items-center justify-center pt-32 pb-20">
-        <div
-          className="absolute inset-0 z-0 opacity-10 pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(var(--secondary) 1px, transparent 1px), linear-gradient(90deg, var(--secondary) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+              <GridBackground />
+        
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
           <SectionHeading 
@@ -40,22 +35,22 @@ export default function PhilosophyPage() {
             <div className="opacity-60 hover:opacity-100 transition-opacity flex flex-col">
               <h3 className="font-mono text-secondary mb-6 text-xl">// OTHERS.EXE</h3>
               <div className="space-y-4 grow flex flex-col">
-                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
+                <Container variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
                   <h4 className="font-bold text-red-500 mb-2">SPAGHETTI CODE</h4>
                   <p className="text-sm text-gray-500">Unmaintainable AI-generated slop that breaks in production.</p>
-                </SkewContainer>
-                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
+                </Container>
+                <Container variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
                   <h4 className="font-bold text-red-500 mb-2">SECURITY HOLES</h4>
                   <p className="text-sm text-gray-500">Exposed ENV variables and weak auth patterns.</p>
-                </SkewContainer>
-                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
+                </Container>
+                <Container variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
                   <h4 className="font-bold text-red-500 mb-2">UNSCALABLE DESIGN</h4>
                   <p className="text-sm text-gray-500">Monoliths that crumble under real-world load.</p>
-                </SkewContainer>
-                <SkewContainer variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
+                </Container>
+                <Container variant="ghost" className="border-red-900/50 bg-red-900/10 p-6 h-full">
                   <h4 className="font-bold text-red-500 mb-2">TECHNICAL DEBT</h4>
                   <p className="text-sm text-gray-500">Shortcuts that compound costs over time.</p>
-                </SkewContainer>
+                </Container>
               </div>
             </div>
 
@@ -63,7 +58,7 @@ export default function PhilosophyPage() {
             <div className="flex flex-col">
               <h3 className="font-mono text-primary mb-6 text-xl">// FIELDWAVES.SYS [ACTIVE]</h3>
               <div className="space-y-4 grow flex flex-col">
-                <SkewContainer variant="glass" className="p-6 h-full">
+                <Container variant="glass" className="p-6 h-full">
                   <div className="flex gap-4 items-start">
                     <GitBranch className="text-primary shrink-0" size={24} />
                     <div>
@@ -73,9 +68,9 @@ export default function PhilosophyPage() {
                       </p>
                     </div>
                   </div>
-                </SkewContainer>
+                </Container>
 
-                <SkewContainer variant="glass" className="p-6 h-full">
+                <Container variant="glass" className="p-6 h-full">
                   <div className="flex gap-4 items-start">
                     <Lock className="text-primary shrink-0" size={24} />
                     <div>
@@ -85,9 +80,9 @@ export default function PhilosophyPage() {
                       </p>
                     </div>
                   </div>
-                </SkewContainer>
+                </Container>
 
-                <SkewContainer variant="glass" className="p-6 h-full">
+                <Container variant="glass" className="p-6 h-full">
                   <div className="flex gap-4 items-start">
                     <Zap className="text-primary shrink-0" size={24} />
                     <div>
@@ -97,9 +92,9 @@ export default function PhilosophyPage() {
                       </p>
                     </div>
                   </div>
-                </SkewContainer>
+                </Container>
 
-                <SkewContainer variant="glass" className="p-6 h-full">
+                <Container variant="glass" className="p-6 h-full">
                   <div className="flex gap-4 items-start">
                     <Code2 className="text-primary shrink-0" size={24} />
                     <div>
@@ -107,7 +102,7 @@ export default function PhilosophyPage() {
                       <p className="text-sm text-secondary">Clean code that your team can own and extend.</p>
                     </div>
                   </div>
-                </SkewContainer>
+                </Container>
               </div>
             </div>
           </div>
@@ -122,27 +117,27 @@ export default function PhilosophyPage() {
           />
 
           <div className="grid md:grid-cols-3 gap-8">
-            <SkewContainer variant="ghost" className="p-8 group sj" hoverEffect>
+            <Container variant="ghost" className="p-8 group sj" hoverEffect>
               <Code2 className="text-primary mb-6 group-hover:scale-110 transition-transform" size={40} />
               <h3 className="font-display text-xl font-bold mb-3">Clean Architecture</h3>
               <p className="text-secondary">
                 Every line of code follows SOLID principles. Your system stays maintainable for years to come.
               </p>
-            </SkewContainer>
+            </Container>
 
-            <SkewContainer variant="ghost" className="p-8 group" hoverEffect>
+            <Container variant="ghost" className="p-8 group" hoverEffect>
               <Lock className="text-primary mb-6 group-hover:scale-110 transition-transform" size={40} />
               <h3 className="font-display text-xl font-bold mb-3">Security First</h3>
               <p className="text-secondary">
                 Enterprise-grade security isn't an afterthought. It's woven into every decision we make.
               </p>
-            </SkewContainer>
+            </Container>
 
-            <SkewContainer variant="ghost" className="p-8 group" hoverEffect>
+            <Container variant="ghost" className="p-8 group" hoverEffect>
               <Award className="text-primary mb-6 group-hover:scale-110 transition-transform" size={40} />
               <h3 className="font-display text-xl font-bold mb-3">Long-term Support</h3>
               <p className="text-secondary">We're invested in your success. Our team stands behind every deployment.</p>
-            </SkewContainer>
+            </Container>
           </div>
         </div>
       </section>

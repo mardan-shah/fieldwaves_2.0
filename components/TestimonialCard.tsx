@@ -1,5 +1,5 @@
 import type React from "react"
-import SkewContainer from "./ui/SkewContainer"
+import Container from "./ui/Container"
 import { Star } from "lucide-react"
 
 interface TestimonialCardProps {
@@ -13,7 +13,7 @@ interface TestimonialCardProps {
 
 const TestimonialCard: React.FC<TestimonialCardProps> = ({ quote, author, title, company, avatar, rating = 5 }) => {
   return (
-    <SkewContainer variant="glass" className="p-8 h-full flex flex-col">
+    <Container variant="glass" className="p-8 h-full flex flex-col">
       <div className="flex gap-1 mb-4">
         {[...Array(rating)].map((_, i) => (
           <Star key={i} size={16} fill="var(--primary)" color="var(--primary)" />
@@ -31,7 +31,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({ quote, author, title,
           </p>
         </div>
       </div>
-    </SkewContainer>
+    </Container>
   )
 }
 

@@ -2,23 +2,23 @@
 
 import type React from "react"
 import { useState } from "react"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import FormInput from "@/components/ui/FormInput"
 import MarkdownEditor from "@/components/ui/MarkdownEditor"
 import EditCaseStudyModal from "@/components/admin/EditCaseStudyModal"
 import ConfirmDialog from "@/components/admin/ConfirmDialog"
-import type { CaseStudy } from "@/types"
+import type { iCaseStudy } from "@/types"
 import ImageCropUpload from "@/components/admin/ImageCropUpload"
 import { BookOpen, Eye, Save, Loader2, Search, Plus, Trash2, Pencil, Star, ChevronUp, ChevronDown } from "lucide-react"
 import { toast } from "sonner"
 import { addCaseStudy, updateCaseStudy, deleteCaseStudy, getAllCaseStudies, toggleCaseStudyFeatured, reorderItem } from "@/app/actions/admin"
 
 interface CaseStudiesViewProps {
-  initialCaseStudies: CaseStudy[]
+  initialCaseStudies: iCaseStudy[]
 }
 
 export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewProps) {
-  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(initialCaseStudies)
+  const [caseStudies, setCaseStudies] = useState<iCaseStudy[]>(initialCaseStudies)
   const [submitting, setSubmitting] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [newCase, setNewCase] = useState({
@@ -36,7 +36,7 @@ export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewP
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Edit modal state
-  const [editCase, setEditCase] = useState<CaseStudy | null>(null)
+  const [editCase, setEditCase] = useState<iCaseStudy | null>(null)
   const [editModalOpen, setEditModalOpen] = useState(false)
 
   // Delete confirm state
@@ -52,7 +52,7 @@ export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewP
 
   const refreshCases = async () => {
     const updated = await getAllCaseStudies()
-    setCaseStudies(updated as CaseStudy[])
+    setCaseStudies(updated as iCaseStudy[])
   }
 
   const handleAddCase = async (e: React.FormEvent) => {
@@ -89,7 +89,7 @@ export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewP
     }
   }
 
-  const handleEditCase = (cs: CaseStudy) => {
+  const handleEditCase = (cs: iCaseStudy) => {
     setEditCase(cs)
     setEditModalOpen(true)
   }
@@ -176,7 +176,7 @@ export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewP
           <h2 className="font-mono font-bold text-lg tracking-wider">CREATE_CASE_STUDY</h2>
         </div>
 
-        <SkewContainer variant="outline" className="p-8 bg-card mx-6 md:mx-12 lg:mx-22">
+        <Container variant="outline" className="p-8 bg-card mx-6 md:mx-12 lg:mx-22">
           <form onSubmit={handleAddCase} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-4">
               <FormInput
@@ -290,7 +290,7 @@ export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewP
             </div>
 
             <button type="submit" disabled={submitting} className="w-full group">
-              <SkewContainer
+              <Container
                 variant="primary"
                 className="py-3 text-center flex items-center justify-center gap-2"
                 hoverEffect
@@ -299,10 +299,10 @@ export default function CaseStudiesView({ initialCaseStudies }: CaseStudiesViewP
                   {submitting ? <Loader2 className="animate-spin" /> : <Save size={18} />}
                   <span className="font-bold tracking-widest">COMMIT_TO_DB</span>
                 </div>
-              </SkewContainer>
+              </Container>
             </button>
           </form>
-        </SkewContainer>
+        </Container>
       </section>
 
       {/* Case Study List */}

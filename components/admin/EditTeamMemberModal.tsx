@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
@@ -10,13 +10,13 @@ import {
 import FormInput from "@/components/ui/FormInput"
 import MarkdownEditor from "@/components/ui/MarkdownEditor"
 import SocialIconPicker, { SOCIAL_PLATFORMS } from "@/components/ui/SocialIconPicker"
-import SkewContainer from "@/components/ui/SkewContainer"
-import type { TeamMember } from "@/types"
+import Container from "@/components/ui/Container"
+import type { iTeamMember } from "@/types"
 import ImageCropUpload from "@/components/admin/ImageCropUpload"
 import { Loader2, Save, Plus, X } from "lucide-react"
 
 interface EditTeamMemberModalProps {
-  member: TeamMember | null
+  member: iTeamMember | null
   open: boolean
   onOpenChange: (open: boolean) => void
   onSave: (id: string, formData: FormData) => Promise<void>
@@ -43,17 +43,18 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
   const [activeTab, setActiveTab] = useState<"basics" | "socials">("basics")
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen && member) {
+  // Initialize form when member or open state changes
+  useEffect(() => {
+    if (open && member) {
       setForm({
-        name: member.name,
-        role: member.role,
+        name: member.name || "",
+        role: member.role || "",
         bio: member.bio || "",
         backgroundColor: member.backgroundColor || "#000000",
-        isOwner: member.isOwner,
+        isOwner: member.isOwner || false,
         order: String(member.order || 0),
       })
-      // Convert socialLinks object to array
+      
       const socialArray: SocialLink[] = []
       if (member.socialLinks) {
         Object.entries(member.socialLinks).forEach(([platform, url]) => {
@@ -65,8 +66,7 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
       setActiveTab("basics")
       setErrors({})
     }
-    onOpenChange(isOpen)
-  }
+  }, [open, member])
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -107,27 +107,8 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
     }
   }
 
-  // Initialize form when dialog opens
-  if (open && member && form.name === "" && form.role === "") {
-    setForm({
-      name: member.name,
-      role: member.role,
-      bio: member.bio || "",
-      backgroundColor: member.backgroundColor || "#000000",
-      isOwner: member.isOwner,
-      order: String(member.order || 0),
-    })
-    const socialArray: SocialLink[] = []
-    if (member.socialLinks) {
-      Object.entries(member.socialLinks).forEach(([platform, url]) => {
-        if (url) socialArray.push({ platform, url })
-      })
-    }
-    setSocials(socialArray)
-  }
-
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card border border-border rounded-none max-w-lg max-h-[90vh] overflow-y-auto" showCloseButton={false}>
         <DialogHeader>
           <DialogTitle className="font-display text-xl font-bold text-primary tracking-wider uppercase">
@@ -252,7 +233,7 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
               />
 
               <button type="button" onClick={handleAddSocial} className="w-full group">
-                <SkewContainer
+                <Container
                   variant="secondary"
                   className="py-2 text-center flex items-center justify-center gap-2"
                   hoverEffect
@@ -261,7 +242,7 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
                     <Plus size={16} />
                     <span className="font-bold text-sm">ADD SOCIAL</span>
                   </div>
-                </SkewContainer>
+                </Container>
               </button>
 
               <div className="space-y-2">
@@ -297,12 +278,12 @@ export default function EditTeamMemberModal({ member, open, onOpenChange, onSave
               CANCEL
             </button>
             <button type="submit" disabled={loading} className="flex-1 group">
-              <SkewContainer variant="primary" className="py-3 text-center flex items-center justify-center gap-2" hoverEffect>
+              <Container variant="primary" className="py-3 text-center flex items-center justify-center gap-2" hoverEffect>
                 <div className="flex items-center justify-center gap-2">
                   {loading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                   <span className="font-bold tracking-widest text-xs">SAVE</span>
                 </div>
-              </SkewContainer>
+              </Container>
             </button>
           </div>
         </form>

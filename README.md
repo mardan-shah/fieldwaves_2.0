@@ -17,7 +17,7 @@ Built with **Next.js 16**, **React 19**, and **Tailwind CSS 4**.
 
 The site follows a strict design language inspired by heavy machinery and professional instrumentation:
 
-- **Geometry:** Parallelograms are mandatory. All main containers use `SkewContainer` with a `-12deg` skew.
+- **Geometry:** Parallelograms are mandatory. All main containers use `Container` with a `-12deg` skew.
 - **Counter-Skew:** Content within skewed containers is automatically counter-skewed to maintain perfect legibility while preserving the edgy silhouette.
 - **Micro-interactions:** Instant, snappy transitions (0.1s - 0.2s). No soft fades. Feedback feels like a physical switch clicking.
 - **Information Density:** UI elements include monospace "metadata" (e.g., `SYSTM_READY`, `SRV_01`, `CORP_ID_FW`) to signal precision and architectural depth.
@@ -29,7 +29,9 @@ The site follows a strict design language inspired by heavy machinery and profes
 ## 🛠️ Key Features
 
 ### Admin Command Center
+
 A secure, persistent sidebar dashboard for managing all aspects of the digital identity:
+
 - **Services Management:** Dynamic CRUD for service offerings with custom Lucide icons.
 - **Deployments (Projects):** Showcase work with screenshot uploads and reordering.
 - **Intelligence Feed (Blog):** Full Markdown editor with live preview and SEO controls.
@@ -37,12 +39,15 @@ A secure, persistent sidebar dashboard for managing all aspects of the digital i
 - **Analytics:** Real-time page view tracking and daily visualizers.
 
 ### Maintenance Mode
+
 A global system-wide toggle accessible from the Admin Panel. When active:
+
 - All public visitors are redirected to a branded **System Maintenance** page.
 - The Admin Panel remains fully accessible for updates and re-engineering.
 - Uses `x-invoke-path` header detection for seamless redirection within the layout.
 
 ### Next.js 16 Optimization
+
 - **Cache Components:** Explicit opt-in caching via `"use cache"` for high performance.
 - **Static Generation:** Dynamic routes use `generateStaticParams` for build-time optimization.
 - **Deterministic Aesthetics:** Component IDs and serial numbers are generated deterministically to satisfy prerendering requirements.
@@ -50,12 +55,14 @@ A global system-wide toggle accessible from the Admin Panel. When active:
 ## 🏁 Quick Start
 
 1. **Clone & Install:**
+
    ```bash
    pnpm install
    ```
 
 2. **Environment Configuration:**
    Create `.env.local` with the following variables:
+
    ```env
    MONGODB_URI=your_mongodb_uri
    GMAIL_USER=your_email@gmail.com
@@ -65,6 +72,7 @@ A global system-wide toggle accessible from the Admin Panel. When active:
    ```
 
 3. **Seed Initial Data:**
+
    ```bash
    bun scripts/seed-content.ts
    ```
@@ -83,7 +91,7 @@ A global system-wide toggle accessible from the Admin Panel. When active:
 │   ├── actions/        # Server Actions (Admin & Public)
 │   └── layout.tsx      # Root configuration & Error Boundaries
 ├── components/
-│   ├── ui/             # Brutalist primitives (SkewContainer, etc.)
+│   ├── ui/             # Brutalist primitives (Container, etc.)
 │   ├── admin/          # Management modals and forms
 │   └── ...             # Visual grid and list components
 ├── lib/
@@ -101,4 +109,5 @@ A global system-wide toggle accessible from the Admin Panel. When active:
 - **Headers:** Strict Content Security Policy (CSP) and security headers enabled.
 
 ---
-*Built by FieldWaves — Engineering Over Vibe.*
+
+_Built by FieldWaves — Engineering Over Vibe._

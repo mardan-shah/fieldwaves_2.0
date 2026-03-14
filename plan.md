@@ -1,19 +1,23 @@
 # FieldWaves Polish Plan
 
 ## Overview
+
 A systematic overhaul covering: CSS variable migration, animation system, skew consistency, admin panel restructure, blog/case study landing pages, and README update.
 
 ---
 
 ## Phase 1: Design Token Migration (Colors)
+
 > **Goal:** Eliminate all 200+ hardcoded hex values. Use CSS variables from `globals.css` via Tailwind theme.
 
 ### Step 1.1 — Extend Tailwind config to map CSS variables
+
 - Update `tailwind.config.ts` (or `globals.css` `@theme` block) to expose CSS variables as Tailwind utilities
 - Map: `bg-primary` -> `var(--primary)`, `bg-card` -> `var(--card)`, `text-muted` -> `var(--muted)`, etc.
 - Add all missing tokens: `--surface`, `--border`, `--input`, `--muted`
 
 ### Step 1.2 — Replace hardcoded colors in all page files
+
 - Replace `bg-[#1a1a1a]` -> `bg-background`
 - Replace `bg-[#141414]` -> `bg-card`
 - Replace `text-[#FF5F1F]` / `bg-[#FF5F1F]` -> `text-primary` / `bg-primary`
@@ -25,6 +29,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - **Files:** All 10+ page files, all 15+ components, all admin components
 
 ### Step 1.3 — Replace hardcoded colors in admin components
+
 - Same mappings as above for all files in `app/admin/_components/`
 - Also fix `components/admin/` edit modals
 
@@ -37,15 +42,18 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 ---
 
 ## Phase 2: Animation System & Accessibility
+
 > **Goal:** Add `prefers-reduced-motion` fallbacks, clean up transition durations for snappy brutalist feel.
 
 ### Step 2.1 — Add reduced-motion media query in globals.css
+
 - Add `@media (prefers-reduced-motion: reduce)` block
 - Disable all custom animations (`animate-pulse-slow`, `animate-slide-in`, `animate-fade-in`)
 - Set `transition-duration: 0.01ms !important` for all elements
 - Set `animation-duration: 0.01ms !important`
 
 ### Step 2.2 — Standardize transition durations
+
 - Brutalist = snappy. Audit and normalize:
   - `duration-300` -> `duration-200` where appropriate
   - `duration-500` -> `duration-200` for hover effects
@@ -53,6 +61,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - Ensure all `transition-*` classes have consistent timing
 
 ### Step 2.3 — Add entrance animations with intersection observer
+
 - Create a lightweight `useInView` hook or use CSS `animation-timeline: view()`
 - Add subtle fade-in-up for section headings and cards on scroll
 - These must respect `prefers-reduced-motion`
@@ -66,21 +75,25 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 ---
 
 ## Phase 3: Skew Consistency & Mobile Fix
+
 > **Goal:** Fix all broken skew implementations, ensure mobile never gets skewed content.
 
 ### Step 3.1 — Audit and fix broken counter-skews
+
 - **`app/philosophy/page.tsx`** — Add `md:skew-x-12` to child content
 - **`components/TeamDetailModal.tsx`** — Add counter-skew to modal content
 - **`components/ProjectDetailModal.tsx`** — Add counter-skew to modal content
 - **`components/ContactForm.tsx`** — Fix inconsistent `skew-x-0` approach, use proper counter-skew
 
 ### Step 3.2 — Standardize skew approach
-- All skew should use `SkewContainer` component where possible
+
+- All skew should use `Container` component where possible
 - For cases where raw classes are needed: always pair `md:-skew-x-12` parent with `md:skew-x-12` child
 - No skew on screens below `md` (768px) — this is already mostly correct
 - Add a `no-skew-mobile` safeguard class if needed
 
 ### Step 3.3 — Test edge cases
+
 - Verify skew doesn't clip content on narrow viewports (768px-1024px)
 - Ensure overflow is handled (no horizontal scrollbar from skewed elements)
 - Check modals render correctly with skew on desktop
@@ -88,21 +101,24 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 **Test:** Resize browser from 320px to 1440px. No content should be skewed on mobile. On desktop, all skewed containers should have readable (counter-skewed) text inside. No horizontal scrollbar.
 
 - [x] Step 3.1 — Fixed broken counter-skews (modals, philosophy, contact form)
-- [x] Step 3.2 — SkewContainer: always-skew by default, `noSkewMobile` prop for cards. Removed all skew-x-0 hacks. overflow-x-hidden on body.
+- [x] Step 3.2 — Container: always-skew by default, `noSkewMobile` prop for cards. Removed all skew-x-0 hacks. overflow-x-hidden on body.
 - [x] Step 3.3 — Cards stay square on mobile, everything else skews on all screens
 
 ---
 
 ## Phase 3.5: Blog & Cases Polish — Search Bars, Detail Pages, Dummy Data
+
 > **Goal:** Consistent search/filter bars with skew styling, beautifully designed detail pages for markdown content, and dummy blog posts + case studies for visual testing.
 
 ### Step 3.5.1 — Unified SearchFilterBar component
+
 - Extract search + tag filter into a reusable `SearchFilterBar` component
 - Skewed search input with counter-skewed content
 - Skewed tag/filter pills
 - Consistent across BlogGrid, CaseStudyGrid, ProjectGrid
 
 ### Step 3.5.2 — Polish MarkdownRenderer typography
+
 - Better spacing, larger body text for readability
 - Styled horizontal rules with skew accent
 - Better code blocks with language label
@@ -110,6 +126,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - Image captions support
 
 ### Step 3.5.3 — Redesign blog detail page
+
 - Full-width cover with gradient overlay
 - Skewed accent bar under title
 - Better meta bar with skew containers
@@ -118,6 +135,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - Proper reading width (max-w-3xl for prose)
 
 ### Step 3.5.4 — Redesign case study detail page
+
 - Full-width cover with gradient overlay
 - Metric cards with skew styling
 - Tech stack pills
@@ -125,6 +143,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - CTA section with skew
 
 ### Step 3.5.5 — Insert dummy blog posts & case studies
+
 - 3 blog posts with real-looking markdown content (code blocks, headings, lists, images, blockquotes)
 - 3 case studies with metric cards, tech stacks, and detailed descriptions
 - Cover images from picsum/unsplash
@@ -140,9 +159,11 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 ---
 
 ## Phase 4: Admin Panel Restructure — Route-Based Sections
+
 > **Goal:** Replace tab-based admin with route-based pages. Each section gets its own URL. Sidebar navigation.
 
 ### Step 4.1 — Create admin layout with persistent sidebar
+
 - Create `app/admin/layout.tsx` with:
   - Left sidebar (fixed, always visible on desktop, collapsible on mobile)
   - Navigation links: Dashboard, Projects, Team, Cases, Blog, Analytics, Settings
@@ -152,6 +173,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - Sidebar design: dark card background, skewed nav items on desktop, clean on mobile
 
 ### Step 4.2 — Create individual admin route pages
+
 - `app/admin/page.tsx` — Dashboard overview (stats, recent activity, quick actions)
 - `app/admin/projects/page.tsx` — ProjectsView (full CRUD)
 - `app/admin/team/page.tsx` — TeamView (full CRUD)
@@ -161,6 +183,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - `app/admin/settings/page.tsx` — SettingsPanel (expanded)
 
 ### Step 4.3 — Dashboard overview page
+
 - Stats grid: total projects, team members, blog posts, case studies, page views
 - Recent activity feed (last 5 created/updated items across all sections)
 - Quick action buttons: "New Blog Post", "New Case Study", "Add Project", "Add Team Member"
@@ -175,9 +198,11 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 ---
 
 ## Phase 5: Admin Panel — Enhanced Controls
+
 > **Goal:** Give admin granular control over every section like a master architect.
 
 ### Step 5.1 — Project management enhancements
+
 - Drag-and-drop reordering (or up/down arrows for order)
 - Bulk actions: select multiple, bulk delete, bulk reorder
 - Project preview before publish
@@ -186,6 +211,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - "Featured" flag to pin projects to homepage
 
 ### Step 5.2 — Team management enhancements
+
 - Drag-and-drop or arrow reordering
 - Avatar preview (live URL preview)
 - Social links validation (URL format check)
@@ -194,6 +220,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - Bulk actions
 
 ### Step 5.3 — Blog management enhancements
+
 - Markdown editor with live preview pane (side-by-side)
 - Cover image URL with live preview
 - Tag management (add/remove tags inline)
@@ -205,6 +232,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - Slug auto-generation from title (with manual override)
 
 ### Step 5.4 — Case study management enhancements
+
 - Same markdown editor with preview
 - Metric cards editor (add/remove/reorder)
 - Tech stack tag input
@@ -213,6 +241,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - SEO fields
 
 ### Step 5.5 — Settings panel expansion
+
 - **Site Identity:** Site name, tagline, logo URL
 - **Homepage Config:** Featured projects count, featured team count, hero text
 - **Display Settings:** Cases display count, blog posts per page
@@ -232,9 +261,11 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 ---
 
 ## Phase 6: Blog & Case Study Landing Pages
+
 > **Goal:** Root pages (`/blog`, `/cases`) become curated landing pages with admin-controlled "top picks". Full listings at `/blog/all`, `/cases/all`.
 
 ### Step 6.1 — Blog landing page (`/blog`)
+
 - Hero section with page description (editable via admin)
 - "TOP PICKS" section: admin-flagged featured posts (3-6 posts, large cards)
 - "LATEST" section: most recent posts (6 posts, smaller cards)
@@ -243,10 +274,12 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - Consistent brutalist styling with skew containers
 
 ### Step 6.2 — Blog all-posts page (`/blog/all`)
+
 - Full grid with search, tag filtering, and pagination
 - Uses existing `BlogGrid` component (refined)
 
 ### Step 6.3 — Case studies landing page (`/cases`)
+
 - Hero section with section description (editable via admin)
 - "FEATURED WORK" section: admin-flagged top case studies (large showcase cards)
 - "MORE WORK" section: remaining published case studies
@@ -254,10 +287,12 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - Metric highlights from featured cases
 
 ### Step 6.4 — Case studies all page (`/cases/all`)
+
 - Already exists — refine with search, filters, pagination
 - Uses existing `CaseStudyGrid`/`CaseStudyList` components
 
 ### Step 6.5 — Update server actions for featured content
+
 - Add `featured` field to BlogPost and CaseStudy models
 - Add `getFeaturedBlogPosts()` and `getFeaturedCaseStudies()` server actions
 - Add admin toggle for featured status in blog/case study views
@@ -273,9 +308,11 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 ---
 
 ## Phase 7: Admin UX Polish — Spacing, Typography, Micro-interactions
+
 > **Goal:** Treat the admin panel as a work of art. Every pixel matters.
 
 ### Step 7.1 — Typography hierarchy in admin
+
 - Section titles: `text-2xl font-display uppercase tracking-wider`
 - Card titles: `text-lg font-semibold`
 - Labels: `text-xs font-mono uppercase tracking-widest text-muted`
@@ -283,6 +320,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - Consistent spacing: `space-y-6` between sections, `space-y-4` within cards, `gap-4` in grids
 
 ### Step 7.2 — Form design polish
+
 - Input fields: consistent padding (`px-4 py-3`), border-border, bg-input
 - Focus states: `ring-2 ring-primary` with transition
 - Error states: `border-destructive` with error message below
@@ -291,6 +329,7 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - Consistent button sizing and spacing
 
 ### Step 7.3 — Card and list item design
+
 - Admin list items: consistent height, aligned columns
 - Hover state: subtle border-primary highlight
 - Action buttons: icon-only with tooltips on desktop, full text on mobile
@@ -298,12 +337,14 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 - Consistent card padding: `p-6` for main cards, `p-4` for nested items
 
 ### Step 7.4 — Loading and empty states
+
 - Skeleton loaders for data-fetching states
 - Empty state illustrations/messages: "No projects yet. Create your first one."
 - Success/error toast styling consistency
 - Button loading states (spinner + disabled)
 
 ### Step 7.5 — Responsive admin layout
+
 - Mobile: hamburger menu for sidebar, full-width content
 - Tablet: collapsible sidebar (icons only), wider content
 - Desktop: full sidebar + content
@@ -321,9 +362,11 @@ A systematic overhaul covering: CSS variable migration, animation system, skew c
 ---
 
 ## Phase 8: README.md Update
+
 > **Goal:** Comprehensive, current documentation.
 
 ### Step 8.1 — Rewrite README.md
+
 - Project name, one-line description, and badges
 - Screenshots (placeholder paths)
 - Tech stack with versions

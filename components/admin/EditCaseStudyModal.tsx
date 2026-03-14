@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/dialog"
 import FormInput from "@/components/ui/FormInput"
 import MarkdownEditor from "@/components/ui/MarkdownEditor"
-import SkewContainer from "@/components/ui/SkewContainer"
-import type { CaseStudy } from "@/types"
+import Container from "@/components/ui/Container"
+import type { iCaseStudy } from "@/types"
 import ImageCropUpload from "@/components/admin/ImageCropUpload"
 import { Loader2, Save, X, Plus, Trash2 } from "lucide-react"
 
 interface EditCaseStudyModalProps {
-  caseStudy: CaseStudy | null
+  caseStudy: iCaseStudy | null
   open: boolean
   onOpenChange: (open: boolean) => void
   onSave: (id: string, formData: FormData) => Promise<void>
@@ -40,13 +40,14 @@ export default function EditCaseStudyModal({ caseStudy, open, onOpenChange, onSa
   const [coverPreview, setCoverPreview] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen && caseStudy) {
+  // Initialize form when caseStudy or open state changes
+  useEffect(() => {
+    if (open && caseStudy) {
       setForm({
-        title: caseStudy.title,
+        title: caseStudy.title || "",
         subtitle: caseStudy.subtitle || "",
-        techStack: caseStudy.techStack.join(", "),
-        published: caseStudy.published,
+        techStack: caseStudy.techStack?.join(", ") || "",
+        published: caseStudy.published || false,
         order: String(caseStudy.order || 0),
         overview: caseStudy.overview || "",
         description: caseStudy.description || "",
@@ -57,8 +58,7 @@ export default function EditCaseStudyModal({ caseStudy, open, onOpenChange, onSa
       setErrors({})
       setActiveTab("DETAILS")
     }
-    onOpenChange(isOpen)
-  }
+  }, [open, caseStudy])
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -108,25 +108,10 @@ export default function EditCaseStudyModal({ caseStudy, open, onOpenChange, onSa
     setMetricCards(updated)
   }
 
-  // Initialize form when dialog opens
-  if (open && caseStudy && form.title === "" && form.subtitle === "" && form.description === "" && form.overview === "") {
-    setForm({
-      title: caseStudy.title,
-      subtitle: caseStudy.subtitle || "",
-      techStack: caseStudy.techStack.join(", "),
-      published: caseStudy.published,
-      order: String(caseStudy.order || 0),
-      overview: caseStudy.overview || "",
-      description: caseStudy.description || "",
-    })
-    setMetricCards(caseStudy.metricCards?.length ? [...caseStudy.metricCards] : [])
-    setCoverPreview(caseStudy.coverImage || null)
-  }
-
   const tabs: Tab[] = ["DETAILS", "METRICS", "CONTENT"]
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card border border-border rounded-none max-w-2xl max-h-[90vh] overflow-y-auto" showCloseButton={false}>
         <DialogHeader>
           <DialogTitle className="font-display text-xl font-bold text-primary tracking-wider uppercase">
@@ -299,12 +284,12 @@ export default function EditCaseStudyModal({ caseStudy, open, onOpenChange, onSa
               CANCEL
             </button>
             <button type="submit" disabled={loading} className="flex-1 group">
-              <SkewContainer variant="primary" className="py-3 text-center flex items-center justify-center gap-2" hoverEffect>
+              <Container variant="primary" className="py-3 text-center flex items-center justify-center gap-2" hoverEffect>
                 <div className="flex items-center justify-center gap-2">
                   {loading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                   <span className="font-bold tracking-widest text-xs">SAVE</span>
                 </div>
-              </SkewContainer>
+              </Container>
             </button>
           </div>
         </form>

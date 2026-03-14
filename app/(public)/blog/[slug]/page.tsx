@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import MarkdownRenderer from "@/components/ui/MarkdownRenderer"
 import TableOfContents from "@/components/ui/TableOfContents"
 import { getBlogPostBySlug, getBlogPosts } from "@/app/actions/public"
@@ -66,21 +66,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <section className={`max-w-7xl mx-auto px-6 ${post.coverImage ? "-mt-40 relative z-10" : "pt-32"}`}>
         {/* Back link */}
         <Link href="/blog" className="inline-block mb-8">
-          <SkewContainer variant="ghost" className="px-4 py-2">
+          <Container variant="ghost" className="px-4 py-2">
             <span className="flex items-center gap-2 font-mono text-xs text-muted hover:text-white transition-colors">
               <ArrowLeft size={14} />
               BACK_TO_BLOG
             </span>
-          </SkewContainer>
+          </Container>
         </Link>
 
         {/* Tags */}
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
             {post.tags.map(tag => (
-              <SkewContainer key={tag} variant="outline" className="px-3 py-1">
+              <Container key={tag} variant="outline" className="px-3 py-1">
                 <span className="font-mono text-[10px] uppercase tracking-widest">{tag}</span>
-              </SkewContainer>
+              </Container>
             ))}
           </div>
         )}
@@ -92,33 +92,33 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         {/* Meta Bar */}
         <div className="flex flex-wrap items-center gap-3 mb-10">
           {post.author && (
-            <SkewContainer variant="glass" className="px-4 py-2">
+            <Container variant="glass" className="px-4 py-2">
               <span className="flex items-center gap-2 font-mono text-xs">
                 <User size={12} className="text-primary" />
                 {post.author}
               </span>
-            </SkewContainer>
+            </Container>
           )}
           {formattedDate && (
-            <SkewContainer variant="glass" className="px-4 py-2">
+            <Container variant="glass" className="px-4 py-2">
               <span className="flex items-center gap-2 font-mono text-xs">
                 <Calendar size={12} className="text-primary" />
                 {formattedDate}
               </span>
-            </SkewContainer>
+            </Container>
           )}
-          <SkewContainer variant="glass" className="px-4 py-2">
+          <Container variant="glass" className="px-4 py-2">
             <span className="flex items-center gap-2 font-mono text-xs">
               <Clock size={12} className="text-primary" />
               {readTime} MIN READ
             </span>
-          </SkewContainer>
-          <SkewContainer variant="glass" className="px-4 py-2">
+          </Container>
+          <Container variant="glass" className="px-4 py-2">
             <span className="flex items-center gap-2 font-mono text-xs">
               <Eye size={12} className="text-primary" />
               {post.views} VIEWS
             </span>
-          </SkewContainer>
+          </Container>
         </div>
 
         {/* Excerpt */}
@@ -151,9 +151,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <p className="font-mono text-xs text-primary tracking-widest mb-4">KEYWORDS</p>
           <div className="flex flex-wrap gap-2">
             {post.keywords.map(kw => (
-              <SkewContainer key={kw} variant="ghost" className="px-3 py-1">
+              <Container key={kw} variant="ghost" className="px-3 py-1">
                 <span className="font-mono text-xs text-muted">{kw}</span>
-              </SkewContainer>
+              </Container>
             ))}
           </div>
         </section>
@@ -165,9 +165,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <h2 className="font-display text-3xl md:text-4xl font-bold uppercase mb-6">More Engineering Insights</h2>
           <p className="text-lg text-secondary mb-8">Explore more from the FieldWaves engineering team.</p>
           <Link href="/blog" className="inline-block">
-            <SkewContainer variant="primary" hoverEffect className="px-8 py-3">
+            <Container variant="primary" hoverEffect className="px-8 py-3">
               <span className="font-mono font-bold tracking-widest text-sm">VIEW ALL POSTS</span>
-            </SkewContainer>
+            </Container>
           </Link>
         </div>
       </section>

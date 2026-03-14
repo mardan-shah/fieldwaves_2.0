@@ -1,18 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import TeamDetailModal from "@/components/TeamDetailModal"
-import type { TeamMember } from "@/types"
+import type { iTeamMember } from "@/types"
 import { Github, Linkedin, Twitter } from "lucide-react"
 import { useInView } from "@/hooks/use-in-view"
 
 interface TeamGridProps {
-  team: TeamMember[]
+  team: iTeamMember[]
 }
 
 export default function TeamGrid({ team }: TeamGridProps) {
-  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
+  const [selectedMember, setSelectedMember] = useState<iTeamMember | null>(null)
   const { ref: gridRef, isInView } = useInView()
 
   return (
@@ -25,7 +25,7 @@ export default function TeamGrid({ team }: TeamGridProps) {
             style={{ animationDelay: `${i * 0.05}s` }}
             onClick={() => setSelectedMember(member)}
           >
-            <SkewContainer variant="glass" className="h-full p-0" noSkewMobile>
+            <Container variant="glass" className="h-full p-0" noSkewMobile>
               <div className="relative h-full flex flex-col">
                 <div className="aspect-square md:aspect-4/5 w-full bg-gray-800 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-200 relative max-h-[300px]">
                   <img
@@ -93,7 +93,7 @@ export default function TeamGrid({ team }: TeamGridProps) {
                   </div>
                 </div>
               </div>
-            </SkewContainer>
+            </Container>
           </div>
         ))}
       </div>

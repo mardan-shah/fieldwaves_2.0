@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import SectionHeading from "@/components/ui/SectionHeading"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 
 export const metadata: Metadata = {
   title: "Privacy Policy | FieldWaves",
@@ -34,13 +34,13 @@ export default function PrivacyPolicyPage() {
         <div className="max-w-4xl mx-auto px-6 space-y-12">
 
           {/* Introduction */}
-          <SkewContainer variant="glass" className="p-8">
+          <Container variant="glass" className="p-8">
             <p className="text-secondary leading-relaxed">
               FieldWaves (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) respects your privacy and is committed to
               protecting the personal data you share with us. This Privacy Policy explains how we collect, use, disclose,
               and safeguard your information when you visit our website and use our services.
             </p>
-          </SkewContainer>
+          </Container>
 
           {/* Section 1 */}
           <div>
@@ -114,10 +114,10 @@ export default function PrivacyPolicyPage() {
                   { name: "Resend", purpose: "Transactional email fallback" },
                   { name: "Google AdSense", purpose: "Advertisement serving" },
                 ].map((provider) => (
-                  <SkewContainer key={provider.name} variant="ghost" className="p-4">
+                  <Container key={provider.name} variant="ghost" className="p-4">
                     <p className="font-mono text-sm text-white font-bold">{provider.name}</p>
                     <p className="text-xs text-muted">{provider.purpose}</p>
-                  </SkewContainer>
+                  </Container>
                 ))}
               </div>
               <p>
@@ -257,7 +257,7 @@ export default function PrivacyPolicyPage() {
             <p className="text-secondary leading-relaxed mb-4">
               If you have any questions about this Privacy Policy or our data practices, please contact us:
             </p>
-            <SkewContainer variant="outline" className="p-6">
+            <Container variant="outline" className="p-6">
               <div className="space-y-2">
                 <p className="font-mono text-sm">
                   <span className="text-primary">EMAIL:</span>{" "}
@@ -268,11 +268,11 @@ export default function PrivacyPolicyPage() {
                 <p className="font-mono text-sm">
                   <span className="text-primary">PAGE:</span>{" "}
                   <a href="/contact" className="text-white hover:text-primary transition-colors">
-                    fieldwaves.io/contact
+                    fieldwaves.com/contact
                   </a>
                 </p>
               </div>
-            </SkewContainer>
+            </Container>
           </div>
 
         </div>

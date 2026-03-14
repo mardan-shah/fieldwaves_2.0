@@ -2,7 +2,7 @@
 
 import React from "react"
 import Link from "next/link"
-import SkewContainer from "./SkewContainer"
+import Container from "./Container"
 
 interface ButtonProps {
   children: React.ReactNode
@@ -37,18 +37,18 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
           className={`inline-block ${className}`}
           ref={ref as any}
         >
-          <SkewContainer variant={variant} className={sizeClasses[size]} hoverEffect>
+          <Container variant={variant} className={`${sizeClasses[size]} min-w-[200px] text-center ${className}`} hoverEffect>
             <span className="font-bold tracking-wider">{children}</span>
-          </SkewContainer>
+          </Container>
         </Component>
       )
     }
 
     return (
       <button type={type} className={`${className}`} ref={ref as any} {...props}>
-        <SkewContainer variant={variant} className={sizeClasses[size]} hoverEffect>
+        <Container variant={variant} className={sizeClasses[size]} hoverEffect>
           <span className="font-bold tracking-wider">{children}</span>
-        </SkewContainer>
+        </Container>
       </button>
     )
   },

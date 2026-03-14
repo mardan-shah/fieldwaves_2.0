@@ -2,8 +2,9 @@ import type { Metadata } from "next"
 import SectionHeading from "@/components/ui/SectionHeading"
 import ServiceCard from "@/components/ServiceCard"
 import Button from "@/components/ui/SkewButton"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import { getServices } from "@/app/actions/public"
+import GridBackground from "@/components/ui/GridBackground"
 
 export const metadata: Metadata = {
   title: "Services | FieldWaves",
@@ -17,14 +18,7 @@ export default async function ServicesPage() {
     <>
       {/* Hero */}
       <section className="relative min-h-[60vh] flex items-center justify-center pt-32 pb-20">
-        <div
-          className="absolute inset-0 z-0 opacity-10 pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(var(--secondary) 1px, transparent 1px), linear-gradient(90deg, var(--secondary) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+        <GridBackground />
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
           <SectionHeading
@@ -65,10 +59,10 @@ export default async function ServicesPage() {
 
           <div className="grid md:grid-cols-4 gap-4">
             {["Discovery", "Strategy", "Implementation", "Optimization"].map((step, i) => (
-              <SkewContainer key={i} variant="glass" className="p-8 text-center">
+              <Container key={i} variant="glass" className="p-8 text-center">
                 <div className="text-4xl font-display font-bold text-primary mb-4">{i + 1}</div>
                 <h3 className="font-display text-lg font-bold">{step}</h3>
-              </SkewContainer>
+              </Container>
             ))}
           </div>
         </div>

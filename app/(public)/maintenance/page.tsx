@@ -1,6 +1,7 @@
 import { Terminal, AlertTriangle, Construction } from "lucide-react"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import { getSettings } from "@/app/actions/public"
+import GridBackground from "@/components/ui/GridBackground"
 
 export default async function MaintenancePage() {
   const settings = await getSettings()
@@ -8,27 +9,21 @@ export default async function MaintenancePage() {
   return (
     <div className="min-h-screen bg-background text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background Grid */}
-      <div
-        className="absolute inset-0 z-0 opacity-10 pointer-events-none"
-        style={{
-          backgroundImage: "linear-gradient(var(--secondary) 1px, transparent 1px), linear-gradient(90deg, var(--secondary) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
-
+            <GridBackground />
+      
       {/* Decorative Lines */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-primary transform -skew-x-12 opacity-50" />
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-primary transform -skew-x-12 opacity-50" />
+      <div className="absolute top-0 left-0 w-full h-1 bg-primary transform  opacity-50" />
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-primary transform  opacity-50" />
 
       <div className="relative z-10 max-w-2xl w-full">
-        <SkewContainer variant="glass" className="p-12 border-t-4 border-t-primary relative overflow-hidden">
+        <Container variant="glass" className="p-12 border-t-4 border-t-primary relative overflow-hidden">
           <div className="absolute top-2 right-4 font-mono text-[10px] text-primary/40 animate-pulse">
             SYSTM_STATUS: DOWN // CODE_RED
           </div>
 
           <div className="flex flex-col items-center text-center space-y-8">
-            <div className="bg-primary/10 p-6 -skew-x-12 border border-primary/20">
-              <Construction size={64} className="text-primary animate-bounce skew-x-0" />
+            <div className="bg-primary/10 p-6  border border-primary/20">
+              <Construction size={64} className="text-primary animate-bounce " />
             </div>
 
             <div className="space-y-4">
@@ -54,7 +49,7 @@ export default async function MaintenancePage() {
               <span>Retry connection in: 00:59:59</span>
             </div>
           </div>
-        </SkewContainer>
+        </Container>
 
         <div className="mt-8 flex justify-center">
           <div className="flex gap-4">

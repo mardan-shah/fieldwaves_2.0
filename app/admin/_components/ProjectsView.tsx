@@ -2,13 +2,13 @@
 
 import type React from "react"
 import { useState } from "react"
-import SkewContainer from "@/components/ui/SkewContainer"
+import Container from "@/components/ui/Container"
 import FormInput from "@/components/ui/FormInput"
 import MarkdownEditor from "@/components/ui/MarkdownEditor"
 import ProjectList from "@/components/ProjectList"
 import EditProjectModal from "@/components/admin/EditProjectModal"
 import ConfirmDialog from "@/components/admin/ConfirmDialog"
-import type { Project } from "@/types"
+import type { iProject } from "@/types"
 import ImageCropUpload from "@/components/admin/ImageCropUpload"
 import { Boxes, Eye, Save, Loader2, Search } from "lucide-react"
 import { toast } from "sonner"
@@ -16,11 +16,11 @@ import { addProject, updateProject, deleteProject, toggleProjectFeatured, reorde
 import { getProjects } from "@/app/actions/public"
 
 interface ProjectsViewProps {
-  initialProjects: Project[]
+  initialProjects: iProject[]
 }
 
 export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
-  const [projects, setProjects] = useState<Project[]>(initialProjects)
+  const [projects, setProjects] = useState<iProject[]>(initialProjects)
   const [submitting, setSubmitting] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [newProject, setNewProject] = useState({
@@ -28,12 +28,14 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
     url: "",
     description: "",
     techStack: "",
+    githubUrl: "",
+
   })
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Edit modal state
-  const [editProject, setEditProject] = useState<Project | null>(null)
+  const [editProject, setEditProject] = useState<iProject | null>(null)
   const [editModalOpen, setEditModalOpen] = useState(false)
 
   // Delete confirm state
@@ -54,7 +56,7 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
 
   const refreshProjects = async () => {
     const updated = await getProjects()
-    setProjects(updated as Project[])
+    setProjects(updated as iProject[])
   }
 
   const handleAddProject = async (e: React.FormEvent) => {
@@ -68,6 +70,7 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
       formData.append("url", newProject.url)
       formData.append("description", newProject.description)
       formData.append("techStack", newProject.techStack)
+      formData.append("githubUrl", newProject.githubUrl)
       if (screenshotFile) {
         formData.append("screenshot", screenshotFile)
       }
@@ -77,7 +80,7 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
 
       await refreshProjects()
       toast.success(`PROJECT "${newProject.title}" DEPLOYED SUCCESSFULLY`)
-      setNewProject({ title: "", url: "", description: "", techStack: "" })
+      setNewProject({ title: "", url: "", description: "", techStack: "", githubUrl: "" })
       setScreenshotFile(null)
       setErrors({})
     } catch (err: any) {
@@ -87,7 +90,7 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
     }
   }
 
-  const handleEditProject = (project: Project) => {
+  const handleEditProject = (project: iProject) => {
     setEditProject(project)
     setEditModalOpen(true)
   }
@@ -156,7 +159,7 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
           <h2 className="font-mono font-bold text-lg tracking-wider">DEPLOY_PROJECT</h2>
         </div>
 
-        <SkewContainer variant="outline" className="p-8 bg-card mx-6 md:mx-12 lg:mx-22">
+        <Container variant="outline" className="p-8 bg-card mx-6 md:mx-12 lg:mx-22">
           <form onSubmit={handleAddProject} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-4">
               <FormInput
@@ -177,6 +180,14 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
                 error={errors.url}
               />
             </div>
+              <FormInput
+                type="url"
+                value={newProject.githubUrl}
+                onChange={(e) => setNewProject(prev => ({ ...prev, githubUrl: e.target.value }))}
+                label="GITHUB_URL"
+                placeholder="https://..."
+              />
+
 
             <MarkdownEditor
               value={newProject.description}
@@ -201,7 +212,7 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
             />
 
             <button type="submit" disabled={submitting} className="w-full group">
-              <SkewContainer
+              <Container
                 variant="primary"
                 className="py-3 text-center flex items-center justify-center gap-2"
                 hoverEffect
@@ -210,10 +221,10 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
                   {submitting ? <Loader2 className="animate-spin" /> : <Save size={18} />}
                   <span className="font-bold tracking-widest">COMMIT_TO_DB</span>
                 </div>
-              </SkewContainer>
+              </Container>
             </button>
           </form>
-        </SkewContainer>
+        </Container>
       </section>
 
       {/* Project List */}
