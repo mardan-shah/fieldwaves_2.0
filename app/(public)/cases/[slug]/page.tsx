@@ -14,9 +14,14 @@ interface CaseStudyPageProps {
 
 export async function generateStaticParams() {
   const cases = await getCaseStudies()
-  return cases.map((c) => ({
+  const params = cases.map((c) => ({
     slug: c.slug,
   }))
+  // Ensure at least one result for Next.js Cache Components
+  if (params.length === 0) {
+    return [{ slug: 'placeholder' }]
+  }
+  return params
 }
 
 export async function generateMetadata({ params }: CaseStudyPageProps) {

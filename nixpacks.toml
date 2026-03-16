@@ -1,0 +1,6 @@
+[phases.install]
+cmds = ["npm install --legacy-peer-deps"]
+
+[phases.build]
+# Disable source maps to save memory during build
+cmds = ["NODE_OPTIONS='--max-old-space-size=2048' npm run build"]
