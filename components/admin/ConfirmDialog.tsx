@@ -32,7 +32,7 @@ export default function ConfirmDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="bg-card border border-border rounded-none max-w-md">
+      <AlertDialogContent className="bg-card border border-border rounded-none max-w-md" aria-describedby={undefined}>
         <AlertDialogHeader>
           <AlertDialogTitle
             className="font-display text-lg font-bold tracking-wider uppercase"

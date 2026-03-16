@@ -95,7 +95,7 @@ export default function EditServiceModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px] bg-card text-white border-border">
+      <DialogContent className="sm:max-w-[525px] bg-card text-white border-border" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="font-display uppercase tracking-widest text-primary">
             {service ? "Edit Service" : "Add New Service"}

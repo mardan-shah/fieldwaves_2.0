@@ -12,7 +12,7 @@ import MarkdownEditor from "@/components/ui/MarkdownEditor"
 import Container from "@/components/ui/Container"
 import type { iProject } from "@/types"
 import ImageCropUpload from "@/components/admin/ImageCropUpload"
-import { Loader2, Save } from "lucide-react"
+import { Loader2, Save, X, Plus } from "lucide-react"
 
 interface EditProjectModalProps {
   project: iProject | null
@@ -31,8 +31,12 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
     techStack: "",
     order: "0",
   })
-  const [screenshotFile, setScreenshotFile] = useState<File | null>(null)
-  const [initialPreview, setInitialPreview] = useState<string | null>(null)
+  
+  // Multiple screenshots support
+  const [existingScreenshots, setExistingScreenshots] = useState<string[]>([])
+  const [newScreenshotFiles, setNewScreenshotFiles] = useState<File[]>([])
+  const [uploaderKey, setUploaderKey] = useState(0)
+  
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Initialize form when project or open state changes
@@ -46,8 +50,9 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
         techStack: project.techStack?.join(", ") || "",
         order: String(project.order || 0),
       })
-      setScreenshotFile(null)
-      setInitialPreview(project.screenshotUrl || null)
+      setExistingScreenshots(project.screenshots || (project.screenshotUrl ? [project.screenshotUrl] : []))
+      setNewScreenshotFiles([])
+      setUploaderKey(prev => prev + 1)
       setErrors({})
     }
   }, [open, project])
@@ -77,9 +82,15 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
       formData.append("description", form.description)
       formData.append("techStack", form.techStack)
       formData.append("order", form.order)
-      if (screenshotFile) {
-        formData.append("screenshot", screenshotFile)
-      }
+      
+      existingScreenshots.forEach(url => {
+        formData.append("existingScreenshots", url)
+      })
+      
+      newScreenshotFiles.forEach(file => {
+        formData.append("screenshots", file)
+      })
+
       await onSave(project._id, formData)
       onOpenChange(false)
     } finally {
@@ -87,22 +98,72 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
     }
   }
 
+  const removeExistingScreenshot = (index: number) => {
+    setExistingScreenshots(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const removeNewScreenshot = (index: number) => {
+    setNewScreenshotFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border border-border rounded-none max-w-lg max-h-[90vh] overflow-y-auto" showCloseButton={false}>
+      <DialogContent className="bg-card border border-border rounded-none max-w-lg max-h-[90vh] overflow-y-auto" showCloseButton={false} aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="font-display text-xl font-bold text-primary tracking-wider uppercase">
             EDIT PROJECT
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <ImageCropUpload
-            currentImage={initialPreview}
-            onCropped={(file) => setScreenshotFile(file)}
-            label="SCREENSHOT"
-            aspect={16 / 9}
-          />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <label className="block font-mono text-xs text-secondary tracking-widest uppercase">Screenshots (16:9 recommended)</label>
+            
+            <div className="grid grid-cols-2 gap-4">
+              {/* Existing Screenshots */}
+              {existingScreenshots.map((url, idx) => (
+                <div key={`existing-${idx}`} className="relative group border border-border aspect-video">
+                  <img src={url} alt="" className="w-full h-full object-cover" />
+                  <button 
+                    type="button"
+                    onClick={() => removeExistingScreenshot(idx)}
+                    className="absolute top-1 right-1 bg-black/80 p-1 text-white hover:text-primary transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 py-1 px-2 text-[8px] font-mono text-white">EXISTING</div>
+                </div>
+              ))}
+              
+              {/* New (Unsaved) Screenshots */}
+              {newScreenshotFiles.map((file, idx) => {
+                const url = URL.createObjectURL(file)
+                return (
+                  <div key={`new-${idx}`} className="relative group border border-primary aspect-video">
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                    <button 
+                      type="button"
+                      onClick={() => removeNewScreenshot(idx)}
+                      className="absolute top-1 right-1 bg-black/80 p-1 text-white hover:text-primary transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                    <div className="absolute bottom-0 left-0 right-0 bg-primary/60 py-1 px-2 text-[8px] font-mono text-white uppercase">NEW // UNSAVED</div>
+                  </div>
+                )
+              })}
+            </div>
+
+            <ImageCropUpload
+              key={uploaderKey}
+              onCropped={(file) => {
+                setNewScreenshotFiles(prev => [...prev, file])
+                setUploaderKey(prev => prev + 1)
+              }}
+              label="ADD_NEW_SCREENSHOT"
+              aspect={16 / 9}
+            />
+          </div>
 
           <FormInput
             type="text"
@@ -165,7 +226,7 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
               <Container variant="primary" className="py-3 text-center flex items-center justify-center gap-2" hoverEffect>
                 <div className="flex items-center justify-center gap-2">
                   {loading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                  <span className="font-bold tracking-widest text-xs">SAVE</span>
+                  <span className="font-bold tracking-widest text-xs">SAVE_CHANGES</span>
                 </div>
               </Container>
             </button>

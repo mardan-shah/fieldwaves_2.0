@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,9 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden"
 import MarkdownRenderer from "@/components/ui/MarkdownRenderer"
 import Container from "@/components/ui/Container"
 import type { iProject } from "@/types"
-import { ArrowUpRight, Github, X } from "lucide-react"
+import { ArrowUpRight, Github, X, ChevronLeft, ChevronRight } from "lucide-react"
+
+import S3Image from "./ui/S3Image"
 
 interface ProjectDetailModalProps {
   project: iProject | null
@@ -18,27 +21,71 @@ interface ProjectDetailModalProps {
 }
 
 export default function ProjectDetailModal({ project, open, onOpenChange }: ProjectDetailModalProps) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  
   if (!project) return null
 
+  const allImages = project.screenshots?.length ? project.screenshots : (project.screenshotUrl ? [project.screenshotUrl] : [])
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length)
+  }
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(val) => {
+      if (!val) setCurrentImageIndex(0)
+      onOpenChange(val)
+    }}>
       <DialogContent
         className="bg-transparent border-none shadow-none max-w-2xl p-0 overflow-visible"
         showCloseButton={false}
+        aria-describedby={undefined}
       >
         <VisuallyHidden.Root>
           <DialogTitle>{project.title}</DialogTitle>
         </VisuallyHidden.Root>
         <div className="bg-card border border-border  max-h-[90vh] overflow-y-auto p-8">
-          {/* Screenshot */}
-          {project.screenshotUrl && (
-            <div className="w-full h-56 bg-black overflow-hidden relative">
-              <img
-                src={project.screenshotUrl}
+          {/* Screenshot Carousel */}
+          {allImages.length > 0 && (
+            <div className="w-full aspect-video bg-black overflow-hidden relative group/carousel">
+              <S3Image
+                src={allImages[currentImageIndex]}
                 alt={project.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-opacity duration-300"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+              
+              {allImages.length > 1 && (
+                <>
+                  <button 
+                    onClick={prevImage}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 p-2 text-white hover:text-primary opacity-0 group-hover/carousel:opacity-100 transition-opacity"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <button 
+                    onClick={nextImage}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 p-2 text-white hover:text-primary opacity-0 group-hover/carousel:opacity-100 transition-opacity"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                  
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+                    {allImages.map((_, i) => (
+                      <button 
+                        key={i}
+                        onClick={() => setCurrentImageIndex(i)}
+                        className={`h-1.5 transition-all duration-300 ${i === currentImageIndex ? "w-6 bg-primary" : "w-2 bg-white/40"}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+              
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent pointer-events-none" />
             </div>
           )}
 

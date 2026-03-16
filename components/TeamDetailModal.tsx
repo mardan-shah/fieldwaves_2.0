@@ -25,6 +25,7 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
       <DialogContent
         className="bg-transparent border-none shadow-none max-w-2xl p-0 overflow-visible"
         showCloseButton={false}
+        aria-describedby={undefined}
       >
         <VisuallyHidden.Root>
           <DialogTitle>{member.name}</DialogTitle>

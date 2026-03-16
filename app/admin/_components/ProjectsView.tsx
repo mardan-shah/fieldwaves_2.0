@@ -10,7 +10,7 @@ import EditProjectModal from "@/components/admin/EditProjectModal"
 import ConfirmDialog from "@/components/admin/ConfirmDialog"
 import type { iProject } from "@/types"
 import ImageCropUpload from "@/components/admin/ImageCropUpload"
-import { Boxes, Eye, Save, Loader2, Search } from "lucide-react"
+import { Boxes, Eye, Save, Loader2, Search, X } from "lucide-react"
 import { toast } from "sonner"
 import { addProject, updateProject, deleteProject, toggleProjectFeatured, reorderItem } from "@/app/actions/admin"
 import { getProjects } from "@/app/actions/public"
@@ -29,9 +29,10 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
     description: "",
     techStack: "",
     githubUrl: "",
-
   })
-  const [screenshotFile, setScreenshotFile] = useState<File | null>(null)
+  
+  const [screenshotFiles, setScreenshotFiles] = useState<File[]>([])
+  const [uploaderKey, setUploaderKey] = useState(0)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Edit modal state
@@ -71,9 +72,10 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
       formData.append("description", newProject.description)
       formData.append("techStack", newProject.techStack)
       formData.append("githubUrl", newProject.githubUrl)
-      if (screenshotFile) {
-        formData.append("screenshot", screenshotFile)
-      }
+      
+      screenshotFiles.forEach(file => {
+        formData.append("screenshots", file)
+      })
 
       const result = await addProject(formData)
       if (result.error) throw new Error(result.error)
@@ -81,13 +83,18 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
       await refreshProjects()
       toast.success(`PROJECT "${newProject.title}" DEPLOYED SUCCESSFULLY`)
       setNewProject({ title: "", url: "", description: "", techStack: "", githubUrl: "" })
-      setScreenshotFile(null)
+      setScreenshotFiles([])
       setErrors({})
+      setUploaderKey(prev => prev + 1)
     } catch (err: any) {
       toast.error(err.message || "Failed to add project")
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const removeNewScreenshot = (index: number) => {
+    setScreenshotFiles(prev => prev.filter((_, i) => i !== index))
   }
 
   const handleEditProject = (project: iProject) => {
@@ -205,11 +212,36 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
               placeholder="Next.js, React, Tailwind (comma separated)"
             />
 
-            <ImageCropUpload
-              onCropped={(file) => setScreenshotFile(file)}
-              label="SCREENSHOT"
-              aspect={16 / 9}
-            />
+            <div className="space-y-4">
+              <label className="block font-mono text-xs text-secondary tracking-widest uppercase">Screenshots (Multi-upload)</label>
+              
+              {screenshotFiles.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {screenshotFiles.map((file, idx) => (
+                    <div key={idx} className="relative aspect-video border border-primary overflow-hidden group">
+                      <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+                      <button 
+                        type="button" 
+                        onClick={() => removeNewScreenshot(idx)}
+                        className="absolute top-1 right-1 bg-black/80 p-1 text-white hover:text-primary opacity-0 group-hover:opacity-100 transition-all"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <ImageCropUpload
+                key={uploaderKey}
+                onCropped={(file) => {
+                  setScreenshotFiles(prev => [...prev, file])
+                  setUploaderKey(prev => prev + 1)
+                }}
+                label="ADD_SCREENSHOT"
+                aspect={16 / 9}
+              />
+            </div>
 
             <button type="submit" disabled={submitting} className="w-full group">
               <Container

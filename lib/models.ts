@@ -45,6 +45,7 @@ export interface IProject extends Document {
   liveUrl: string;
   githubUrl?: string;
   screenshotUrl: string;
+  screenshots: string[]; // Support for multiple images
   techStack: string[];
   order: number;
   featured: boolean;
@@ -56,6 +57,7 @@ const ProjectSchema = new Schema<IProject>({
   liveUrl: { type: String, required: true },
   githubUrl: { type: String },
   screenshotUrl: { type: String },
+  screenshots: [{ type: String }],
   techStack: [{ type: String }],
   order: { type: Number, default: 0 },
   featured: { type: Boolean, default: false },

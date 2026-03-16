@@ -24,6 +24,7 @@ export interface iProject {
   description: string
   liveUrl: string
   screenshotUrl: string
+  screenshots?: string[]
   techStack: string[]
   order: number
   featured: boolean

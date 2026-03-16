@@ -26,51 +26,6 @@ const INITIAL_SETTINGS = {
   maintenanceMode: false,
 };
 
-const INITIAL_TEAM = [
-  {
-    name: 'Alex "Root" Mercer',
-    role: 'Principal Architect',
-    bio: 'Specializing in high-availability distributed systems and kernel-level optimizations.',
-    avatarUrl: 'https://picsum.photos/seed/alex/400/400',
-    socialLinks: { github: 'https://github.com', twitter: 'https://twitter.com' },
-    isOwner: true,
-    order: 1,
-  },
-  {
-    name: 'Sarah "Zero" Chen',
-    role: 'Security Lead',
-    bio: 'Offensive security specialist. If it connects to the internet, I can break it.',
-    avatarUrl: 'https://picsum.photos/seed/sarah/400/400',
-    socialLinks: { linkedin: 'https://linkedin.com' },
-    isOwner: false,
-    order: 2,
-  },
-  {
-    name: 'Marcus "Voxel" Davis',
-    role: 'Creative Technologist',
-    bio: 'WebGL shader wizardry and brutalist UI implementation.',
-    avatarUrl: 'https://picsum.photos/seed/marcus/400/400',
-    socialLinks: { github: 'https://github.com' },
-    isOwner: false,
-    order: 3,
-  }
-];
-
-const INITIAL_PROJECTS = [
-  {
-    title: 'HYPER_GRID Financial',
-    liveUrl: 'https://example.com',
-    screenshotUrl: 'https://picsum.photos/seed/finance/600/400',
-    techStack: ['Rust', 'WASM', 'Next.js'],
-  },
-  {
-    title: 'ORBITAL Logistics',
-    liveUrl: 'https://example.com',
-    screenshotUrl: 'https://picsum.photos/seed/logistics/600/400',
-    techStack: ['Go', 'gRPC', 'Kubernetes'],
-  }
-];
-
 const ContactSchema = z.object({
   name: z.string().min(2).max(100, 'Name too long').regex(/^[^\r\n]+$/, 'Name contains invalid characters'),
   email: z.string().email().max(254, 'Email too long'),
@@ -189,13 +144,7 @@ export async function getProjects(): Promise<{ _id: string; title: string; descr
   cacheLife('hours');
   cacheTag('projects');
   await connectToDatabase();
-  let projects = await Project.find().sort({ order: 1, _id: -1 }).lean();
-
-  if (projects.length === 0) {
-    console.log('Seeding Projects...');
-    await Project.insertMany(INITIAL_PROJECTS);
-    projects = await Project.find().sort({ order: 1, _id: -1 }).lean();
-  }
+  const projects = await Project.find().sort({ order: 1, _id: -1 }).lean();
 
   return projects.map(p => ({
     _id: p._id.toString(),
@@ -203,7 +152,8 @@ export async function getProjects(): Promise<{ _id: string; title: string; descr
     description: (p as any).description || '',
     liveUrl: p.liveUrl,
     githubUrl: (p as any).githubUrl || '',
-    screenshotUrl: p.screenshotUrl,
+    screenshotUrl: p.screenshotUrl || '/placeholder.svg',
+    screenshots: (p as any).screenshots || [],
     techStack: p.techStack,
     order: (p as any).order || 0,
     featured: (p as any).featured || false,
@@ -223,14 +173,8 @@ export async function getTeam(): Promise<{ _id: string; name: string; role: stri
      settings = await GlobalSettings.findOne().lean();
   }
 
-  let team = await TeamMember.find().sort({ order: 1 }).lean();
+  const team = await TeamMember.find().sort({ order: 1 }).lean();
   
-  if (team.length === 0) {
-    console.log('Seeding Team...');
-    await TeamMember.insertMany(INITIAL_TEAM);
-    team = await TeamMember.find().sort({ order: 1 }).lean();
-  }
-
   const result = team.map(t => ({
     _id: t._id.toString(),
     name: t.name,

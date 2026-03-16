@@ -4,12 +4,13 @@ import { z } from 'zod';
 import { GlobalSettings, Project, TeamMember, Admin, CaseStudy, BlogPost, PageView, Service } from '@/lib/models';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import connectToDatabase from '@/lib/db';
-import { writeFile, mkdir } from 'node:fs/promises';
-import { join, basename } from 'node:path';
+import { basename } from 'node:path';
 import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import { createSession, destroySession, getSession } from '@/lib/session';
+import s3Client from '@/lib/s3';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 
 // --- Constants ---
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -261,19 +262,43 @@ async function saveUploadedFile(file: File, directory: string): Promise<string> 
   const validation = validateUploadedFile(file);
   if (validation.error) throw new Error(validation.error);
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
+  try {
+    const bytes = await file.arrayBuffer();
+    if (bytes.byteLength === 0) {
+      throw new Error('File is empty');
+    }
+    const buffer = Buffer.from(bytes);
 
-  // Generate safe filename: UUID + original extension only
-  const originalExt = basename(file.name).split('.').pop()?.replace(/[^a-zA-Z0-9]/g, '') || 'jpg';
-  const fileName = `${crypto.randomUUID()}.${originalExt}`;
-  const dirPath = join(process.cwd(), `public/${directory}`);
+    // Generate safe filename: UUID + original extension only
+    const originalExt = basename(file.name).split('.').pop()?.replace(/[^a-zA-Z0-9]/g, '') || 'jpg';
+    const fileName = `${crypto.randomUUID()}.${originalExt}`;
+    
+    // S3 Key (path in bucket)
+    const key = `${directory}/${fileName}`;
 
-  await mkdir(dirPath, { recursive: true });
+    const bucketName = process.env.S3_BUCKET_NAME;
+    if (!bucketName) throw new Error('S3_BUCKET_NAME environment variable is not defined');
 
-  const filePath = join(dirPath, fileName);
-  await writeFile(filePath, buffer);
-  return `/${directory}/${fileName}`;
+    // 1. Upload the file
+    await s3Client.send(new PutObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+      Body: buffer,
+      ContentType: file.type || 'application/octet-stream',
+    }));
+
+    // 2. Construct public URL
+    const publicBaseUrl = process.env.NEXT_PUBLIC_S3_URL?.replace(/\/$/, '') || '';
+    return `${publicBaseUrl}/${key}`;
+  } catch (error: any) {
+    console.error(`S3 Upload Failed [Bucket: ${process.env.S3_BUCKET_NAME}] [Dir: ${directory}]:`, {
+      message: error.message,
+      name: error.name,
+      requestId: error.$metadata?.requestId,
+      statusCode: error.$metadata?.httpStatusCode,
+    });
+    throw new Error(`Cloud storage upload failed: ${error.message}`);
+  }
 }
 
 // --- Project Actions ---
@@ -300,34 +325,43 @@ export async function addProject(formData: FormData) {
   const { title, url, githubUrl, description, techStack, order } = validatedFields.data;
 
   // Handle custom screenshot upload
-  const screenshotFile = formData.get('screenshot') as File;
-  let screenshotUrl: string;
+  const screenshotFiles = formData.getAll('screenshots') as File[];
+  let screenshots: string[] = [];
 
-  if (screenshotFile && screenshotFile.size > 0) {
-    screenshotUrl = await saveUploadedFile(screenshotFile, 'projects');
-  } else {
-    screenshotUrl = '/placeholder.svg';
+  try {
+    for (const file of screenshotFiles) {
+      if (file && file.size > 0) {
+        const url = await saveUploadedFile(file, 'projects');
+        screenshots.push(url);
+      }
+    }
+
+    // Set first screenshot as main screenshotUrl for backward compatibility
+    const screenshotUrl = screenshots.length > 0 ? screenshots[0] : (formData.get('screenshotUrl') as string) || '/placeholder.svg';
+
+    // Process techStack (comma-separated string to array)
+    const techStackArray = techStack
+      ? techStack.split(',').map(t => t.trim()).filter(Boolean)
+      : ['Next.js', 'React', 'MongoDB'];
+
+    await Project.create({
+      title,
+      description: description || '',
+      liveUrl: url,
+      githubUrl: githubUrl || '',
+      screenshotUrl,
+      screenshots,
+      techStack: techStackArray,
+      order: order ?? 0,
+    });
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+    revalidateTag('projects', 'max');
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || 'Failed to add project' };
   }
-
-  // Process techStack (comma-separated string to array)
-  const techStackArray = techStack
-    ? techStack.split(',').map(t => t.trim()).filter(Boolean)
-    : ['Next.js', 'React', 'MongoDB'];
-
-  await Project.create({
-    title,
-    description: description || '',
-    liveUrl: url,
-    githubUrl: githubUrl || '',
-    screenshotUrl,
-    techStack: techStackArray,
-    order: order ?? 0,
-  });
-
-  revalidatePath('/');
-  revalidatePath('/admin');
-  revalidateTag('projects', 'max');
-  return { success: true };
 }
 
 export async function updateProject(id: string, formData: FormData) {
@@ -352,34 +386,48 @@ export async function updateProject(id: string, formData: FormData) {
 
   const { title, url, githubUrl, description, techStack, order } = validatedFields.data;
 
-  const project = await Project.findById(id);
-  if (!project) return { error: 'Project not found' };
+  try {
+    const project = await Project.findById(id);
+    if (!project) return { error: 'Project not found' };
 
-  // Handle custom screenshot upload
-  const screenshotFile = formData.get('screenshot') as File;
-  let screenshotUrl = project.screenshotUrl;
+    // Handle existing screenshots (some might have been removed)
+    const existingScreenshots = formData.getAll('existingScreenshots') as string[];
+    
+    // Handle new screenshot uploads
+    const newScreenshotFiles = formData.getAll('screenshots') as File[];
+    let screenshots = [...existingScreenshots];
 
-  if (screenshotFile && screenshotFile.size > 0) {
-    screenshotUrl = await saveUploadedFile(screenshotFile, 'projects');
+    for (const file of newScreenshotFiles) {
+      if (file && file.size > 0) {
+        const url = await saveUploadedFile(file, 'projects');
+        screenshots.push(url);
+      }
+    }
+
+    // Update main screenshotUrl for backward compatibility
+    const screenshotUrl = screenshots.length > 0 ? screenshots[0] : project.screenshotUrl;
+
+    const techStackArray = techStack
+      ? techStack.split(',').map(t => t.trim()).filter(Boolean)
+      : project.techStack;
+
+    project.title = title;
+    project.description = description || '';
+    project.liveUrl = url;
+    project.githubUrl = githubUrl || '';
+    project.screenshotUrl = screenshotUrl;
+    project.screenshots = screenshots;
+    project.techStack = techStackArray;
+    project.order = order ?? project.order;
+    await project.save();
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+    revalidateTag('projects', 'max');
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || 'Failed to update project' };
   }
-
-  const techStackArray = techStack
-    ? techStack.split(',').map(t => t.trim()).filter(Boolean)
-    : project.techStack;
-
-  project.title = title;
-  project.description = description || '';
-  project.liveUrl = url;
-  project.githubUrl = githubUrl || '';
-  project.screenshotUrl = screenshotUrl;
-  project.techStack = techStackArray;
-  project.order = order ?? project.order;
-  await project.save();
-
-  revalidatePath('/');
-  revalidatePath('/admin');
-  revalidateTag('projects', 'max');
-  return { success: true };
 }
 
 export async function deleteProject(id: string) {
@@ -477,48 +525,52 @@ export async function addTeamMember(formData: FormData) {
 
   const { name, role, bio, socialLinks, backgroundColor, isOwner, order } = validatedFields.data;
 
-  // Handle File Upload
-  const file = formData.get('avatar') as File;
-  let avatarUrl = '';
+  try {
+    // Handle File Upload
+    const file = formData.get('avatar') as File;
+    let avatarUrl = '';
 
-  if (file && file.size > 0) {
-    avatarUrl = await saveUploadedFile(file, 'team');
-  } else {
-    avatarUrl = (formData.get('avatarUrl') as string) || '/placeholder-user.jpg';
-  }
-
-  // Parse social links (JSON string -> Map)
-  let socialLinksMap = new Map();
-  if (socialLinks) {
-    try {
-      const parsed = JSON.parse(socialLinks);
-      if (Array.isArray(parsed)) {
-        parsed.forEach((link: { platform?: string; url?: string }) => {
-          if (link.platform && link.url) {
-            socialLinksMap.set(link.platform, link.url);
-          }
-        });
-      }
-    } catch (e) {
-      console.error('Failed to parse social links', e);
+    if (file && file.size > 0) {
+      avatarUrl = await saveUploadedFile(file, 'team');
+    } else {
+      avatarUrl = (formData.get('avatarUrl') as string) || '/placeholder-user.jpg';
     }
+
+    // Parse social links (JSON string -> Map)
+    let socialLinksMap = new Map();
+    if (socialLinks) {
+      try {
+        const parsed = JSON.parse(socialLinks);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((link: { platform?: string; url?: string }) => {
+            if (link.platform && link.url) {
+              socialLinksMap.set(link.platform, link.url);
+            }
+          });
+        }
+      } catch (e) {
+        console.error('Failed to parse social links', e);
+      }
+    }
+
+    await TeamMember.create({
+      name,
+      role,
+      bio,
+      avatarUrl,
+      socialLinks: socialLinksMap,
+      backgroundColor: backgroundColor || 'transparent',
+      isOwner: isOwner === 'true',
+      order: order ?? 0,
+    });
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+    revalidateTag('team', 'max');
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || 'Failed to add team member' };
   }
-
-  await TeamMember.create({
-    name,
-    role,
-    bio,
-    avatarUrl,
-    socialLinks: socialLinksMap,
-    backgroundColor: backgroundColor || 'transparent',
-    isOwner: isOwner === 'true',
-    order: order ?? 0,
-  });
-
-  revalidatePath('/');
-  revalidatePath('/admin');
-  revalidateTag('team', 'max');
-  return { success: true };
 }
 
 export async function updateTeamMember(id: string, formData: FormData) {
@@ -544,45 +596,49 @@ export async function updateTeamMember(id: string, formData: FormData) {
 
   const { name, role, bio, socialLinks, backgroundColor, isOwner, order } = validatedFields.data;
 
-  const member = await TeamMember.findById(id);
-  if (!member) return { error: 'Team member not found' };
+  try {
+    const member = await TeamMember.findById(id);
+    if (!member) return { error: 'Team member not found' };
 
-  // Handle File Upload
-  const file = formData.get('avatar') as File;
-  if (file && file.size > 0) {
-    member.avatarUrl = await saveUploadedFile(file, 'team');
-  }
-
-  // Parse social links
-  if (socialLinks) {
-    try {
-      const parsed = JSON.parse(socialLinks);
-      const newMap = new Map();
-      if (Array.isArray(parsed)) {
-        parsed.forEach((link: { platform?: string; url?: string }) => {
-          if (link.platform && link.url) {
-            newMap.set(link.platform, link.url);
-          }
-        });
-      }
-      member.socialLinks = newMap;
-    } catch (e) {
-      console.error('Failed to parse social links', e);
+    // Handle File Upload
+    const file = formData.get('avatar') as File;
+    if (file && file.size > 0) {
+      member.avatarUrl = await saveUploadedFile(file, 'team');
     }
+
+    // Parse social links
+    if (socialLinks) {
+      try {
+        const parsed = JSON.parse(socialLinks);
+        const newMap = new Map();
+        if (Array.isArray(parsed)) {
+          parsed.forEach((link: { platform?: string; url?: string }) => {
+            if (link.platform && link.url) {
+              newMap.set(link.platform, link.url);
+            }
+          });
+        }
+        member.socialLinks = newMap;
+      } catch (e) {
+        console.error('Failed to parse social links', e);
+      }
+    }
+
+    member.name = name;
+    member.role = role;
+    member.bio = bio || '';
+    member.backgroundColor = backgroundColor || member.backgroundColor;
+    member.isOwner = isOwner === 'true';
+    member.order = order ?? member.order;
+    await member.save();
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+    revalidateTag('team', 'max');
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || 'Failed to update team member' };
   }
-
-  member.name = name;
-  member.role = role;
-  member.bio = bio || '';
-  member.backgroundColor = backgroundColor || member.backgroundColor;
-  member.isOwner = isOwner === 'true';
-  member.order = order ?? member.order;
-  await member.save();
-
-  revalidatePath('/');
-  revalidatePath('/admin');
-  revalidateTag('team', 'max');
-  return { success: true };
 }
 
 export async function toggleTeamMemberOwner(id: string) {
@@ -690,47 +746,53 @@ export async function addCaseStudy(formData: FormData) {
 
   const { title, subtitle, overview, description, techStack, metricCards, published, order } = validated.data;
 
-  const slug = await ensureUniqueSlug(generateSlug(title));
+  try {
+    const slug = await ensureUniqueSlug(generateSlug(title));
 
-  // Handle cover image upload
-  const coverFile = formData.get('coverImage') as File;
-  let coverImage = '';
-  if (coverFile && coverFile.size > 0) {
-    coverImage = await saveUploadedFile(coverFile, 'cases');
-  }
-
-  // Parse tech stack
-  const techStackArray = techStack
-    ? techStack.split(',').map(t => t.trim()).filter(Boolean)
-    : [];
-
-  // Parse metric cards
-  let metricCardsArray: { label: string; value: string; unit: string }[] = [];
-  if (metricCards) {
-    try {
-      metricCardsArray = JSON.parse(metricCards);
-    } catch (e) {
-      console.error('Failed to parse metric cards', e);
+    // Handle cover image upload
+    const coverFile = formData.get('coverImage') as File;
+    let coverImage = '';
+    if (coverFile && coverFile.size > 0) {
+      coverImage = await saveUploadedFile(coverFile, 'cases');
+    } else {
+      coverImage = (formData.get('coverImageUrl') as string) || '';
     }
+
+    // Parse tech stack
+    const techStackArray = techStack
+      ? techStack.split(',').map(t => t.trim()).filter(Boolean)
+      : [];
+
+    // Parse metric cards
+    let metricCardsArray: { label: string; value: string; unit: string }[] = [];
+    if (metricCards) {
+      try {
+        metricCardsArray = JSON.parse(metricCards);
+      } catch (e) {
+        console.error('Failed to parse metric cards', e);
+      }
+    }
+
+    await CaseStudy.create({
+      title,
+      slug,
+      subtitle: subtitle || '',
+      overview: overview || '',
+      description: description || '',
+      coverImage,
+      metricCards: metricCardsArray,
+      techStack: techStackArray,
+      published: published === 'true',
+      order: order ?? 0,
+    });
+
+    revalidatePath('/cases');
+    revalidatePath('/admin');
+    revalidateTag('cases', 'max');
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || 'Failed to add case study' };
   }
-
-  await CaseStudy.create({
-    title,
-    slug,
-    subtitle: subtitle || '',
-    overview: overview || '',
-    description: description || '',
-    coverImage,
-    metricCards: metricCardsArray,
-    techStack: techStackArray,
-    published: published === 'true',
-    order: order ?? 0,
-  });
-
-  revalidatePath('/cases');
-  revalidatePath('/admin');
-  revalidateTag('cases', 'max');
-  return { success: true };
 }
 
 export async function updateCaseStudy(id: string, formData: FormData) {
@@ -757,48 +819,52 @@ export async function updateCaseStudy(id: string, formData: FormData) {
 
   const { title, subtitle, overview, description, techStack, metricCards, published, order } = validated.data;
 
-  const caseStudy = await CaseStudy.findById(id);
-  if (!caseStudy) return { error: 'Case study not found' };
+  try {
+    const caseStudy = await CaseStudy.findById(id);
+    if (!caseStudy) return { error: 'Case study not found' };
 
-  // Update slug if title changed
-  if (title !== caseStudy.title) {
-    caseStudy.slug = await ensureUniqueSlug(generateSlug(title), id);
-  }
-
-  // Handle cover image upload
-  const coverFile = formData.get('coverImage') as File;
-  if (coverFile && coverFile.size > 0) {
-    caseStudy.coverImage = await saveUploadedFile(coverFile, 'cases');
-  }
-
-  const techStackArray = techStack
-    ? techStack.split(',').map(t => t.trim()).filter(Boolean)
-    : caseStudy.techStack;
-
-  let metricCardsArray = caseStudy.metricCards;
-  if (metricCards) {
-    try {
-      metricCardsArray = JSON.parse(metricCards);
-    } catch (e) {
-      console.error('Failed to parse metric cards', e);
+    // Update slug if title changed
+    if (title !== caseStudy.title) {
+      caseStudy.slug = await ensureUniqueSlug(generateSlug(title), id);
     }
+
+    // Handle cover image upload
+    const coverFile = formData.get('coverImage') as File;
+    if (coverFile && coverFile.size > 0) {
+      caseStudy.coverImage = await saveUploadedFile(coverFile, 'cases');
+    }
+
+    const techStackArray = techStack
+      ? techStack.split(',').map(t => t.trim()).filter(Boolean)
+      : caseStudy.techStack;
+
+    let metricCardsArray = caseStudy.metricCards;
+    if (metricCards) {
+      try {
+        metricCardsArray = JSON.parse(metricCards);
+      } catch (e) {
+        console.error('Failed to parse metric cards', e);
+      }
+    }
+
+    caseStudy.title = title;
+    caseStudy.subtitle = subtitle || '';
+    caseStudy.overview = overview || '';
+    caseStudy.description = description || '';
+    caseStudy.metricCards = metricCardsArray;
+    caseStudy.techStack = techStackArray;
+    caseStudy.published = published === 'true';
+    caseStudy.order = order ?? caseStudy.order;
+    await caseStudy.save();
+
+    revalidatePath('/cases');
+    revalidatePath(`/cases/${caseStudy.slug}`);
+    revalidatePath('/admin');
+    revalidateTag('cases', 'max');
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || 'Failed to update case study' };
   }
-
-  caseStudy.title = title;
-  caseStudy.subtitle = subtitle || '';
-  caseStudy.overview = overview || '';
-  caseStudy.description = description || '';
-  caseStudy.metricCards = metricCardsArray;
-  caseStudy.techStack = techStackArray;
-  caseStudy.published = published === 'true';
-  caseStudy.order = order ?? caseStudy.order;
-  await caseStudy.save();
-
-  revalidatePath('/cases');
-  revalidatePath(`/cases/${caseStudy.slug}`);
-  revalidatePath('/admin');
-  revalidateTag('cases', 'max');
-  return { success: true };
 }
 
 export async function deleteCaseStudy(id: string) {
@@ -930,35 +996,41 @@ export async function addBlogPost(formData: FormData) {
 
   const { title, excerpt, content, keywords, tags, author, published, order } = validated.data;
 
-  const slug = await ensureUniqueBlogSlug(generateSlug(title));
+  try {
+    const slug = await ensureUniqueBlogSlug(generateSlug(title));
 
-  const coverFile = formData.get('coverImage') as File;
-  let coverImage = '';
-  if (coverFile && coverFile.size > 0) {
-    coverImage = await saveUploadedFile(coverFile, 'blog');
+    const coverFile = formData.get('coverImage') as File;
+    let coverImage = '';
+    if (coverFile && coverFile.size > 0) {
+      coverImage = await saveUploadedFile(coverFile, 'blog');
+    } else {
+      coverImage = (formData.get('coverImageUrl') as string) || '';
+    }
+
+    const keywordsArray = keywords ? keywords.split(',').map(k => k.trim()).filter(Boolean) : [];
+    const tagsArray = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+    await BlogPost.create({
+      title,
+      slug,
+      excerpt: excerpt || '',
+      content: content || '',
+      coverImage,
+      keywords: keywordsArray,
+      tags: tagsArray,
+      author: author || '',
+      published: published === 'true',
+      order: order ?? 0,
+      views: 0,
+    });
+
+    revalidatePath('/blog');
+    revalidatePath('/admin');
+    revalidateTag('blog', 'max');
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || 'Failed to add blog post' };
   }
-
-  const keywordsArray = keywords ? keywords.split(',').map(k => k.trim()).filter(Boolean) : [];
-  const tagsArray = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [];
-
-  await BlogPost.create({
-    title,
-    slug,
-    excerpt: excerpt || '',
-    content: content || '',
-    coverImage,
-    keywords: keywordsArray,
-    tags: tagsArray,
-    author: author || '',
-    published: published === 'true',
-    order: order ?? 0,
-    views: 0,
-  });
-
-  revalidatePath('/blog');
-  revalidatePath('/admin');
-  revalidateTag('blog', 'max');
-  return { success: true };
 }
 
 export async function updateBlogPost(id: string, formData: FormData) {
@@ -985,33 +1057,37 @@ export async function updateBlogPost(id: string, formData: FormData) {
 
   const { title, excerpt, content, keywords, tags, author, published, order } = validated.data;
 
-  const post = await BlogPost.findById(id);
-  if (!post) return { error: 'Blog post not found' };
+  try {
+    const post = await BlogPost.findById(id);
+    if (!post) return { error: 'Blog post not found' };
 
-  if (title !== post.title) {
-    post.slug = await ensureUniqueBlogSlug(generateSlug(title), id);
+    if (title !== post.title) {
+      post.slug = await ensureUniqueBlogSlug(generateSlug(title), id);
+    }
+
+    const coverFile = formData.get('coverImage') as File;
+    if (coverFile && coverFile.size > 0) {
+      post.coverImage = await saveUploadedFile(coverFile, 'blog');
+    }
+
+    post.title = title;
+    post.excerpt = excerpt || '';
+    post.content = content || '';
+    post.keywords = keywords ? keywords.split(',').map(k => k.trim()).filter(Boolean) : post.keywords;
+    post.tags = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : post.tags;
+    post.author = author || '';
+    post.published = published === 'true';
+    post.order = order ?? post.order;
+    await post.save();
+
+    revalidatePath('/blog');
+    revalidatePath(`/blog/${post.slug}`);
+    revalidatePath('/admin');
+    revalidateTag('blog', 'max');
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || 'Failed to update blog post' };
   }
-
-  const coverFile = formData.get('coverImage') as File;
-  if (coverFile && coverFile.size > 0) {
-    post.coverImage = await saveUploadedFile(coverFile, 'blog');
-  }
-
-  post.title = title;
-  post.excerpt = excerpt || '';
-  post.content = content || '';
-  post.keywords = keywords ? keywords.split(',').map(k => k.trim()).filter(Boolean) : post.keywords;
-  post.tags = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : post.tags;
-  post.author = author || '';
-  post.published = published === 'true';
-  post.order = order ?? post.order;
-  await post.save();
-
-  revalidatePath('/blog');
-  revalidatePath(`/blog/${post.slug}`);
-  revalidatePath('/admin');
-  revalidateTag('blog', 'max');
-  return { success: true };
 }
 
 export async function toggleBlogPostFeatured(id: string) {
