@@ -7,7 +7,7 @@ import SearchFilterBar from "@/components/SearchFilterBar"
 import type { iProject } from "@/types"
 import { ArrowUpRight } from "lucide-react"
 import { useInView } from "@/hooks/use-in-view"
-
+import {cn } from "@/lib/utils"
 import S3Image from "./ui/S3Image"
 
 interface ProjectGridProps {

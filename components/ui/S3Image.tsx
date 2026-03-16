@@ -1,11 +1,12 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import LoadingSpinner from "./LoadingSpinner"
 import { AlertCircle } from "lucide-react"
 
-interface S3ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+interface S3ImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
+  src?: string | Blob
   fallbackSrc?: string
   aspectRatio?: "video" | "square" | "portrait" | "auto"
   showLoadingSpinner?: boolean
@@ -21,17 +22,38 @@ export default function S3Image({
   ...props
 }: S3ImageProps) {
   const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading")
-  const [currentSrc, setCurrentSrc] = useState<string | undefined>(src)
+  const [currentSrc, setCurrentSrc] = useState<string | undefined>()
+  const objectUrlRef = useRef<string | null>(null)
 
   useEffect(() => {
+    // Revoke previous object URL if exists
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current)
+      objectUrlRef.current = null
+    }
+
     if (src) {
       setStatus("loading")
-      setCurrentSrc(src)
+      if (src instanceof Blob) {
+        const objectUrl = URL.createObjectURL(src)
+        objectUrlRef.current = objectUrl
+        setCurrentSrc(objectUrl)
+      } else {
+        setCurrentSrc(src)
+      }
     } else {
       setStatus("error")
       setCurrentSrc(fallbackSrc)
     }
   }, [src, fallbackSrc])
+
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current)
+      }
+    }
+  }, [])
 
   const handleLoad = () => {
     setStatus("loaded")
