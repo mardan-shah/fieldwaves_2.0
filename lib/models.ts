@@ -71,6 +71,7 @@ export interface ICaseStudy extends Document {
   overview: string;
   description: string;
   coverImage: string;
+  gallery: string[]; // Support for multiple images in markdown
   metricCards: { label: string; value: string; unit: string }[];
   techStack: string[];
   published: boolean;
@@ -92,6 +93,7 @@ const CaseStudySchema = new Schema<ICaseStudy>({
   overview: { type: String, default: '' },
   description: { type: String, default: '' },
   coverImage: { type: String, default: '' },
+  gallery: [{ type: String }],
   metricCards: { type: [MetricCardSchema], default: [] },
   techStack: [{ type: String }],
   published: { type: Boolean, default: false },
@@ -107,6 +109,7 @@ export interface IBlogPost extends Document {
   excerpt: string;
   content: string;
   coverImage: string;
+  gallery: string[]; // Support for multiple images in markdown
   keywords: string[];
   tags: string[];
   author: string;
@@ -122,6 +125,7 @@ const BlogPostSchema = new Schema<IBlogPost>({
   excerpt: { type: String, default: '' },
   content: { type: String, default: '' },
   coverImage: { type: String, default: '' },
+  gallery: [{ type: String }],
   keywords: [{ type: String }],
   tags: [{ type: String }],
   author: { type: String, default: '' },

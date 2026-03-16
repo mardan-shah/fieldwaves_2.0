@@ -1299,3 +1299,22 @@ export async function deleteService(id: string) {
     return { error: err.message || 'Database error' };
   }
 }
+
+// --- Gallery Actions ---
+
+export async function uploadGalleryImage(formData: FormData) {
+  const session = await requireAuth();
+  if (!session) return { error: 'Unauthorized' };
+
+  const file = formData.get('file') as File;
+  const type = formData.get('type') as string; // 'blog' or 'cases'
+  
+  if (!file || !type) return { error: 'Missing file or type' };
+
+  try {
+    const url = await saveUploadedFile(file, `gallery/${type}`);
+    return { success: true, url };
+  } catch (error: any) {
+    return { error: error.message || 'Gallery upload failed' };
+  }
+}

@@ -4,6 +4,7 @@ import Link from "next/link"
 import Container from "@/components/ui/Container"
 import Button from "@/components/ui/SkewButton"
 import type { iCaseStudy } from "@/types"
+import S3Image from "./ui/S3Image"
 
 interface CaseStudyCardProps {
   caseStudy: iCaseStudy
@@ -66,10 +67,11 @@ export default function CaseStudyCard({ caseStudy, imagePosition }: CaseStudyCar
 
         <div className={`order-1 ${isRight ? "md:order-2" : "md:order-1"}`}>
           <Container variant="outline" className="aspect-[4/3] overflow-hidden bg-card" hoverEffect>
-            <img 
-              src={caseStudy.coverImage || "https://picsum.photos/seed/case/800/600"} 
+            <S3Image 
+              src={caseStudy.coverImage} 
               alt={caseStudy.title}
-              className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+              fallbackSrc="https://picsum.photos/seed/case/800/600"
+              className="w-full h-full object-cover grayscale transition-all duration-700 hover:grayscale-0"
             />
           </Container>
         </div>

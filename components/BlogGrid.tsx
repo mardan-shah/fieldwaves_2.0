@@ -7,6 +7,7 @@ import SearchFilterBar from "@/components/SearchFilterBar"
 import type { iBlogPost } from "@/types"
 import { Calendar, Eye } from "lucide-react"
 import { useInView } from "@/hooks/use-in-view"
+import S3Image from "./ui/S3Image"
 
 interface BlogGridProps {
   posts: iBlogPost[]
@@ -69,7 +70,7 @@ export default function BlogGrid({ posts, showSearch = true }: BlogGridProps) {
                     <div className="flex flex-col h-full">
                       {post.coverImage && (
                         <div className="h-48 overflow-hidden">
-                          <img
+                          <S3Image
                             src={post.coverImage}
                             alt={post.title}
                             className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-200 scale-110 group-hover:scale-100"

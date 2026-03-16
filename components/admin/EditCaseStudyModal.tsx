@@ -12,6 +12,7 @@ import MarkdownEditor from "@/components/ui/MarkdownEditor"
 import Container from "@/components/ui/Container"
 import type { iCaseStudy } from "@/types"
 import ImageCropUpload from "@/components/admin/ImageCropUpload"
+import GalleryUploader from "@/components/admin/GalleryUploader"
 import { Loader2, Save, X, Plus, Trash2 } from "lucide-react"
 
 interface EditCaseStudyModalProps {
@@ -21,7 +22,7 @@ interface EditCaseStudyModalProps {
   onSave: (id: string, formData: FormData) => Promise<void>
 }
 
-type Tab = "DETAILS" | "METRICS" | "CONTENT"
+type Tab = "DETAILS" | "METRICS" | "CONTENT" | "GALLERY"
 
 export default function EditCaseStudyModal({ caseStudy, open, onOpenChange, onSave }: EditCaseStudyModalProps) {
   const [loading, setLoading] = useState(false)
@@ -108,7 +109,7 @@ export default function EditCaseStudyModal({ caseStudy, open, onOpenChange, onSa
     setMetricCards(updated)
   }
 
-  const tabs: Tab[] = ["DETAILS", "METRICS", "CONTENT"]
+  const tabs: Tab[] = ["DETAILS", "METRICS", "CONTENT", "GALLERY"]
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -272,6 +273,13 @@ export default function EditCaseStudyModal({ caseStudy, open, onOpenChange, onSa
                 placeholder="Full case study content (markdown supported)"
                 rows={12}
               />
+            </div>
+          )}
+
+          {/* GALLERY Tab */}
+          {activeTab === "GALLERY" && (
+            <div className="space-y-4 pt-2">
+              <GalleryUploader type="cases" />
             </div>
           )}
 

@@ -12,6 +12,7 @@ import MarkdownEditor from "@/components/ui/MarkdownEditor"
 import Container from "@/components/ui/Container"
 import type { iBlogPost } from "@/types"
 import ImageCropUpload from "@/components/admin/ImageCropUpload"
+import GalleryUploader from "@/components/admin/GalleryUploader"
 import { Loader2, Save } from "lucide-react"
 
 interface EditBlogModalProps {
@@ -21,7 +22,7 @@ interface EditBlogModalProps {
   onSave: (id: string, formData: FormData) => Promise<void>
 }
 
-type Tab = "DETAILS" | "CONTENT" | "SEO"
+type Tab = "DETAILS" | "CONTENT" | "SEO" | "GALLERY"
 
 export default function EditBlogModal({ post, open, onOpenChange, onSave }: EditBlogModalProps) {
   const [loading, setLoading] = useState(false)
@@ -90,7 +91,7 @@ export default function EditBlogModal({ post, open, onOpenChange, onSave }: Edit
     }
   }
 
-  const tabs: Tab[] = ["DETAILS", "CONTENT", "SEO"]
+  const tabs: Tab[] = ["DETAILS", "CONTENT", "SEO", "GALLERY"]
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -221,6 +222,12 @@ export default function EditBlogModal({ post, open, onOpenChange, onSave }: Edit
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {activeTab === "GALLERY" && (
+            <div className="space-y-4 pt-2">
+              <GalleryUploader type="blog" />
             </div>
           )}
 
