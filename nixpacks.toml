@@ -1,3 +1,6 @@
+[variables]
+nodejs = "22"
+
 [phases.install]
 cmds = ["npm install --legacy-peer-deps"]
 
