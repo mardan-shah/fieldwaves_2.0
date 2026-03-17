@@ -143,242 +143,292 @@ export async function getProjects(): Promise<{ _id: string; title: string; descr
   "use cache"
   cacheLife('hours');
   cacheTag('projects');
-  await connectToDatabase();
-  const projects = await Project.find().sort({ order: 1, _id: -1 }).lean();
+  try {
+    await connectToDatabase();
+    const projects = await Project.find().sort({ order: 1, _id: -1 }).lean();
 
-  return projects.map(p => ({
-    _id: p._id.toString(),
-    title: p.title,
-    description: (p as any).description || '',
-    liveUrl: p.liveUrl,
-    githubUrl: (p as any).githubUrl || '',
-    screenshotUrl: p.screenshotUrl || '/placeholder.svg',
-    screenshots: (p as any).screenshots || [],
-    techStack: p.techStack,
-    order: (p as any).order || 0,
-    featured: (p as any).featured || false,
-  }));
+    return projects.map(p => ({
+      _id: p._id.toString(),
+      title: p.title,
+      description: (p as any).description || '',
+      liveUrl: p.liveUrl,
+      githubUrl: (p as any).githubUrl || '',
+      screenshotUrl: p.screenshotUrl || '/placeholder.svg',
+      screenshots: (p as any).screenshots || [],
+      techStack: p.techStack,
+      order: (p as any).order || 0,
+      featured: (p as any).featured || false,
+    }));
+  } catch (error) {
+    console.error("Failed to fetch projects:", error);
+    return [];
+  }
 }
 
 export async function getTeam(): Promise<{ _id: string; name: string; role: string; bio: string; socialLinks: Record<string, string>; avatarUrl: string; backgroundColor: string; isOwner: boolean; order: number }[]> {
   "use cache"
   cacheLife('hours');
   cacheTag('team', 'settings');
-  await connectToDatabase();
-  
-  // Check settings first
-  let settings = await GlobalSettings.findOne().lean();
-  if (!settings) {
-     await GlobalSettings.create(INITIAL_SETTINGS);
-     settings = await GlobalSettings.findOne().lean();
+  try {
+    await connectToDatabase();
+    
+    // Check settings first
+    let settings = await GlobalSettings.findOne().lean();
+    if (!settings) {
+       await GlobalSettings.create(INITIAL_SETTINGS);
+       settings = await GlobalSettings.findOne().lean();
+    }
+
+    const team = await TeamMember.find().sort({ order: 1 }).lean();
+    
+    const result = team.map(t => ({
+      _id: t._id.toString(),
+      name: t.name,
+      role: t.role,
+      bio: t.bio || '',
+      socialLinks: t.socialLinks instanceof Map
+        ? Object.fromEntries(t.socialLinks)
+        : (t.socialLinks || {}),
+      avatarUrl: t.avatarUrl || '/placeholder-user.jpg',
+      backgroundColor: t.backgroundColor || 'transparent',
+      isOwner: t.isOwner || false,
+      order: t.order || 0,
+    }));
+
+    if (settings?.soloMode) {
+      return result.filter(m => m.isOwner);
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Failed to fetch team members:", error);
+    return [];
   }
-
-  const team = await TeamMember.find().sort({ order: 1 }).lean();
-  
-  const result = team.map(t => ({
-    _id: t._id.toString(),
-    name: t.name,
-    role: t.role,
-    bio: t.bio || '',
-    socialLinks: t.socialLinks instanceof Map
-      ? Object.fromEntries(t.socialLinks)
-      : (t.socialLinks || {}),
-    avatarUrl: t.avatarUrl || '/placeholder-user.jpg',
-    backgroundColor: t.backgroundColor || 'transparent',
-    isOwner: t.isOwner || false,
-    order: t.order || 0,
-  }));
-
-  if (settings?.soloMode) {
-    return result.filter(m => m.isOwner);
-  }
-
-  return result;
 }
 
 export async function getSettings(): Promise<{ soloMode: boolean; maintenanceMode: boolean; maintenanceMessage: string; casesDisplayCount: number } | null> {
   "use cache"
   cacheLife('minutes');
   cacheTag('settings');
-  await connectToDatabase();
-  let settings = await GlobalSettings.findOne().lean();
-  if (!settings) {
-     await GlobalSettings.create(INITIAL_SETTINGS);
-     settings = await GlobalSettings.findOne().lean();
+  try {
+    await connectToDatabase();
+    let settings = await GlobalSettings.findOne().lean();
+    if (!settings) {
+       await GlobalSettings.create(INITIAL_SETTINGS);
+       settings = await GlobalSettings.findOne().lean();
+    }
+    return settings ? { 
+      soloMode: settings.soloMode, 
+      maintenanceMode: settings.maintenanceMode, 
+      maintenanceMessage: settings.maintenanceMessage || "",
+      casesDisplayCount: (settings as any).casesDisplayCount ?? 3 
+    } : null;
+  } catch (error) {
+    console.error("Failed to fetch settings:", error);
+    return { soloMode: false, maintenanceMode: false, maintenanceMessage: "", casesDisplayCount: 3 };
   }
-  return settings ? { 
-    soloMode: settings.soloMode, 
-    maintenanceMode: settings.maintenanceMode, 
-    maintenanceMessage: settings.maintenanceMessage || "",
-    casesDisplayCount: (settings as any).casesDisplayCount ?? 3 
-  } : null;
 }
 
 export async function getServices() {
   "use cache"
   cacheLife('hours');
   cacheTag('services');
-  await connectToDatabase();
-  const services = await Service.find({ active: true }).sort({ order: 1 }).lean();
-  return services.map(s => ({
-    _id: s._id.toString(),
-    title: s.title,
-    description: s.description,
-    iconName: s.iconName,
-    features: s.features || [],
-    order: s.order || 0,
-    active: s.active,
-  }));
+  try {
+    await connectToDatabase();
+    const services = await Service.find({ active: true }).sort({ order: 1 }).lean();
+    return services.map(s => ({
+      _id: s._id.toString(),
+      title: s.title,
+      description: s.description,
+      iconName: s.iconName,
+      features: s.features || [],
+      order: s.order || 0,
+      active: s.active,
+    }));
+  } catch (error) {
+    console.error("Failed to fetch services:", error);
+    return [];
+  }
 }
 
 export async function getCaseStudies() {
   "use cache"
   cacheLife('hours');
   cacheTag('cases');
-  await connectToDatabase();
-  const cases = await CaseStudy.find({ published: true }).sort({ order: 1, _id: -1 }).lean();
-  return cases.map(c => ({
-    _id: c._id.toString(),
-    title: c.title,
-    slug: c.slug,
-    subtitle: c.subtitle || '',
-    overview: c.overview || '',
-    description: c.description || '',
-    coverImage: c.coverImage || '',
-    metricCards: (c.metricCards || []).map((m: any) => ({ label: m.label || '', value: m.value || '', unit: m.unit || '' })),
-    techStack: c.techStack || [],
-    published: c.published,
-    featured: (c as any).featured || false,
-    order: c.order || 0,
-    views: (c as any).views || 0,
-    createdAt: (c as any).createdAt?.toISOString?.() || '',
-    updatedAt: (c as any).updatedAt?.toISOString?.() || '',
-  }));
+  try {
+    await connectToDatabase();
+    const cases = await CaseStudy.find({ published: true }).sort({ order: 1, _id: -1 }).lean();
+    return cases.map(c => ({
+      _id: c._id.toString(),
+      title: c.title,
+      slug: c.slug,
+      subtitle: c.subtitle || '',
+      overview: c.overview || '',
+      description: c.description || '',
+      coverImage: c.coverImage || '',
+      metricCards: (c.metricCards || []).map((m: any) => ({ label: m.label || '', value: m.value || '', unit: m.unit || '' })),
+      techStack: c.techStack || [],
+      published: c.published,
+      featured: (c as any).featured || false,
+      order: c.order || 0,
+      views: (c as any).views || 0,
+      createdAt: (c as any).createdAt?.toISOString?.() || '',
+      updatedAt: (c as any).updatedAt?.toISOString?.() || '',
+    }));
+  } catch (error) {
+    console.error("Failed to fetch case studies:", error);
+    return [];
+  }
 }
 
 export async function getCaseStudyBySlug(slug: string) {
   "use cache"
   cacheLife('hours');
   cacheTag('cases', `case-${slug}`);
-  await connectToDatabase();
-  const c = await CaseStudy.findOne({ slug, published: true }).lean();
-  if (!c) return null;
-  return {
-    _id: c._id.toString(),
-    title: c.title,
-    slug: c.slug,
-    subtitle: c.subtitle || '',
-    overview: c.overview || '',
-    description: c.description || '',
-    coverImage: c.coverImage || '',
-    metricCards: (c.metricCards || []).map((m: any) => ({ label: m.label || '', value: m.value || '', unit: m.unit || '' })),
-    techStack: c.techStack || [],
-    published: c.published,
-    featured: (c as any).featured || false,
-    order: c.order || 0,
-    views: (c as any).views || 0,
-    createdAt: (c as any).createdAt?.toISOString?.() || '',
-    updatedAt: (c as any).updatedAt?.toISOString?.() || '',
-  };
+  try {
+    await connectToDatabase();
+    const c = await CaseStudy.findOne({ slug, published: true }).lean();
+    if (!c) return null;
+    return {
+      _id: c._id.toString(),
+      title: c.title,
+      slug: c.slug,
+      subtitle: c.subtitle || '',
+      overview: c.overview || '',
+      description: c.description || '',
+      coverImage: c.coverImage || '',
+      metricCards: (c.metricCards || []).map((m: any) => ({ label: m.label || '', value: m.value || '', unit: m.unit || '' })),
+      techStack: c.techStack || [],
+      published: c.published,
+      featured: (c as any).featured || false,
+      order: c.order || 0,
+      views: (c as any).views || 0,
+      createdAt: (c as any).createdAt?.toISOString?.() || '',
+      updatedAt: (c as any).updatedAt?.toISOString?.() || '',
+    };
+  } catch (error) {
+    console.error(`Failed to fetch case study ${slug}:`, error);
+    return null;
+  }
 }
 
 export async function getBlogPosts() {
   "use cache"
   cacheLife('hours');
   cacheTag('blog');
-  await connectToDatabase();
-  const posts = await BlogPost.find({ published: true }).sort({ order: 1, _id: -1 }).lean();
-  return posts.map(p => ({
-    _id: p._id.toString(),
-    title: p.title,
-    slug: p.slug,
-    excerpt: p.excerpt || '',
-    content: p.content || '',
-    coverImage: p.coverImage || '',
-    keywords: p.keywords || [],
-    tags: p.tags || [],
-    author: p.author || '',
-    published: p.published,
-    featured: (p as any).featured || false,
-    order: p.order || 0,
-    views: p.views || 0,
-    createdAt: (p as any).createdAt?.toISOString?.() || '',
-    updatedAt: (p as any).updatedAt?.toISOString?.() || '',
-  }));
+  try {
+    await connectToDatabase();
+    const posts = await BlogPost.find({ published: true }).sort({ order: 1, _id: -1 }).lean();
+    return posts.map(p => ({
+      _id: p._id.toString(),
+      title: p.title,
+      slug: p.slug,
+      excerpt: p.excerpt || '',
+      content: p.content || '',
+      coverImage: p.coverImage || '',
+      keywords: p.keywords || [],
+      tags: p.tags || [],
+      author: p.author || '',
+      published: p.published,
+      featured: (p as any).featured || false,
+      order: p.order || 0,
+      views: p.views || 0,
+      createdAt: (p as any).createdAt?.toISOString?.() || '',
+      updatedAt: (p as any).updatedAt?.toISOString?.() || '',
+    }));
+  } catch (error) {
+    console.error("Failed to fetch blog posts:", error);
+    return [];
+  }
 }
 
 export async function getFeaturedBlogPosts() {
   "use cache"
   cacheLife('hours');
   cacheTag('blog', 'featured-blog');
-  await connectToDatabase();
-  const posts = await BlogPost.find({ published: true, featured: true }).sort({ order: 1, _id: -1 }).lean();
-  return posts.map(p => ({
-    _id: p._id.toString(),
-    title: p.title,
-    slug: p.slug,
-    excerpt: p.excerpt || '',
-    content: p.content || '',
-    coverImage: p.coverImage || '',
-    keywords: p.keywords || [],
-    tags: p.tags || [],
-    author: p.author || '',
-    published: p.published,
-    featured: (p as any).featured || false,
-    order: p.order || 0,
-    views: p.views || 0,
-    createdAt: (p as any).createdAt?.toISOString?.() || '',
-    updatedAt: (p as any).updatedAt?.toISOString?.() || '',
-  }));
+  try {
+    await connectToDatabase();
+    const posts = await BlogPost.find({ published: true, featured: true }).sort({ order: 1, _id: -1 }).lean();
+    return posts.map(p => ({
+      _id: p._id.toString(),
+      title: p.title,
+      slug: p.slug,
+      excerpt: p.excerpt || '',
+      content: p.content || '',
+      coverImage: p.coverImage || '',
+      keywords: p.keywords || [],
+      tags: p.tags || [],
+      author: p.author || '',
+      published: p.published,
+      featured: (p as any).featured || false,
+      order: p.order || 0,
+      views: p.views || 0,
+      createdAt: (p as any).createdAt?.toISOString?.() || '',
+      updatedAt: (p as any).updatedAt?.toISOString?.() || '',
+    }));
+  } catch (error) {
+    console.error("Failed to fetch featured blog posts:", error);
+    return [];
+  }
 }
 
 export async function getFeaturedCaseStudies() {
   "use cache"
   cacheLife('hours');
   cacheTag('cases', 'featured-cases');
-  await connectToDatabase();
-  const cases = await CaseStudy.find({ published: true, featured: true }).sort({ order: 1, _id: -1 }).lean();
-  return cases.map(c => ({
-    _id: c._id.toString(),
-    title: c.title,
-    slug: c.slug,
-    subtitle: c.subtitle || '',
-    overview: c.overview || '',
-    description: c.description || '',
-    coverImage: c.coverImage || '',
-    metricCards: (c.metricCards || []).map((m: any) => ({ label: m.label || '', value: m.value || '', unit: m.unit || '' })),
-    techStack: c.techStack || [],
-    published: c.published,
-    featured: (c as any).featured || false,
-    order: c.order || 0,
-    views: (c as any).views || 0,
-    createdAt: (c as any).createdAt?.toISOString?.() || '',
-    updatedAt: (c as any).updatedAt?.toISOString?.() || '',
-  }));
+  try {
+    await connectToDatabase();
+    const cases = await CaseStudy.find({ published: true, featured: true }).sort({ order: 1, _id: -1 }).lean();
+    return cases.map(c => ({
+      _id: c._id.toString(),
+      title: c.title,
+      slug: c.slug,
+      subtitle: c.subtitle || '',
+      overview: c.overview || '',
+      description: c.description || '',
+      coverImage: c.coverImage || '',
+      metricCards: (c.metricCards || []).map((m: any) => ({ label: m.label || '', value: m.value || '', unit: m.unit || '' })),
+      techStack: c.techStack || [],
+      published: c.published,
+      featured: (c as any).featured || false,
+      order: c.order || 0,
+      views: (c as any).views || 0,
+      createdAt: (c as any).createdAt?.toISOString?.() || '',
+      updatedAt: (c as any).updatedAt?.toISOString?.() || '',
+    }));
+  } catch (error) {
+    console.error("Failed to fetch featured case studies:", error);
+    return [];
+  }
 }
 
 export async function getBlogPostBySlug(slug: string) {
   "use cache"
   cacheLife('hours');
   cacheTag('blog', `blog-${slug}`);
-  await connectToDatabase();
-  const p = await BlogPost.findOne({ slug, published: true }).lean();
-  if (!p) return null;
-  return {
-    _id: p._id.toString(),
-    title: p.title,
-    slug: p.slug,
-    excerpt: p.excerpt || '',
-    content: p.content || '',
-    coverImage: p.coverImage || '',
-    keywords: p.keywords || [],
-    tags: p.tags || [],
-    author: p.author || '',
-    published: p.published,
-    featured: (p as any).featured || false,
-    order: p.order || 0,
-    views: p.views || 0,
-    createdAt: (p as any).createdAt?.toISOString?.() || '',
-    updatedAt: (p as any).updatedAt?.toISOString?.() || '',
-  };
+  try {
+    await connectToDatabase();
+    const p = await BlogPost.findOne({ slug, published: true }).lean();
+    if (!p) return null;
+    return {
+      _id: p._id.toString(),
+      title: p.title,
+      slug: p.slug,
+      excerpt: p.excerpt || '',
+      content: p.content || '',
+      coverImage: p.coverImage || '',
+      keywords: p.keywords || [],
+      tags: p.tags || [],
+      author: p.author || '',
+      published: p.published,
+      featured: (p as any).featured || false,
+      order: p.order || 0,
+      views: p.views || 0,
+      createdAt: (p as any).createdAt?.toISOString?.() || '',
+      updatedAt: (p as any).updatedAt?.toISOString?.() || '',
+    };
+  } catch (error) {
+    console.error(`Failed to fetch blog post ${slug}:`, error);
+    return null;
+  }
 }

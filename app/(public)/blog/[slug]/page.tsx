@@ -12,15 +12,20 @@ interface BlogPostPageProps {
 }
 
 export async function generateStaticParams() {
-  const posts = await getBlogPosts()
-  const params = posts.map((post) => ({
-    slug: post.slug,
-  }))
-  // Ensure at least one result for Next.js Cache Components
-  if (params.length === 0) {
+  try {
+    const posts = await getBlogPosts()
+    const params = posts.map((post) => ({
+      slug: post.slug,
+    }))
+    // Ensure at least one result for Next.js Cache Components
+    if (params.length === 0) {
+      return [{ slug: 'placeholder' }]
+    }
+    return params
+  } catch (error) {
+    console.warn("Failed to generate static params for blog:", error)
     return [{ slug: 'placeholder' }]
   }
-  return params
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps) {

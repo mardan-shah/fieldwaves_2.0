@@ -13,15 +13,20 @@ interface CaseStudyPageProps {
 }
 
 export async function generateStaticParams() {
-  const cases = await getCaseStudies()
-  const params = cases.map((c) => ({
-    slug: c.slug,
-  }))
-  // Ensure at least one result for Next.js Cache Components
-  if (params.length === 0) {
+  try {
+    const cases = await getCaseStudies()
+    const params = cases.map((c) => ({
+      slug: c.slug,
+    }))
+    // Ensure at least one result for Next.js Cache Components
+    if (params.length === 0) {
+      return [{ slug: 'placeholder' }]
+    }
+    return params
+  } catch (error) {
+    console.warn("Failed to generate static params for cases:", error)
     return [{ slug: 'placeholder' }]
   }
-  return params
 }
 
 export async function generateMetadata({ params }: CaseStudyPageProps) {

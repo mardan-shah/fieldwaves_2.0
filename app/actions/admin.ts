@@ -1151,20 +1151,24 @@ export async function getAllBlogPosts() {
 import { connection } from 'next/server';
 
 export async function trackPageView(path: string, contentType: 'case_study' | 'blog' | 'page', contentId: string = '') {
-  await connection();
-  await connectToDatabase();
-  const date = new Date().toISOString().split('T')[0];
+  try {
+    await connection();
+    await connectToDatabase();
+    const date = new Date().toISOString().split('T')[0];
 
-  await PageView.findOneAndUpdate(
-    { path, date },
-    { $inc: { count: 1 }, $setOnInsert: { contentType, contentId } },
-    { upsert: true }
-  );
+    await PageView.findOneAndUpdate(
+      { path, date },
+      { $inc: { count: 1 }, $setOnInsert: { contentType, contentId } },
+      { upsert: true }
+    );
 
-  if (contentType === 'blog' && contentId) {
-    await BlogPost.findByIdAndUpdate(contentId, { $inc: { views: 1 } });
-  } else if (contentType === 'case_study' && contentId) {
-    await CaseStudy.findByIdAndUpdate(contentId, { $inc: { views: 1 } });
+    if (contentType === 'blog' && contentId && validateObjectId(contentId)) {
+      await BlogPost.findByIdAndUpdate(contentId, { $inc: { views: 1 } });
+    } else if (contentType === 'case_study' && contentId && validateObjectId(contentId)) {
+      await CaseStudy.findByIdAndUpdate(contentId, { $inc: { views: 1 } });
+    }
+  } catch (error) {
+    console.error(`Failed to track page view for ${path}:`, error);
   }
 }
 
