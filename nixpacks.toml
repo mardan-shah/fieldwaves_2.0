@@ -1,9 +1,11 @@
-[variables]
-nodejs = "22"
+[phases.setup]
+nixPkgs = ["bun"]
 
 [phases.install]
-cmds = ["npm install --legacy-peer-deps"]
+cmds = ["bun install"]
 
 [phases.build]
-# Disable source maps to save memory during build
-cmds = ["NODE_OPTIONS='--max-old-space-size=2048' npm run build"]
+cmds = ["bun run build"]
+
+[start]
+cmd = "bun run start"
