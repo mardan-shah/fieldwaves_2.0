@@ -2,6 +2,7 @@ import Link from "next/link"
 import { getAllTeamMembers, getAllCaseStudies, getAllBlogPosts, getAnalytics } from "../actions/admin"
 import { getSettings, getProjects } from "../actions/public"
 import Container from "@/components/ui/Container"
+import { connection } from "next/server"
 import {
   FolderKanban,
   Users,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react"
 
 export default async function AdminDashboardPage() {
+  await connection()
   const [settings, projects, team, caseStudies, blogPosts, analytics] = await Promise.all([
     getSettings(),
     getProjects(),

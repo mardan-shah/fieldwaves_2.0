@@ -1,8 +1,10 @@
 import { getProjects } from "@/app/actions/public"
 import type { iProject } from "@/types"
 import ProjectsView from "../_components/ProjectsView"
+import { connection } from "next/server"
 
 export default async function AdminProjectsPage() {
+  await connection()
   const projects = await getProjects()
 
   return (

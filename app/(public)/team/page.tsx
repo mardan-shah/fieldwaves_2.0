@@ -4,6 +4,7 @@ import Button from "@/components/ui/SkewButton"
 import TeamGrid from "@/components/TeamGrid"
 import { getTeam } from "@/app/actions/public"
 import GridBackground from "@/components/ui/GridBackground"
+import { connection } from "next/server"
 
 export const metadata: Metadata = {
   title: "Team | FieldWaves",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 }
 
 export default async function TeamPage() {
+  await connection()
   const team = await getTeam()
 
   return (

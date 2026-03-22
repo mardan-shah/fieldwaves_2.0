@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import SectionHeading from "@/components/ui/SectionHeading"
 import BlogGrid from "@/components/BlogGrid"
 import { getBlogPosts } from "@/app/actions/public"
+import { connection } from "next/server"
 
 export const metadata: Metadata = {
   title: "All Posts | FieldWaves Blog",
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 }
 
 export default async function AllBlogPostsPage() {
+  await connection()
   const posts = await getBlogPosts()
 
   return (

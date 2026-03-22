@@ -3,8 +3,10 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import Button from "@/components/ui/button";
 import { getProjects } from "@/app/actions/public";
 import { iProject } from "@/types";
+import { connection } from "next/server";
 
 const FeaturedProjects = async () => {
+  await connection();
   let projects: iProject[] = [];
   try {
     projects = await getProjects();

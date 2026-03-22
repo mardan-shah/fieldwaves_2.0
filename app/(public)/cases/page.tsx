@@ -7,6 +7,7 @@ import CaseStudyGrid from "@/components/CaseStudyGrid"
 import { getCaseStudies, getFeaturedCaseStudies } from "@/app/actions/public"
 import { Star } from "lucide-react"
 import GridBackground from "@/components/ui/GridBackground"
+import { connection } from "next/server"
 
 export const metadata: Metadata = {
   title: "Case Studies | FieldWaves",
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 }
 
 export default async function CaseStudiesPage() {
+  await connection()
   const [allCases, featured] = await Promise.all([
     getCaseStudies(),
     getFeaturedCaseStudies(),

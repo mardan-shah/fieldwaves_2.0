@@ -6,6 +6,7 @@ import TableOfContents from "@/components/ui/TableOfContents"
 import { getBlogPostBySlug, getBlogPosts } from "@/app/actions/public"
 import { trackPageView } from "@/app/actions/admin"
 import { ArrowLeft, Calendar, User, Eye, Clock } from "lucide-react"
+import { connection } from "next/server"
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>
@@ -29,6 +30,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps) {
+  await connection()
   const { slug } = await params
   const post = await getBlogPostBySlug(slug)
   if (!post) return { title: "Not Found" }
@@ -46,6 +48,7 @@ function estimateReadTime(content: string): number {
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  await connection()
   const { slug } = await params
   const post = await getBlogPostBySlug(slug)
 

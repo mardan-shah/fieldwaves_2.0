@@ -1,7 +1,9 @@
 import { getAdminServices } from "@/app/actions/admin"
 import ServicesView from "../_components/ServicesView"
+import { connection } from "next/server"
 
 export default async function AdminServicesPage() {
+  await connection()
   const services = await getAdminServices()
 
   return (

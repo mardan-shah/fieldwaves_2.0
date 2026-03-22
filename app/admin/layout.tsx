@@ -2,8 +2,10 @@ import { getSession } from "@/lib/session"
 import { checkAdminExists } from "../actions/admin"
 import AdminLoginForm from "./_components/AdminLoginForm"
 import AdminSidebar from "./_components/AdminSidebar"
+import { connection } from "next/server"
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  await connection()
   const session = await getSession()
 
   if (!session) {

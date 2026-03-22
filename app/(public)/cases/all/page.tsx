@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import SectionHeading from "@/components/ui/SectionHeading"
 import CaseStudyGrid from "@/components/CaseStudyGrid"
 import { getCaseStudies } from "@/app/actions/public"
+import { connection } from "next/server"
 
 export const metadata: Metadata = {
   title: "All Case Studies | FieldWaves",
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 }
 
 export default async function AllCaseStudiesPage() {
+  await connection()
   const caseStudies = await getCaseStudies()
 
   return (

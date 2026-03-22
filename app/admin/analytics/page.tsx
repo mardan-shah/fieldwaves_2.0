@@ -1,6 +1,8 @@
 import AnalyticsView from "../_components/AnalyticsView"
+import { connection } from "next/server"
 
-export default function AdminAnalyticsPage() {
+export default async function AdminAnalyticsPage() {
+  await connection()
   return (
     <div className="space-y-8">
       <div>

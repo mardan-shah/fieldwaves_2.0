@@ -1,8 +1,9 @@
 import StatCard from "@/components/ui/StatCard";
 import { getProjects } from "@/app/actions/public";
+import { connection } from "next/server";
 
 const Stats = async () => {
-    
+  await connection();
   let projects = [];
   try {
     projects = await getProjects();

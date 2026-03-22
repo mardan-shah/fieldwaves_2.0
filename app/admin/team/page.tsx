@@ -1,8 +1,10 @@
 import { getAllTeamMembers } from "@/app/actions/admin"
 import type { iTeamMember } from "@/types"
 import TeamView from "../_components/TeamView"
+import { connection } from "next/server"
 
 export default async function AdminTeamPage() {
+  await connection()
   const team = await getAllTeamMembers()
 
   return (

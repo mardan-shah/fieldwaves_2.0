@@ -1,8 +1,10 @@
 import { getAllCaseStudies } from "@/app/actions/admin"
 import type { iCaseStudy } from "@/types"
 import CaseStudiesView from "../_components/CaseStudiesView"
+import { connection } from "next/server"
 
 export default async function AdminCasesPage() {
+  await connection()
   const caseStudies = await getAllCaseStudies()
 
   return (

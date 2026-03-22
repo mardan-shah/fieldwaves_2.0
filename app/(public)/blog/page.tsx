@@ -5,6 +5,7 @@ import Container from "@/components/ui/Container"
 import { getBlogPosts, getFeaturedBlogPosts } from "@/app/actions/public"
 import { Star, ArrowRight, Calendar, Eye } from "lucide-react"
 import GridBackground from "@/components/ui/GridBackground"
+import { connection } from "next/server"
 
 export const metadata: Metadata = {
   title: "Blog | FieldWaves",
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 }
 
 export default async function BlogPage() {
+  await connection()
   const [allPosts, featured] = await Promise.all([
     getBlogPosts(),
     getFeaturedBlogPosts(),

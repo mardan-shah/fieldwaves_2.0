@@ -1,8 +1,10 @@
 import { getAllBlogPosts } from "@/app/actions/admin"
 import type { iBlogPost } from "@/types"
 import BlogsView from "../_components/BlogsView"
+import { connection } from "next/server"
 
 export default async function AdminBlogPage() {
+  await connection()
   const blogPosts = await getAllBlogPosts()
 
   return (

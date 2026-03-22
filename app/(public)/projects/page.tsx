@@ -4,6 +4,7 @@ import Button from "@/components/ui/SkewButton"
 import ProjectGrid from "@/components/ProjectGrid"
 import { getProjects } from "@/app/actions/public"
 import GridBackground from "@/components/ui/GridBackground"
+import { connection } from "next/server"
 
 export const metadata: Metadata = {
   title: "Projects | FieldWaves",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 }
 
 export default async function ProjectsPage() {
+  await connection()
   const projects = await getProjects()
 
   return (

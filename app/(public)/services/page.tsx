@@ -5,6 +5,7 @@ import Button from "@/components/ui/SkewButton"
 import Container from "@/components/ui/Container"
 import { getServices } from "@/app/actions/public"
 import GridBackground from "@/components/ui/GridBackground"
+import { connection } from "next/server"
 
 export const metadata: Metadata = {
   title: "Services | FieldWaves",
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 }
 
 export default async function ServicesPage() {
+  await connection()
   const services = await getServices()
 
   return (

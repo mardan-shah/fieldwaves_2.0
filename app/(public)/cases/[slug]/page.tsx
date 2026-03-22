@@ -7,6 +7,7 @@ import Button from "@/components/ui/SkewButton"
 import { getCaseStudyBySlug, getCaseStudies } from "@/app/actions/public"
 import { trackPageView } from "@/app/actions/admin"
 import { ArrowLeft, Eye, Calendar } from "lucide-react"
+import { connection } from "next/server"
 
 interface CaseStudyPageProps {
   params: Promise<{ slug: string }>
@@ -30,6 +31,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: CaseStudyPageProps) {
+  await connection()
   const { slug } = await params
   const caseStudy = await getCaseStudyBySlug(slug)
   if (!caseStudy) return { title: "Not Found" }
@@ -41,6 +43,7 @@ export async function generateMetadata({ params }: CaseStudyPageProps) {
 }
 
 export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
+  await connection()
   const { slug } = await params
   const caseStudy = await getCaseStudyBySlug(slug)
 

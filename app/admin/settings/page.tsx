@@ -2,8 +2,10 @@ import { getAllTeamMembers, getAllCaseStudies, getAllBlogPosts } from "@/app/act
 import { getSettings, getProjects } from "@/app/actions/public"
 import type { iGlobalSettings, iProject, iTeamMember, iCaseStudy, iBlogPost } from "@/types"
 import SettingsPanel from "../_components/SettingsPanel"
+import { connection } from "next/server"
 
 export default async function AdminSettingsPage() {
+  await connection()
   const [settings, projects, team, caseStudies, blogPosts] = await Promise.all([
     getSettings(),
     getProjects(),

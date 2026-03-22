@@ -2,8 +2,10 @@ import { Terminal, AlertTriangle, Construction } from "lucide-react"
 import Container from "@/components/ui/Container"
 import { getSettings } from "@/app/actions/public"
 import GridBackground from "@/components/ui/GridBackground"
+import { connection } from "next/server"
 
 export default async function MaintenancePage() {
+  await connection()
   const settings = await getSettings()
   const message = settings?.maintenanceMessage || "We're currently performing scheduled infrastructure upgrades to improve performance and security. Our systems will be back online shortly."
   return (

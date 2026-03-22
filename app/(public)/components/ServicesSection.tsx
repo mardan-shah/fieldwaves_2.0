@@ -3,8 +3,10 @@ import ServiceCard from "@/components/ServiceCard";
 import Button from "@/components/ui/button";
 import { getServices } from "@/app/actions/public";
 import { iService } from "@/types";
+import { connection } from "next/server";
 
 const ServicesSection = async () => {
+  await connection();
   let services: iService[] = [];
   try {
     services = await getServices();
