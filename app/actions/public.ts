@@ -140,9 +140,6 @@ export async function submitContactForm(formData: FormData) {
 }
 
 export async function getProjects(): Promise<{ _id: string; title: string; description: string; liveUrl: string; githubUrl: string; screenshotUrl: string; techStack: string[]; order: number; featured: boolean }[]> {
-  "use cache"
-  cacheLife('hours');
-  cacheTag('projects');
   try {
     await connectToDatabase();
     const projects = await Project.find().sort({ order: 1, _id: -1 }).lean();
