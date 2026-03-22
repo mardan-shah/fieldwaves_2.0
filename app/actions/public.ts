@@ -163,9 +163,6 @@ export async function getProjects(): Promise<{ _id: string; title: string; descr
 }
 
 export async function getTeam(): Promise<{ _id: string; name: string; role: string; bio: string; socialLinks: Record<string, string>; avatarUrl: string; backgroundColor: string; isOwner: boolean; order: number }[]> {
-  "use cache"
-  cacheLife('hours');
-  cacheTag('team', 'settings');
   try {
     await connectToDatabase();
     
@@ -204,9 +201,6 @@ export async function getTeam(): Promise<{ _id: string; name: string; role: stri
 }
 
 export async function getSettings(): Promise<{ soloMode: boolean; maintenanceMode: boolean; maintenanceMessage: string; casesDisplayCount: number } | null> {
-  "use cache"
-  cacheLife('minutes');
-  cacheTag('settings');
   try {
     await connectToDatabase();
     let settings = await GlobalSettings.findOne().lean();

@@ -33,6 +33,7 @@ async function connectToDatabase() {
     const opts = {
       dbName: "fieldwaves",
       bufferCommands: false,
+      serverSelectionTimeoutMS: 5000, // 5 second timeout
     };
 
     cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
