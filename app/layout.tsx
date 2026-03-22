@@ -9,8 +9,15 @@ import { Toaster } from "sonner"
 import AdSenseScript from "@/components/ads/AdSenseScript"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+})
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+})
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -44,7 +51,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`font-sans antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <ErrorBoundary>
           <Suspense fallback={null}>
             {children}
