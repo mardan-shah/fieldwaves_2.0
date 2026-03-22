@@ -4,7 +4,7 @@ import connectToDatabase from '@/lib/db';
 import { Project, TeamMember, GlobalSettings, CaseStudy, BlogPost, Service } from '@/lib/models';
 import { Resend } from 'resend';
 import { z } from 'zod';
-import { cacheLife, cacheTag } from 'next/cache';
+import { connection } from 'next/server';
 
 import nodemailer from 'nodemailer';
 import { buildClientConfirmationEmail, buildAdminNotificationEmail } from '@/lib/email-templates';
@@ -140,6 +140,7 @@ export async function submitContactForm(formData: FormData) {
 }
 
 export async function getProjects(): Promise<{ _id: string; title: string; description: string; liveUrl: string; githubUrl: string; screenshotUrl: string; techStack: string[]; order: number; featured: boolean }[]> {
+  await connection();
   try {
     await connectToDatabase();
     const projects = await Project.find().sort({ order: 1, _id: -1 }).lean();
@@ -163,6 +164,7 @@ export async function getProjects(): Promise<{ _id: string; title: string; descr
 }
 
 export async function getTeam(): Promise<{ _id: string; name: string; role: string; bio: string; socialLinks: Record<string, string>; avatarUrl: string; backgroundColor: string; isOwner: boolean; order: number }[]> {
+  await connection();
   try {
     await connectToDatabase();
     
@@ -201,6 +203,7 @@ export async function getTeam(): Promise<{ _id: string; name: string; role: stri
 }
 
 export async function getSettings(): Promise<{ soloMode: boolean; maintenanceMode: boolean; maintenanceMessage: string; casesDisplayCount: number } | null> {
+  await connection();
   try {
     await connectToDatabase();
     let settings = await GlobalSettings.findOne().lean();
@@ -221,9 +224,7 @@ export async function getSettings(): Promise<{ soloMode: boolean; maintenanceMod
 }
 
 export async function getServices() {
-  "use cache"
-  cacheLife('hours');
-  cacheTag('services');
+  await connection();
   try {
     await connectToDatabase();
     const services = await Service.find({ active: true }).sort({ order: 1 }).lean();
@@ -243,9 +244,7 @@ export async function getServices() {
 }
 
 export async function getCaseStudies() {
-  "use cache"
-  cacheLife('hours');
-  cacheTag('cases');
+  await connection();
   try {
     await connectToDatabase();
     const cases = await CaseStudy.find({ published: true }).sort({ order: 1, _id: -1 }).lean();
@@ -273,9 +272,7 @@ export async function getCaseStudies() {
 }
 
 export async function getCaseStudyBySlug(slug: string) {
-  "use cache"
-  cacheLife('hours');
-  cacheTag('cases', `case-${slug}`);
+  await connection();
   try {
     await connectToDatabase();
     const c = await CaseStudy.findOne({ slug, published: true }).lean();
@@ -304,9 +301,7 @@ export async function getCaseStudyBySlug(slug: string) {
 }
 
 export async function getBlogPosts() {
-  "use cache"
-  cacheLife('hours');
-  cacheTag('blog');
+  await connection();
   try {
     await connectToDatabase();
     const posts = await BlogPost.find({ published: true }).sort({ order: 1, _id: -1 }).lean();
@@ -334,9 +329,7 @@ export async function getBlogPosts() {
 }
 
 export async function getFeaturedBlogPosts() {
-  "use cache"
-  cacheLife('hours');
-  cacheTag('blog', 'featured-blog');
+  await connection();
   try {
     await connectToDatabase();
     const posts = await BlogPost.find({ published: true, featured: true }).sort({ order: 1, _id: -1 }).lean();
@@ -364,9 +357,7 @@ export async function getFeaturedBlogPosts() {
 }
 
 export async function getFeaturedCaseStudies() {
-  "use cache"
-  cacheLife('hours');
-  cacheTag('cases', 'featured-cases');
+  await connection();
   try {
     await connectToDatabase();
     const cases = await CaseStudy.find({ published: true, featured: true }).sort({ order: 1, _id: -1 }).lean();
@@ -394,9 +385,7 @@ export async function getFeaturedCaseStudies() {
 }
 
 export async function getBlogPostBySlug(slug: string) {
-  "use cache"
-  cacheLife('hours');
-  cacheTag('blog', `blog-${slug}`);
+  await connection();
   try {
     await connectToDatabase();
     const p = await BlogPost.findOne({ slug, published: true }).lean();

@@ -10,8 +10,8 @@ export default async function PublicLayout({
 }: {
   children: React.ReactNode
 }) {
-  const settings = await getSettings()
   const headerList = await headers()
+  const settings = await getSettings()
   const pathname = headerList.get("x-pathname") || ""
   const isMaintenancePage = pathname === "/maintenance"
   const showNavbarFooter = !isMaintenancePage && !settings?.maintenanceMode
