@@ -123,11 +123,11 @@ export default function ContactForm() {
             <button
               type="submit"
               disabled={loading || submitted}
-              className="w-full skew-x-12 group"
+              className="w-full group"
             >
               <Container
                 variant="primary"
-                className="py-3 text-center"
+                className="py-3 text-center "
                 hoverEffect
               >
                 <div className="flex items-center justify-center gap-2">
