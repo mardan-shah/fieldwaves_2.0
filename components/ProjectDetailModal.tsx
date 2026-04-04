@@ -51,11 +51,12 @@ export default function ProjectDetailModal({ project, open, onOpenChange }: Proj
         <div className="bg-card border border-border  max-h-[90vh] overflow-y-auto p-8">
           {/* Screenshot Carousel */}
           {allImages.length > 0 && (
-            <div className="w-full aspect-video bg-black overflow-hidden relative group/carousel">
+            <div className="w-full aspect-[21/9] bg-black overflow-hidden relative group/carousel">
               <S3Image
                 src={allImages[currentImageIndex]}
                 alt={project.title}
-                className="w-full h-full object-cover transition-opacity duration-300"
+                objectFit="contain"
+                className="w-full h-full transition-opacity duration-300"
               />
               
               {allImages.length > 1 && (

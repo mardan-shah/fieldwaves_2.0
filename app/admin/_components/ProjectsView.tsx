@@ -218,8 +218,8 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
               {screenshotFiles.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {screenshotFiles.map((file, idx) => (
-                    <div key={idx} className="relative aspect-video border border-primary overflow-hidden group">
-                      <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+                    <div key={idx} className="relative aspect-[21/9] border border-primary overflow-hidden group">
+                      <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-contain bg-black" />
                       <button 
                         type="button" 
                         onClick={() => removeNewScreenshot(idx)}
@@ -239,7 +239,7 @@ export default function ProjectsView({ initialProjects }: ProjectsViewProps) {
                   setUploaderKey(prev => prev + 1)
                 }}
                 label="ADD_SCREENSHOT"
-                aspect={16 / 9}
+                aspect={21 / 9}
               />
             </div>
 

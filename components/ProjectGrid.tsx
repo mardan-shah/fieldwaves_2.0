@@ -34,7 +34,7 @@ function ImageCarousel({ screenshots, mainImage, alt }: { screenshots: string[],
 
   return (
     <div 
-      className="h-[250px] w-full bg-black relative overflow-hidden border-b-2 border-border group-hover:border-primary transition-colors"
+      className="aspect-[21/9] w-full bg-black relative overflow-hidden border-b-2 border-border group-hover:border-primary transition-colors"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -44,6 +44,7 @@ function ImageCarousel({ screenshots, mainImage, alt }: { screenshots: string[],
           src={src}
           alt={alt}
           showLoadingSpinner={false}
+          objectFit="contain"
           className={cn(
             "absolute inset-0 grayscale group-hover:grayscale-0",
             i === index ? "opacity-100" : "opacity-0"

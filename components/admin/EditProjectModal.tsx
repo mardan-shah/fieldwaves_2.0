@@ -122,8 +122,8 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
             <div className="grid grid-cols-2 gap-4">
               {/* Existing Screenshots */}
               {existingScreenshots.map((url, idx) => (
-                <div key={`existing-${idx}`} className="relative group border border-border aspect-video">
-                  <img src={url} alt="" className="w-full h-full object-cover" />
+                <div key={`existing-${idx}`} className="relative group border border-border aspect-[21/9] bg-black">
+                  <img src={url} alt="" className="w-full h-full object-contain" />
                   <button 
                     type="button"
                     onClick={() => removeExistingScreenshot(idx)}
@@ -139,8 +139,8 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
               {newScreenshotFiles.map((file, idx) => {
                 const url = URL.createObjectURL(file)
                 return (
-                  <div key={`new-${idx}`} className="relative group border border-primary aspect-video">
-                    <img src={url} alt="" className="w-full h-full object-cover" />
+                  <div key={`new-${idx}`} className="relative group border border-primary aspect-[21/9] bg-black">
+                    <img src={url} alt="" className="w-full h-full object-contain" />
                     <button 
                       type="button"
                       onClick={() => removeNewScreenshot(idx)}
@@ -161,7 +161,7 @@ export default function EditProjectModal({ project, open, onOpenChange, onSave }
                 setUploaderKey(prev => prev + 1)
               }}
               label="ADD_NEW_SCREENSHOT"
-              aspect={16 / 9}
+              aspect={21 / 9}
             />
           </div>
 

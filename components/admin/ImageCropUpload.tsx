@@ -54,7 +54,7 @@ export default function ImageCropUpload({
   currentImage,
   onCropped,
   label = "IMAGE",
-  aspect = 16 / 9,
+  aspect = 21 / 9, // Wider aspect ratio to accommodate ultrawide screenshots
   height = "h-36",
 }: ImageCropUploadProps) {
   const [preview, setPreview] = useState<string | null>(currentImage || null)

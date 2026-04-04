@@ -11,13 +11,14 @@ interface S3ImageProps {
   alt?: string
   className?: string
   fallbackSrc?: string
-  aspectRatio?: "video" | "square" | "portrait" | "auto"
+  aspectRatio?: "video" | "square" | "portrait" | "wide" | "auto"
   showLoadingSpinner?: boolean
   fill?: boolean
   sizes?: string
   width?: number
   height?: number
   priority?: boolean
+  objectFit?: "cover" | "contain"
 }
 
 export default function S3Image({
@@ -32,6 +33,7 @@ export default function S3Image({
   width,
   height,
   priority = false,
+  objectFit = "cover",
 }: S3ImageProps) {
   const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading")
   const [currentSrc, setCurrentSrc] = useState<string | undefined>()
@@ -82,6 +84,7 @@ export default function S3Image({
     video: "aspect-video",
     square: "aspect-square",
     portrait: "aspect-[3/4]",
+    wide: "aspect-[21/9]",
     auto: "",
   }
 
@@ -113,7 +116,8 @@ export default function S3Image({
             onLoad={handleLoad}
             onError={handleError}
             className={cn(
-              "object-cover transition-all duration-700",
+              "transition-all duration-700",
+              objectFit === "contain" ? "object-contain" : "object-cover",
               status === "loaded" ? "opacity-100 scale-100" : "opacity-0 scale-105",
             )}
             priority={priority}
@@ -127,7 +131,8 @@ export default function S3Image({
             onLoad={handleLoad}
             onError={handleError}
             className={cn(
-              "w-full h-full object-cover transition-all duration-700",
+              "w-full h-full transition-all duration-700",
+              objectFit === "contain" ? "object-contain" : "object-cover",
               status === "loaded" ? "opacity-100 scale-100" : "opacity-0 scale-105",
             )}
             priority={priority}
