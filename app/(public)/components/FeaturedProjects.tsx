@@ -14,7 +14,7 @@ const FeaturedProjects = async () => {
     console.error("Error fetching projects for stats:", error);
   }
 
-  console.log("Fetched projects for FeaturedProjects:", projects);
+  // console.log("Fetched projects for FeaturedProjects:", projects);
   return (
     <section className="py-24 bg-card">
       <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-6">
