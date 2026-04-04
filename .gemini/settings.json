@@ -29,6 +29,18 @@
         "shadcn@latest",
         "mcp"
       ]
+    },
+    "mongodb": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mongodb/mcp-server",
+        "--connection-string",
+        "${MONGODB_URI}"
+      ],
+      "env": {
+        "MONGODB_READ_ONLY": "true"
+      }
     }
   }
 }

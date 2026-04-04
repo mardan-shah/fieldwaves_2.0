@@ -1,15 +1,23 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 import LoadingSpinner from "./LoadingSpinner"
 import { AlertCircle } from "lucide-react"
 
-interface S3ImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
+interface S3ImageProps {
   src?: string | Blob
+  alt?: string
+  className?: string
   fallbackSrc?: string
   aspectRatio?: "video" | "square" | "portrait" | "auto"
   showLoadingSpinner?: boolean
+  fill?: boolean
+  sizes?: string
+  width?: number
+  height?: number
+  priority?: boolean
 }
 
 export default function S3Image({
@@ -19,7 +27,11 @@ export default function S3Image({
   fallbackSrc = "/placeholder.svg",
   aspectRatio = "auto",
   showLoadingSpinner = true,
-  ...props
+  fill = true,
+  sizes = "100vw",
+  width,
+  height,
+  priority = false,
 }: S3ImageProps) {
   const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading")
   const [currentSrc, setCurrentSrc] = useState<string | undefined>()
@@ -91,19 +103,37 @@ export default function S3Image({
       )}
 
       {/* Actual Image */}
-      <img
-        src={currentSrc}
-        alt={alt}
-        onLoad={handleLoad}
-        onError={handleError}
-        className={cn(
-          "w-full h-full object-cover transition-all duration-700",
-          status === "loaded" ? "opacity-100 scale-100" : "opacity-0 scale-105",
-          className
-        )}
-        loading="lazy"
-        {...props}
-      />
+      {currentSrc && (
+        fill ? (
+          <Image
+            src={currentSrc}
+            alt={alt}
+            fill
+            sizes={sizes}
+            onLoad={handleLoad}
+            onError={handleError}
+            className={cn(
+              "object-cover transition-all duration-700",
+              status === "loaded" ? "opacity-100 scale-100" : "opacity-0 scale-105",
+            )}
+            priority={priority}
+          />
+        ) : (
+          <Image
+            src={currentSrc}
+            alt={alt}
+            width={width || 800}
+            height={height || 600}
+            onLoad={handleLoad}
+            onError={handleError}
+            className={cn(
+              "w-full h-full object-cover transition-all duration-700",
+              status === "loaded" ? "opacity-100 scale-100" : "opacity-0 scale-105",
+            )}
+            priority={priority}
+          />
+        )
+      )}
       
       {/* Subtle scanline overlay for industrial aesthetic */}
       <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_4px,3px_100%] opacity-20 group-hover/s3image:opacity-10 transition-opacity" />

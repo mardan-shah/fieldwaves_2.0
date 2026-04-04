@@ -279,12 +279,16 @@ async function saveUploadedFile(file: File, directory: string): Promise<string> 
     const bucketName = process.env.S3_BUCKET_NAME;
     if (!bucketName) throw new Error('S3_BUCKET_NAME environment variable is not defined');
 
-    // 1. Upload the file
+    // 1. Upload the file with cache headers
     await s3Client.send(new PutObjectCommand({
       Bucket: bucketName,
       Key: key,
       Body: buffer,
       ContentType: file.type || 'application/octet-stream',
+      CacheControl: 'public, max-age=31536000, immutable', // 1 year cache
+      Metadata: {
+        'uploaded-at': new Date().toISOString(),
+      },
     }));
 
     // 2. Construct public URL

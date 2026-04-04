@@ -3,6 +3,7 @@
 import type React from "react"
 import type { iProject } from "@/types"
 import Container from "./ui/Container"
+import Image from "next/image"
 import { Trash2, ExternalLink, Pencil, ChevronUp, ChevronDown, Star } from "lucide-react"
 
 interface ProjectListProps {
@@ -57,11 +58,13 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects, onDelete, onEdit, o
 
             {/* Thumbnail */}
             {project.screenshotUrl && (
-              <div className="w-20 h-14 shrink-0 bg-black border border-border overflow-hidden hidden sm:block">
-                <img
+              <div className="w-20 h-14 shrink-0 bg-black border border-border overflow-hidden hidden sm:block relative">
+                <Image
                   src={project.screenshotUrl}
                   alt={project.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="80px"
+                  className="object-cover"
                 />
               </div>
             )}

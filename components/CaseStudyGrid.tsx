@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import Container from "@/components/ui/Container"
 import SearchFilterBar from "@/components/SearchFilterBar"
 import type { iCaseStudy } from "@/types"
@@ -63,11 +64,13 @@ export default function CaseStudyGrid({ caseStudies }: CaseStudyGridProps) {
             }`}
           >
             <Container variant="outline" className="h-full bg-card overflow-hidden" hoverEffect>
-              <div className="aspect-video overflow-hidden border-b border-border">
-                <img 
+              <div className="aspect-video overflow-hidden border-b border-border relative">
+                <Image 
                   src={cs.coverImage || "https://picsum.photos/seed/case/800/600"} 
                   alt={cs.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
               </div>
               <div className="p-6">

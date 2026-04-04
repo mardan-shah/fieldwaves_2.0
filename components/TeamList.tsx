@@ -1,6 +1,7 @@
 "use client"
 
 import { Trash2, Pencil, Crown, ChevronUp, ChevronDown } from "lucide-react"
+import Image from "next/image"
 import type { iTeamMember } from "@/types"
 
 interface TeamListProps {
@@ -49,10 +50,12 @@ export default function TeamList({ team, onDelete, onEdit, onReorder }: TeamList
             className="w-16 h-16 shrink-0 relative overflow-hidden border border-border"
             style={{ backgroundColor: member.backgroundColor || 'transparent' }}
           >
-            <img
+            <Image
               src={member.avatarUrl}
               alt={member.name}
-              className="w-full h-full object-cover"
+              fill
+              sizes="64px"
+              className="object-cover"
             />
           </div>
 
