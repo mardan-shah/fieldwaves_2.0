@@ -18,6 +18,10 @@ const transporter = nodemailer.createTransport({
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
   },
+  // Add timeout and better error handling
+  pool: true,
+  maxConnections: 1,
+  maxMessages: 3,
 });
 
 // Initial Data for Seeding
@@ -134,8 +138,13 @@ export async function submitContactForm(formData: FormData) {
 
     return { success: true };
   } catch (err: any) {
-    console.error('Lead Notification Failed:', err);
-    return { error: 'Failed to send message. Please try again later.' };
+    console.error('Lead Notification Failed:', {
+      message: err.message,
+      code: err.code,
+      command: err.command,
+      stack: err.stack,
+    });
+    return { error: `Failed to send message: ${err.message || 'Please check your email configuration.'}` };
   }
 }
 
