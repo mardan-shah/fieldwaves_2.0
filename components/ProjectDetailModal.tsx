@@ -41,7 +41,7 @@ export default function ProjectDetailModal({ project, open, onOpenChange }: Proj
       onOpenChange(val)
     }}>
       <DialogContent
-        className="bg-transparent border-none shadow-none max-w-2xl p-0 overflow-visible"
+        className="bg-transparent border-none shadow-none max-w-4xl! p-0 overflow-visible"
         showCloseButton={false}
         aria-describedby={undefined}
       >

@@ -23,7 +23,7 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="bg-transparent border-none shadow-none max-w-2xl p-0 overflow-visible"
+        className="bg-transparent border-none shadow-none max-w-4xl! p-0 overflow-visible"
         showCloseButton={false}
         aria-describedby={undefined}
       >

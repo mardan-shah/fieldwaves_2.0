@@ -95,7 +95,7 @@ export default function EditBlogModal({ post, open, onOpenChange, onSave }: Edit
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border border-border rounded-none max-w-2xl max-h-[90vh] overflow-y-auto" showCloseButton={false} aria-describedby={undefined}>
+      <DialogContent className="bg-card border border-border rounded-none max-w-4xl! max-h-[90vh] overflow-y-auto" showCloseButton={false} aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="font-display text-xl font-bold text-primary tracking-wider uppercase">
             EDIT BLOG POST

@@ -13,7 +13,7 @@ const ServicesSection = async () => {
   } catch (error) {
     console.error("Error fetching services:", error);
   }
-  console.log("Fetched services:", services);
+  // console.log("Fetched services:", services);
 
   return (
     <section className="py-24 relative overflow-hidden">
