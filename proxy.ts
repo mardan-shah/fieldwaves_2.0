@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// Named export 'proxy' is required by Next.js 16+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const requestHeaders = new Headers(request.headers);
@@ -11,9 +12,13 @@ export function proxy(request: NextRequest) {
     const origin = request.headers.get('origin');
     const host = request.headers.get('host');
 
+    console.log(`[PROXY] POST request to ${pathname}`);
+    console.log(`[PROXY] Origin: ${origin}, Host: ${host}`);
+
     // Block POST requests without an Origin header
     if (!origin) {
-      return new NextResponse('Forbidden', { status: 403 });
+      console.log('[PROXY] ❌ Blocked: Missing origin header');
+      return new NextResponse('Forbidden: Missing origin header', { status: 403 });
     }
 
     if (host) {
@@ -21,13 +26,18 @@ export function proxy(request: NextRequest) {
       const expectedHost = host.split(':')[0];
       const actualHost = originUrl.hostname;
 
+      console.log(`[PROXY] Checking: ${actualHost} vs ${expectedHost}`);
+
       // In production, strict origin match only
       const isProduction = process.env.NODE_ENV === 'production';
       const isLocalhost = actualHost === 'localhost' || expectedHost === 'localhost';
 
       if (actualHost !== expectedHost && !(isLocalhost && !isProduction)) {
-        return new NextResponse('Forbidden', { status: 403 });
+        console.log(`[PROXY] ❌ CSRF blocked: ${actualHost} !== ${expectedHost}`);
+        return new NextResponse('Forbidden: Origin mismatch', { status: 403 });
       }
+      
+      console.log(`[PROXY] ✅ CSRF check passed`);
     }
   }
 
