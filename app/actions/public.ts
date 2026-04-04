@@ -13,15 +13,23 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Configure Nodemailer for reliable lead delivery
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // true for 465, false for other ports
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
   },
-  // Add timeout and better error handling
+  // Critical: Add connection and socket timeouts
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 5000,    // 5 seconds
+  socketTimeout: 15000,     // 15 seconds
   pool: true,
   maxConnections: 1,
   maxMessages: 3,
+  // Debug logging (remove in production)
+  logger: process.env.NODE_ENV === 'development',
+  debug: process.env.NODE_ENV === 'development',
 });
 
 // Initial Data for Seeding
@@ -97,7 +105,12 @@ export async function submitContactForm(formData: FormData) {
   const clientEmail = buildClientConfirmationEmail(name, message);
 
   try {
+    console.log('[EMAIL] Starting email send process...');
+    
     // 1. Send Lead Notification via Gmail (Guaranteed Delivery)
+    console.log('[EMAIL] Attempting Gmail SMTP...');
+    const emailStartTime = Date.now();
+    
     await transporter.sendMail({
       from: `"FieldWaves System" <${process.env.GMAIL_USER}>`,
       to: process.env.CONTACT_EMAIL,
@@ -105,6 +118,8 @@ export async function submitContactForm(formData: FormData) {
       html: adminEmail.html,
       text: adminEmail.text,
     });
+    
+    console.log(`[EMAIL] Gmail sent successfully in ${Date.now() - emailStartTime}ms`);
 
     // 2. Client Confirmation Workflow
     let confirmationSent = false;
@@ -112,6 +127,7 @@ export async function submitContactForm(formData: FormData) {
     // Try Resend first (Branded)
     if (process.env.RESEND_API_KEY) {
       try {
+        console.log('[EMAIL] Attempting Resend for confirmation...');
         const res = await resend.emails.send({
           from: 'FieldWaves <contact@fieldwaves.com>',
           to: email,
@@ -119,14 +135,18 @@ export async function submitContactForm(formData: FormData) {
           html: clientEmail.html,
           text: clientEmail.text,
         });
-        if (!res.error) confirmationSent = true;
+        if (!res.error) {
+          confirmationSent = true;
+          console.log('[EMAIL] Resend confirmation sent successfully');
+        }
       } catch (e) {
-        console.warn('Resend failed, falling back to Gmail for confirmation');
+        console.warn('[EMAIL] Resend failed, falling back to Gmail for confirmation');
       }
     }
 
     // Fallback to Gmail if Resend failed or was skipped
     if (!confirmationSent) {
+      console.log('[EMAIL] Sending confirmation via Gmail...');
       await transporter.sendMail({
         from: `"FieldWaves" <${process.env.GMAIL_USER}>`,
         to: email,
@@ -134,17 +154,29 @@ export async function submitContactForm(formData: FormData) {
         html: clientEmail.html,
         text: clientEmail.text,
       });
+      console.log('[EMAIL] Gmail confirmation sent successfully');
     }
 
+    console.log('[EMAIL] All emails sent successfully!');
     return { success: true };
   } catch (err: any) {
-    console.error('Lead Notification Failed:', {
+    console.error('[EMAIL] Lead Notification Failed:', {
       message: err.message,
       code: err.code,
       command: err.command,
-      stack: err.stack,
+      response: err.response,
+      responseCode: err.responseCode,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
     });
-    return { error: `Failed to send message: ${err.message || 'Please check your email configuration.'}` };
+    
+    // Return user-friendly error message
+    const userMessage = err.code === 'EAUTH' 
+      ? 'Email configuration error. Please contact support.'
+      : err.code === 'ETIMEDOUT' || err.code === 'ECONNECTION'
+      ? 'Connection timeout. Please try again in a moment.'
+      : `Failed to send message: ${err.message}`;
+    
+    return { error: userMessage };
   }
 }
 
