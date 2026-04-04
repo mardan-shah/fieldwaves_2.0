@@ -106,47 +106,61 @@ export async function submitContactForm(formData: FormData) {
 
   try {
     console.log('[EMAIL] Starting email send process...');
-    
-    // 1. Send Lead Notification via Gmail (Guaranteed Delivery)
-    console.log('[EMAIL] Attempting Gmail SMTP...');
     const emailStartTime = Date.now();
     
-    await transporter.sendMail({
-      from: `"FieldWaves System" <${process.env.GMAIL_USER}>`,
-      to: process.env.CONTACT_EMAIL,
-      subject: `[NEW_LEAD] Inquiry from ${name}`,
-      html: adminEmail.html,
-      text: adminEmail.text,
-    });
+    // Use Resend as PRIMARY (works on all cloud platforms - no SMTP needed)
+    // Gmail SMTP is blocked by most cloud providers (Railway, Render, Vercel, etc.)
     
-    console.log(`[EMAIL] Gmail sent successfully in ${Date.now() - emailStartTime}ms`);
-
-    // 2. Client Confirmation Workflow
-    let confirmationSent = false;
-
-    // Try Resend first (Branded)
     if (process.env.RESEND_API_KEY) {
-      try {
-        console.log('[EMAIL] Attempting Resend for confirmation...');
-        const res = await resend.emails.send({
-          from: 'FieldWaves <contact@fieldwaves.com>',
-          to: email,
-          subject: 'We have received your request - FieldWaves',
-          html: clientEmail.html,
-          text: clientEmail.text,
-        });
-        if (!res.error) {
-          confirmationSent = true;
-          console.log('[EMAIL] Resend confirmation sent successfully');
-        }
-      } catch (e) {
-        console.warn('[EMAIL] Resend failed, falling back to Gmail for confirmation');
+      console.log('[EMAIL] Using Resend API (recommended for production)...');
+      
+      // 1. Send lead notification to admin
+      const adminResult = await resend.emails.send({
+        from: 'FieldWaves <contact@fieldwaves.com>',
+        to: process.env.CONTACT_EMAIL || 'contact@fieldwaves.com',
+        subject: `[NEW_LEAD] Inquiry from ${name}`,
+        html: adminEmail.html,
+        text: adminEmail.text,
+      });
+      
+      if (adminResult.error) {
+        console.error('[EMAIL] Resend admin notification failed:', adminResult.error);
+        throw new Error(adminResult.error.message);
       }
-    }
-
-    // Fallback to Gmail if Resend failed or was skipped
-    if (!confirmationSent) {
-      console.log('[EMAIL] Sending confirmation via Gmail...');
+      console.log(`[EMAIL] ✅ Admin notification sent via Resend in ${Date.now() - emailStartTime}ms`);
+      
+      // 2. Send confirmation to client
+      const clientResult = await resend.emails.send({
+        from: 'FieldWaves <contact@fieldwaves.com>',
+        to: email,
+        subject: 'We have received your request - FieldWaves',
+        html: clientEmail.html,
+        text: clientEmail.text,
+      });
+      
+      if (clientResult.error) {
+        console.warn('[EMAIL] Client confirmation failed (non-critical):', clientResult.error);
+        // Don't fail the whole request for client confirmation
+      } else {
+        console.log('[EMAIL] ✅ Client confirmation sent via Resend');
+      }
+      
+    } else {
+      // Fallback to Gmail SMTP (only works locally or on servers that allow SMTP)
+      console.log('[EMAIL] No RESEND_API_KEY, falling back to Gmail SMTP...');
+      console.warn('[EMAIL] ⚠️ Gmail SMTP may not work on cloud platforms!');
+      
+      await transporter.sendMail({
+        from: `"FieldWaves System" <${process.env.GMAIL_USER}>`,
+        to: process.env.CONTACT_EMAIL,
+        subject: `[NEW_LEAD] Inquiry from ${name}`,
+        html: adminEmail.html,
+        text: adminEmail.text,
+      });
+      
+      console.log(`[EMAIL] Gmail sent in ${Date.now() - emailStartTime}ms`);
+      
+      // Client confirmation via Gmail
       await transporter.sendMail({
         from: `"FieldWaves" <${process.env.GMAIL_USER}>`,
         to: email,
@@ -154,10 +168,9 @@ export async function submitContactForm(formData: FormData) {
         html: clientEmail.html,
         text: clientEmail.text,
       });
-      console.log('[EMAIL] Gmail confirmation sent successfully');
     }
 
-    console.log('[EMAIL] All emails sent successfully!');
+    console.log('[EMAIL] ✅ All emails sent successfully!');
     return { success: true };
   } catch (err: any) {
     console.error('[EMAIL] Lead Notification Failed:', {
