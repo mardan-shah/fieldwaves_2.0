@@ -55,7 +55,7 @@ export default function TeamList({ team, onDelete, onEdit, onReorder }: TeamList
               alt={member.name}
               fill
               sizes="64px"
-              className="object-cover"
+              className="object-cover object-top"
             />
           </div>
 

@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog"
+import Image from "next/image"
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden"
 import MarkdownRenderer from "@/components/ui/MarkdownRenderer"
 import Container from "@/components/ui/Container"
@@ -30,19 +31,34 @@ export default function TeamDetailModal({ member, open, onOpenChange }: TeamDeta
         <VisuallyHidden.Root>
           <DialogTitle>{member.name}</DialogTitle>
         </VisuallyHidden.Root>
-        <div className="bg-card border border-border -skew-x-12 max-h-[90vh] overflow-y-auto p-8">
+        <div className="bg-card border border-border max-h-[90vh] overflow-y-auto p-8">
         {/* Avatar */}
         {member.avatarUrl && (
           <div
-            className="w-full h-64 overflow-hidden relative"
+            className="w-full h-80 md:h-[400px] overflow-hidden relative"
             style={{ backgroundColor: member.backgroundColor || "#000" }}
           >
-            <img
+            {/* Blurred background layer to fill empty space seamlessly */}
+            <div className="absolute inset-0 opacity-30 blur-2xl transform scale-110">
+              <Image
+                src={member.avatarUrl}
+                alt={`${member.name} background`}
+                fill
+                className="object-cover object-top"
+              />
+            </div>
+            
+            {/* Main image uncropped */}
+            <Image
               src={member.avatarUrl}
               alt={member.name}
-              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, 800px"
+              className="object-contain object-bottom relative z-10 drop-shadow-2xl"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent " />
+            
+            {/* Bottom fade overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent z-20 pointer-events-none" />
           </div>
         )}
 

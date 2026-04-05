@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import Container from "@/components/ui/Container"
 import TeamDetailModal from "@/components/TeamDetailModal"
 import type { iTeamMember } from "@/types"
@@ -31,7 +32,7 @@ export default function TeamGrid({ team }: TeamGridProps) {
                   <img
                     src={member.avatarUrl || "/placeholder.svg"}
                     alt={member.name}
-                    className="w-full h-full object-cover scale-125"
+                    className="w-full h-full object-cover object-top scale-125"
                   />
                   {/* Hover Overlay */}
                   <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-6 backdrop-blur-[2px]">
