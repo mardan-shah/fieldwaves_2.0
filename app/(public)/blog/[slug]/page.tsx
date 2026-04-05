@@ -79,8 +79,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <section className={`max-w-7xl mx-auto px-6 ${post.coverImage ? "-mt-40 relative z-10" : "pt-32"}`}>
         {/* Back link */}
         <Link href="/blog" className="inline-block mb-8">
-          <Container variant="ghost" className="px-4 py-2">
-            <span className="flex items-center gap-2 font-mono text-xs text-muted hover:text-white transition-colors">
+          <Container variant="ghost" className="px-4 py-2 text-muted  hover:text-white hover:border-white">
+            <span className="flex items-center gap-2 font-mono text-xs  transition-colors">
               <ArrowLeft size={14} />
               BACK_TO_BLOG
             </span>
