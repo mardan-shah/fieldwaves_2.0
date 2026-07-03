@@ -1,7 +1,7 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import Script from "next/script"
 import { Geist, Geist_Mono } from "next/font/google"
+import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import ErrorBoundary from "../components/ErrorBoundary"
 import ScrollToTop from "../components/ScrollToTop"
@@ -53,6 +53,7 @@ export default function RootLayout({
           <AdSenseScript />
           <Toaster position="top-right" theme="dark" richColors />
         </ErrorBoundary>
+        <Analytics />
       </body>
     </html>
   )
