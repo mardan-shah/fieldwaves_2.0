@@ -24,7 +24,7 @@ const Stats = async () => {
           <StatCard
             index={2}
             label="Uptime"
-            value="99.99%"
+            value="99%"
             description="Average reliability"
           />
           <StatCard

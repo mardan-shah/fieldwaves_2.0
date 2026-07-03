@@ -7,9 +7,16 @@ interface StatCardProps {
   unit?: string
   description?: string
   index?: number
+  progress?: number
 }
 
-const StatCard: React.FC<StatCardProps> = ({ label, value, unit, description, index = 1 }) => {
+const StatCard: React.FC<StatCardProps> = ({ label, value, unit, description, index = 1, progress }) => {
+  const percentValue =
+    typeof value === "string" && value.trim().endsWith("%")
+      ? Number.parseFloat(value)
+      : undefined
+  const meterValue = Math.min(100, Math.max(0, progress ?? percentValue ?? 100))
+
   return (
     <Container variant="glass" className="p-8 h-full relative overflow-hidden group">
       <div className="absolute top-2 right-4 font-mono text-[8px] opacity-30 select-none">
@@ -21,8 +28,11 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, unit, description, in
           <span className="font-display text-4xl md:text-5xl font-bold group-hover:text-primary transition-colors">{value}</span>
           {unit && <span className="text-secondary font-mono text-sm">{unit}</span>}
         </div>
-        <div className="h-1 w-full bg-secondary/20 relative">
-          <div className="absolute inset-0 bg-primary/40 w-[60%] group-hover:w-[90%] transition-all duration-700" />
+        <div className="h-1 w-full bg-secondary/20 relative" aria-hidden="true">
+          <div
+            className="absolute inset-y-0 left-0 bg-primary/50 group-hover:bg-primary/80 transition-colors duration-300"
+            style={{ width: `${meterValue}%` }}
+          />
         </div>
         {description && <p className="text-xs text-secondary leading-relaxed uppercase tracking-wide opacity-80">{description}</p>}
       </div>
