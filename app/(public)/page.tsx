@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 
 import { Suspense } from "react"
 import HomeHero from "./components/HomeHero"
-import LoadingSpinner from "@/components/ui/LoadingSpinner"
 import Stats from "./components/Stats"
 import FeaturedProjects from "./components/FeaturedProjects"
 import ServicesSection from "./components/ServicesSection"
@@ -15,17 +14,21 @@ export const metadata: Metadata = {
 }
 
 
-export default async function Home() {
-
-
+export default function Home() {
   return (
-    <Suspense fallback={<LoadingSpinner fullPage label="Loading..." size="lg" />}>
+    <>
       <HomeHero />
-      <Stats />
-      <FeaturedProjects />
-      <ServicesSection />
+      <Suspense fallback={null}>
+        <Stats />
+      </Suspense>
+      <Suspense fallback={null}>
+        <FeaturedProjects />
+      </Suspense>
+      <Suspense fallback={null}>
+        <ServicesSection />
+      </Suspense>
       <WhyUs />
       <CallToActionSection />
-    </Suspense>
+    </>
   )
 }
